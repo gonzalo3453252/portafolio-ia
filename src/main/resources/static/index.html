@@ -1831,6 +1831,8 @@ import matplotlib.pyplot as plt`,
     function stateForPersist() {
       const c = JSON.parse(JSON.stringify(appState));
       (c.weeks || []).forEach((w) => {
+        delete w.pptView;
+        delete w.docView;
         if (w._auto) {
           FILE_CONVENTION.forEach((kind) => {
             const o = w._auto[kind.key];
@@ -2638,7 +2640,9 @@ import matplotlib.pyplot as plt`,
         iconBox.textContent = "P";
         currentModalDownloadHandler = () => downloadPptByWeek(w.week);
 
-        if (w.pptUrl && /^https?:\/\//i.test(w.pptUrl)) {
+        if (w.pptView) {
+          replaceIframeHtml(iframe, buildPdfViewerHtml(w.pptView, w.pptLabel));
+        } else if (w.pptUrl && /^https?:\/\//i.test(w.pptUrl)) {
           if (w.pptUrl.toLowerCase().endsWith(".pdf")) {
             replaceIframeHtml(iframe, buildPdfViewerHtml(w.pptUrl, w.pptLabel));
           } else {
@@ -2773,7 +2777,9 @@ import matplotlib.pyplot as plt`,
         iconBox.textContent = "P";
         currentModalDownloadHandler = () => downloadWordByWeek(w.week);
 
-        if (w.docUrl && (w.docUrl.startsWith("data:application/pdf") || w.docUrl.toLowerCase().endsWith(".pdf"))) {
+        if (w.docView) {
+          replaceIframeHtml(iframe, buildPdfViewerHtml(w.docView, w.docLabel));
+        } else if (w.docUrl && (w.docUrl.startsWith("data:application/pdf") || w.docUrl.toLowerCase().endsWith(".pdf"))) {
           replaceIframeHtml(iframe, buildPdfViewerHtml(w.docUrl, w.docLabel));
         } else if (w.docUrl && /^https?:\/\//i.test(w.docUrl)) {
           iframe.src = `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(w.docUrl)}`;
@@ -3243,8 +3249,8 @@ import matplotlib.pyplot as plt`,
     // Solo quien tiene acceso al repositorio puede agregar archivos ahí.
     // =========================================================================
     const FILE_CONVENTION = [
-      { key: "ppt",   urlKey: "pptUrl",   flag: "hasPpt",   base: "presentacion", exts: ["pptx", "pdf", "ppt"], label: "pptLabel" },
-      { key: "doc",   urlKey: "docUrl",   flag: "hasWord",  base: "informe",      exts: ["docx", "pdf", "doc"], label: "docLabel" },
+      { key: "ppt",   urlKey: "pptUrl",   viewKey: "pptView", flag: "hasPpt",   base: "presentacion", exts: ["pptx", "pdf", "ppt"], label: "pptLabel" },
+      { key: "doc",   urlKey: "docUrl",   viewKey: "docView", flag: "hasWord",  base: "informe",      exts: ["docx", "pdf", "doc"], label: "docLabel" },
       { key: "colab", urlKey: "colabUrl", flag: "hasColab", base: "laboratorio",  exts: ["ipynb"],              label: "colabLabel" }
     ];
 
@@ -3311,8 +3317,16 @@ import matplotlib.pyplot as plt`,
         if (!r.ok) return null;
         const d = await r.json();
         const byWeek = {};
+        const viewsByWeek = {};
         for (const it of (d.tree || [])) {
           if (it.type !== "blob") continue;
+          const mv = /^src\/main\/resources\/static\/archivos\/semana-(\d+)\/_vista\/([^\/]+\.pdf)$/.exec(it.path);
+          if (mv) {
+            const vwk = String(parseInt(mv[1], 10));
+            if (!viewsByWeek[vwk]) viewsByWeek[vwk] = [];
+            viewsByWeek[vwk].push(mv[2]);
+            continue;
+          }
           const m = /^src\/main\/resources\/static\/archivos\/semana-(\d+)\/([^\/]+)$/.exec(it.path);
           if (!m) continue;
           const wk = String(parseInt(m[1], 10));
@@ -3332,6 +3346,9 @@ import matplotlib.pyplot as plt`,
         }
         Object.keys(byWeek).forEach((wk) => {
           const e = classifyWeekFiles(byWeek[wk].sort());
+          const vs = viewsByWeek[wk] || [];
+          if (e.ppt && vs.indexOf(e.ppt + ".pdf") >= 0) e.pptView = e.ppt + ".pdf";
+          if (e.doc && vs.indexOf(e.doc + ".pdf") >= 0) e.docView = e.doc + ".pdf";
           if (Object.keys(e).length) manifest[wk] = e;
         });
         try { sessionStorage.setItem("ia_tree_v2", JSON.stringify({ t: Date.now(), m: manifest })); } catch (e) {}
@@ -3366,6 +3383,11 @@ import matplotlib.pyplot as plt`,
               w[kind.urlKey] = fileUrl;
               w[kind.flag] = true;
               w[kind.label] = name;
+              const viewName = kind.viewKey && manifest[String(w.week)][kind.viewKey];
+              if (viewName) {
+                const viewUrl = new URL(folder + "_vista/" + encodeURIComponent(viewName), location.href).href;
+                if (!verify || await publicFileExists(viewUrl)) w[kind.viewKey] = viewUrl;
+              }
               changed = true;
             }
             continue;

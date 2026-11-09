@@ -27,6 +27,11 @@ La lista de archivos la genera `scripts/generar-manifiesto.js` automáticamente 
 
 > El panel `#creador` guarda los cambios solo en tu navegador; no sirve para publicar archivos a los demás.
 
+### Vistas PDF automáticas
+Cada `.pptx` / `.docx` que subes genera solo su vista en PDF (carpeta `_vista/` de la semana, mediante el workflow
+`Generar vistas PDF…` en la pestaña Actions). La página usa esa vista para mostrar las diapositivas nítidas y completas.
+Tarda ~2-3 minutos; mientras tanto se usa el visor de Microsoft. **No borres ni edites la carpeta `_vista`.**
+
 ## (Opcional) Ejecutar en tu PC con Java
 
 ```bash

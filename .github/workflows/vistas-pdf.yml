@@ -1,0 +1,67 @@
+name: Generar vistas PDF de presentaciones e informes
+
+# Cada vez que subes un .pptx/.ppt/.docx/.doc a archivos/semana-XX/, se crea su vista PDF
+# (en archivos/semana-XX/_vista/) para que la página la muestre nítida y completa.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/main/resources/static/archivos/**/*.pptx'
+      - 'src/main/resources/static/archivos/**/*.ppt'
+      - 'src/main/resources/static/archivos/**/*.docx'
+      - 'src/main/resources/static/archivos/**/*.doc'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: vistas-pdf
+  cancel-in-progress: false
+
+jobs:
+  convertir:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Instalar LibreOffice
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y --no-install-recommends libreoffice-impress libreoffice-writer fonts-liberation fonts-crosextra-carlito fonts-crosextra-caladea fonts-noto-core
+
+      - name: Convertir archivos nuevos o modificados
+        run: |
+          shopt -s nullglob
+          BASE=src/main/resources/static/archivos
+          CHANGED=$(git -c core.quotepath=false diff --name-only "${{ github.event.before }}" "${{ github.sha }}" 2>/dev/null || true)
+          for f in $BASE/semana-*/*.pptx $BASE/semana-*/*.ppt $BASE/semana-*/*.docx $BASE/semana-*/*.doc; do
+            d=$(dirname "$f"); n=$(basename "$f"); out="$d/_vista/$n.pdf"
+            if [ ! -f "$out" ] || echo "$CHANGED" | grep -qxF "$f"; then
+              echo "Convirtiendo: $f"
+              tmp=$(mktemp -d)
+              if timeout 300 soffice --headless --convert-to pdf --outdir "$tmp" "$f" >/dev/null 2>&1; then
+                mkdir -p "$d/_vista"
+                mv "$tmp/${n%.*}.pdf" "$out"
+              else
+                echo "No se pudo convertir: $f"
+              fi
+              rm -rf "$tmp"
+            fi
+          done
+          # limpiar vistas cuyo archivo original ya no existe
+          for v in $BASE/semana-*/_vista/*.pdf; do
+            d=$(dirname "$(dirname "$v")"); src="$d/$(basename "$v" .pdf)"
+            [ -f "$src" ] || { echo "Borrando vista huérfana: $v"; rm -f "$v"; }
+          done
+
+      - name: Guardar vistas en el repositorio
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A src/main/resources/static/archivos
+          if git diff --cached --quiet; then echo "Sin cambios"; exit 0; fi
+          git commit -m "Vistas PDF generadas automáticamente"
+          for i in 1 2 3; do git pull --rebase origin main && git push origin main && break || sleep 5; done

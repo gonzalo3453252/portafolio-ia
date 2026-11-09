@@ -45,6 +45,13 @@ for (const dir of fs.readdirSync(root)) {
     else if (!entry.ppt) entry.ppt = f;
     else if (!entry.doc) entry.doc = f;
   }
+  // Vistas PDF generadas automáticamente (archivos/semana-NN/_vista/<archivo>.pdf)
+  const viewDir = path.join(root, dir, "_vista");
+  if (fs.existsSync(viewDir)) {
+    const views = fs.readdirSync(viewDir);
+    if (entry.ppt && views.includes(entry.ppt + ".pdf")) entry.pptView = entry.ppt + ".pdf";
+    if (entry.doc && views.includes(entry.doc + ".pdf")) entry.docView = entry.doc + ".pdf";
+  }
   if (Object.keys(entry).length) manifest[week] = entry;
 }
 
