@@ -1,6 +1,0 @@
-target/
-.idea/
-*.iml
-.vscode/
-_site/
-src/main/resources/static/archivos/manifest.json

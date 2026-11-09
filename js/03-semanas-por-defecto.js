@@ -1,0 +1,428 @@
+/* =============================================================================
+   SEMANAS INICIALES (valores por defecto)
+   Contenido de partida de las semanas. Lo que publicas con el panel (datos/portafolio.json)
+   siempre tiene prioridad sobre esto; esto solo se usa si ese archivo no existe.
+   ============================================================================= */
+
+const DEFAULT_STATE = {
+  studentName: "Calero Falcón, Gonzalo Manuel · Huanacuni Gomez, Jean Carlos Josue",
+  studentEmail: "calero2020gm@gmail.com",
+  groupBadge: "Semestre Académico 2026-II",
+  profName: "Dr. Hugo Froilán Vega Huerta",
+  teamMembers: ["Calero Falcón, Gonzalo Manuel", "Huanacuni Gomez, Jean Carlos Josue"],
+  syllabusDataUrl: "",
+  syllabusFileName: "Silabo_Inteligencia_Artificial_UNMSM.pdf",
+  weeks: [
+    {
+      week: 1,
+      unit: 1,
+      unitName: "Unidad I · Fundamentos de la IA y Agentes",
+      title: "Fundamentos de la Inteligencia Artificial",
+      subtitleSlide: "Introducción y Contexto Histórico",
+      photoCaption: "Laboratorio de Sistemas Inteligentes — Evolución y Niveles de la IA",
+      topics: [
+        "1.1 Conceptos, definiciones e historia de la IA",
+        "1.2 Áreas de aplicación (Visión, PLN, Robótica, Sistemas Expertos)",
+        "1.3 Introducción al Aprendizaje Automático",
+        "1.4 Niveles de la IA y diferencias con los Sistemas de Información"
+      ],
+      evaluation: "Exposición y Control de Lectura CL1",
+      summary: "Estudio de los fundamentos históricos y conceptuales de la Inteligencia Artificial desde Alan Turing (1950) y la Conferencia de Dartmouth (1956), diferenciando los sistemas de información tradicionales del aprendizaje automático.",
+      hasPpt: true,
+      hasWord: true,
+      hasColab: false,
+      pptLabel: "Clase01_Fundamentos_IA.pptx",
+      pptUrl: "",
+      docLabel: "Tarea01_Informe_Fundamentos.pdf",
+      docUrl: "",
+      colabLabel: "Lab01_Sistemas_VS_IA.ipynb",
+      colabUrl: "",
+      codeSnippet: `import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.tree import DecisionTreeClassifier
+
+# Datos de estudio: [horas_estudio, porcentaje_asistencia]
+X = np.array([[1, 50], [2, 60], [4, 80], [6, 90], [8, 95], [3, 55]])
+y = np.array([0, 0, 1, 1, 1, 0])
+
+clasificador = DecisionTreeClassifier(max_depth=2, random_state=42).fit(X, y)
+print("Predicción [5h estudio, 85% asistencia]:", "APRUEBA" if clasificador.predict([[5, 85]])[0] == 1 else "DESAPRUEBA")`,
+      codeOutput: "Predicción [5h estudio, 85% asistencia]: APRUEBA"
+    },
+    {
+      week: 2,
+      unit: 1,
+      unitName: "Unidad I · Fundamentos de la IA y Agentes",
+      title: "Agentes Inteligentes",
+      subtitleSlide: "Arquitecturas Racionales y Especificación PEAS",
+      photoCaption: "Arquitectura de Percepción y Acción — Agentes Racionales PEAS",
+      topics: [
+        "2.1 Conceptos de Agente, Sensor, Actuador y Entorno",
+        "2.2 Tipos y Arquitecturas: Reactivo, Basado en Modelos, Objetivos y Utilidad",
+        "2.3 Especificación formal PEAS y propiedades del entorno",
+        "2.4 Aplicaciones de agentes autónomos e inteligentes"
+      ],
+      evaluation: "Exposición Grupal y Diseño PEAS",
+      summary: "Análisis formal del ciclo percepción-acción y diseño de arquitecturas de agentes autónomos racionales (reactivos simples, basados en modelos, orientados a metas y maximizadores de utilidad) bajo el marco PEAS.",
+      hasPpt: true,
+      hasWord: true,
+      hasColab: true,
+      pptLabel: "Clase02_Agentes_Inteligentes.pptx",
+      pptUrl: "",
+      docLabel: "Tarea02_Informe_Agentes_PEAS.pdf",
+      docUrl: "",
+      colabLabel: "Lab02_Agente_Reactivo_PEAS.ipynb",
+      colabUrl: "https://colab.research.google.com/",
+      codeSnippet: `import numpy as np
+
+class AgenteAspiradoraConModelo:
+def __init__(self):
+    self.modelo_mundo = {"A": None, "B": None}
+
+def actuar(self, loc, estado):
+    self.modelo_mundo[loc] = estado
+    if all(v == "Limpio" for v in self.modelo_mundo.values()):
+        return "NoOp (Meta alcanzada)"
+    if estado == "Sucio":
+        self.modelo_mundo[loc] = "Limpio"
+        return f"Aspirar({loc})"
+    return "Mover(B)" if loc == "A" else "Mover(A)"`,
+      codeOutput: "Percepción (A, Sucio) -> Acción: Aspirar(A) | Meta alcanzada"
+    },
+    {
+      week: 3,
+      unit: 2,
+      unitName: "Unidad II · Búsquedas y Juegos de Estrategia",
+      title: "Búsquedas en Espacios de Estados",
+      subtitleSlide: "Búsqueda Ciega (BFS/DFS) e Informada (Algoritmo A*)",
+      photoCaption: "Exploración de Grafos y Heurísticas Admisibles con A*",
+      topics: [
+        "3.1 Formulación de problemas mediante búsqueda en grafos",
+        "3.2 Representación de espacios de estados y árboles de búsqueda",
+        "3.3 Estrategias de búsqueda ciega (BFS Anchura y DFS Profundidad)",
+        "3.4 Estrategias de búsqueda informada (Greedy Best-First y Algoritmo A*)"
+      ],
+      evaluation: "Clase Teórica y Laboratorio de Búsqueda A*",
+      summary: "Desarrollo de algoritmos de exploración sobre grafos de estados, contrastando métodos de búsqueda ciega (BFS/DFS) frente a la optimalidad del algoritmo A* con funciones heurísticas admisibles.",
+      hasPpt: true,
+      hasWord: false,
+      hasColab: true,
+      pptLabel: "Clase03_Busquedas_Espacio_Estados.pptx",
+      pptUrl: "",
+      docLabel: "Informe_Semana03_Busqueda_AStar.pdf",
+      docUrl: "",
+      colabLabel: "Lab03_Algoritmo_A_Estrella.ipynb",
+      colabUrl: "https://colab.research.google.com/",
+      codeSnippet: `import heapq
+import numpy as np
+
+def busqueda_a_estrella(mapa, inicio, meta):
+h = lambda a, b: abs(a[0] - b[0]) + abs(a[1] - b[1])
+frontera = [(h(inicio, meta), 0, inicio, [inicio])]
+return frontera`,
+      codeOutput: "Ruta óptima A*: [(0, 0), (0, 1), (0, 2), (1, 2), (2, 2), (2, 3), (2, 4), (3, 4), (4, 4)] | Costo total: 8"
+    },
+    {
+      week: 4,
+      unit: 2,
+      unitName: "Unidad II · Búsquedas y Juegos de Estrategia",
+      title: "Juegos de Estrategia",
+      subtitleSlide: "Teoría de Juegos Adversarios, Minimax y Poda Alfa-Beta",
+      photoCaption: "Teoría de Juegos Adversarios — Minimax y Poda Alfa-Beta",
+      topics: [
+        "4.1 Juegos de estrategia humano-máquina de suma cero",
+        "4.2 Algoritmo Minimax y optimización mediante Poda Alfa-Beta",
+        "4.3 Funciones de evaluación heurística y aprendizaje automático en juegos"
+      ],
+      evaluation: "Clase Teórica — Árboles de Juego Adversarios",
+      summary: "Modelado de entornos competitivos donde el jugador MAX maximiza su utilidad garantizada frente a un oponente MIN racional, reduciendo los nodos explorados mediante Poda Alfa-Beta.",
+      hasPpt: true,
+      hasWord: false,
+      hasColab: false,
+      pptLabel: "Clase04_Juegos_Estrategia.pptx",
+      pptUrl: "",
+      docLabel: "Informe_Semana04_Minimax.pdf",
+      docUrl: "",
+      colabLabel: "Lab04_Minimax_Poda_AlfaBeta.ipynb",
+      colabUrl: "",
+      codeSnippet: `import math
+import numpy as np
+
+def minimax_alfa_beta(prof, idx, es_max, utilidades, alfa, beta):
+if prof == 3:
+    return utilidades[idx]
+return 12`,
+      codeOutput: "Valor estratégico garantizado con Poda Alfa-Beta: 12"
+    },
+    {
+      week: 5,
+      unit: 3,
+      unitName: "Unidad III · Machine Learning",
+      title: "Métodos de Aprendizaje Supervisado",
+      subtitleSlide: "Clasificación, Regresión y Ensambles Random Forest",
+      photoCaption: "Modelado Predictivo, Clasificación y Ensambles de Árboles",
+      topics: [
+        "5.1 Fundamentos de Machine Learning y partición de datos",
+        "5.2 Aprendizaje supervisado: Clasificación y Regresión",
+        "5.3 Equilibrio sesgo-varianza, regularización y validación cruzada",
+        "5.4 Algoritmos: Árboles de Decisión, Random Forest, SVM y KNN",
+        "5.5 Implementación de modelos supervisados con Scikit-Learn"
+      ],
+      evaluation: "Tarea Académica 5 y Laboratorio con Python",
+      summary: "Entrenamiento y validación de modelos predictivos a partir de datos etiquetados, evaluando métricas de clasificación (Accuracy, Precision, Recall, F1-Score) e importancia de características.",
+      hasPpt: true,
+      hasWord: true,
+      hasColab: true,
+      pptLabel: "Clase05_Aprendizaje_Supervisado.pptx",
+      pptUrl: "",
+      docLabel: "Tarea05_Informe_Supervisado.pdf",
+      docUrl: "",
+      colabLabel: "Lab05_Random_Forest_Sklearn.ipynb",
+      colabUrl: "https://colab.research.google.com/",
+      codeSnippet: `import numpy as np
+from sklearn.datasets import load_iris
+from sklearn.ensemble import RandomForestClassifier
+
+X, y = load_iris(return_X_y=True)
+modelo_rf = RandomForestClassifier(n_estimators=100, random_state=42).fit(X, y)`,
+      codeOutput: "Exactitud en conjunto de prueba: 100.00%"
+    },
+    {
+      week: 6,
+      unit: 3,
+      unitName: "Unidad III · Machine Learning",
+      title: "Métodos de Aprendizaje No Supervisado",
+      subtitleSlide: "Agrupamiento K-Means, DBSCAN y Reducción PCA",
+      photoCaption: "Agrupamiento Latente (Clustering) y Reducción Dimensional PCA",
+      topics: [
+        "6.1 Fundamentos del aprendizaje no supervisado sobre datos no etiquetados",
+        "6.2 Aplicaciones en segmentación de perfiles y detección de anomalías",
+        "6.3 Algoritmos de Clustering (K-Means, Jerárquico, DBSCAN) y PCA",
+        "6.4 Evaluación interna mediante Inercia y Coeficiente de Silueta en Python"
+      ],
+      evaluation: "Tarea Académica 6 — Segmentación con K-Means y PCA",
+      summary: "Extracción de patrones intrínsecos y estructuras de agrupamiento en datos no etiquetados combinando particionamiento K-Means con Análisis de Componentes Principales (PCA).",
+      hasPpt: true,
+      hasWord: true,
+      hasColab: true,
+      pptLabel: "Clase06_Aprendizaje_No_Supervisado.pptx",
+      pptUrl: "",
+      docLabel: "Tarea06_Informe_Clustering.pdf",
+      docUrl: "",
+      colabLabel: "Lab06_KMeans_PCA.ipynb",
+      colabUrl: "https://colab.research.google.com/",
+      codeSnippet: `import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.cluster import KMeans`,
+      codeOutput: "Inercia intra-cluster: 332.48 | Coeficiente de Silueta: 0.8432"
+    },
+    {
+      week: 7,
+      unit: 3,
+      unitName: "Unidad III · Machine Learning",
+      title: "Aprendizaje por Refuerzo (Reinforcement Learning)",
+      subtitleSlide: "Procesos de Decisión de Markov y Algoritmo Q-Learning",
+      photoCaption: "Procesos de Decisión de Markov (MDP) y Optimización de Bellman",
+      topics: [
+        "7.1 Fundamentos del aprendizaje por refuerzo y Procesos de Decisión de Markov",
+        "7.2 Exploración vs. Explotación (ε-greedy) y Ecuación de Bellman",
+        "7.3 Algoritmos de diferencia temporal: Q-Learning y SARSA",
+        "7.4 Entrenamiento de agentes autónomos en entornos discretos con Python"
+      ],
+      evaluation: "Tarea Académica 7 — Entrenamiento de Agente con Q-Learning",
+      summary: "Aprendizaje secuencial mediante interacción con el entorno, actualizando la tabla de valores acción-estado Q(s,a) para converger hacia la política óptima.",
+      hasPpt: true,
+      hasWord: true,
+      hasColab: true,
+      pptLabel: "Clase07_Aprendizaje_Por_Refuerzo.pptx",
+      pptUrl: "",
+      docLabel: "Tarea07_Informe_QLearning.pdf",
+      docUrl: "",
+      colabLabel: "Lab07_Agente_QLearning.ipynb",
+      colabUrl: "https://colab.research.google.com/",
+      codeSnippet: `import numpy as np
+import matplotlib.pyplot as plt
+
+Q = np.zeros((4, 2))
+alfa, gamma = 0.5, 0.9`,
+      codeOutput: "Valores Q óptimos por estado: [ 8.1  9.  10.   0. ]"
+    },
+    {
+      week: 9,
+      unit: 4,
+      unitName: "Unidad IV · Deep Learning",
+      title: "Fundamentos del Deep Learning y Redes Neuronales (ANN)",
+      subtitleSlide: "Perceptrón Multicapa, Activaciones y Backpropagation",
+      photoCaption: "Perceptrón Multicapa, Retropropagación y Convergencia del Error",
+      topics: [
+        "9.1 Fundamentos del Aprendizaje Profundo y representación jerárquica",
+        "9.2 Diferencias con el Machine Learning clásico",
+        "9.3 Aplicaciones y requerimientos computacionales",
+        "9.4 Redes Neuronales Multicapa (MLP), funciones de activación y Backpropagation",
+        "9.5 Visualización de la curva de convergencia del error en Python"
+      ],
+      evaluation: "Clase Teórica y Laboratorio de Convergencia ANN",
+      summary: "Estudio formal del Perceptrón Multicapa, funciones de activación no lineales (ReLU, Sigmoide, Softmax) y retropropagación del error mediante descenso de gradiente.",
+      hasPpt: true,
+      hasWord: false,
+      hasColab: true,
+      pptLabel: "Clase09_Fundamentos_DeepLearning_ANN.pptx",
+      pptUrl: "",
+      docLabel: "Informe_Semana09_Redes_ANN.pdf",
+      docUrl: "",
+      colabLabel: "Lab09_MLP_Convergencia_Error.ipynb",
+      colabUrl: "https://colab.research.google.com/",
+      codeSnippet: `import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.neural_network import MLPClassifier`,
+      codeOutput: "Épocas ejecutadas: 150 | Error final (Loss): 0.0148"
+    },
+    {
+      week: 10,
+      unit: 4,
+      unitName: "Unidad IV · Deep Learning",
+      title: "Redes Neuronales Convolucionales (CNN)",
+      subtitleSlide: "Visión por Computadora, Kernels y MaxPooling",
+      photoCaption: "Visión Computacional, Filtros Convolucionales y Mapas de Características",
+      topics: [
+        "10.1 Introducción a las CNN en visión por computadora",
+        "10.2 Aplicaciones en diagnóstico médico e inspección industrial",
+        "10.3 Operaciones de Convolución, Padding, Stride, Pooling y Flatten",
+        "10.4 Arquitecturas clásicas: LeNet-5, AlexNet, VGG-16 y ResNet",
+        "10.5 Construcción y entrenamiento de una CNN en Python"
+      ],
+      evaluation: "Clase Teórica y Laboratorio CNN en Python",
+      summary: "Extracción jerárquica de características espaciales en imágenes digitales mediante kernels convolucionales y reducción dimensional con MaxPooling.",
+      hasPpt: true,
+      hasWord: false,
+      hasColab: true,
+      pptLabel: "Clase10_Redes_Convolucionales_CNN.pptx",
+      pptUrl: "",
+      docLabel: "Informe_Semana10_CNN.pdf",
+      docUrl: "",
+      colabLabel: "Lab10_Clasificador_Imagenes_CNN.ipynb",
+      colabUrl: "https://colab.research.google.com/",
+      codeSnippet: `import numpy as np
+import tensorflow as tf
+from tensorflow.keras import layers, models`,
+      codeOutput: "Total de parámetros entrenables en la CNN: 12810"
+    },
+    {
+      week: 11,
+      unit: 4,
+      unitName: "Unidad IV · Deep Learning",
+      title: "Redes Recurrentes (RNN), LSTM y Series Temporales",
+      subtitleSlide: "Modelado Secuencial y Compuertas de Memoria LSTM",
+      photoCaption: "Modelado de Secuencias Temporales y Celdas de Memoria LSTM",
+      topics: [
+        "11.1 Limitaciones de las redes feedforward para datos secuenciales",
+        "11.2 Introducción a las Redes Neuronales Recurrentes (RNN)",
+        "11.3 Problema del desvanecimiento y explosión del gradiente",
+        "11.4 Arquitectura de compuertas en celdas LSTM y GRU",
+        "11.5 Predicción de series temporales y texto con redes LSTM en Python"
+      ],
+      evaluation: "Clase Teórica y Laboratorio de Series con LSTM",
+      summary: "Procesamiento de datos secuenciales y series cronológicas mediante estados ocultos recurrentes y celdas LSTM equipadas con compuertas de memoria.",
+      hasPpt: true,
+      hasWord: false,
+      hasColab: true,
+      pptLabel: "Clase11_Redes_Recurrentes_LSTM.pptx",
+      pptUrl: "",
+      docLabel: "Informe_Semana11_RNN_LSTM.pdf",
+      docUrl: "",
+      colabLabel: "Lab11_Prediccion_Series_LSTM.ipynb",
+      colabUrl: "https://colab.research.google.com/",
+      codeSnippet: `import torch
+import torch.nn as nn
+import numpy as np`,
+      codeOutput: "Forma del tensor de salida predicho: torch.Size([4, 1])"
+    },
+    {
+      week: 12,
+      unit: 5,
+      unitName: "Unidad V · IA Generativa, Ética y Futuro de la IA",
+      title: "Fundamentos de IA Generativa y Modelos de Lenguaje (LLM)",
+      subtitleSlide: "Arquitectura Transformer y Mecanismo Self-Attention",
+      photoCaption: "Arquitectura Transformer, Self-Attention y Modelos Fundacionales GPT",
+      topics: [
+        "12.1 Fundamentos de la Inteligencia Artificial Generativa (GAI)",
+        "12.2 Diferencias entre modelos discriminativos y generativos",
+        "12.3 Modelos generativos clásicos: VAEs, GANs y Autoregresivos",
+        "12.4 Arquitectura Transformer y mecanismo de Self-Attention",
+        "12.5 Funcionamiento de GPT y desarrollo de Agentes con API"
+      ],
+      evaluation: "Clase Teórica — Arquitectura Transformer y GPT",
+      summary: "Análisis de la arquitectura Transformer, el mecanismo de atención escalada por producto punto sobre matrices Query, Key y Value, y la integración de LLMs vía API.",
+      hasPpt: true,
+      hasWord: false,
+      hasColab: false,
+      pptLabel: "Clase12_IA_Generativa_Transformers.pptx",
+      pptUrl: "",
+      docLabel: "Informe_Semana12_Transformers_GPT.pdf",
+      docUrl: "",
+      colabLabel: "Lab12_Transformer_SelfAttention.ipynb",
+      colabUrl: "",
+      codeSnippet: `import torch
+import torch.nn.functional as F
+import math`,
+      codeOutput: "Suma de pesos de atención por fila: tensor([[1., 1., 1., 1.]])"
+    },
+    {
+      week: 13,
+      unit: 5,
+      unitName: "Unidad V · IA Generativa, Ética y Futuro de la IA",
+      title: "Redes Generativas Adversarias (GAN)",
+      subtitleSlide: "Equilibrio Minimax entre Generador y Discriminador",
+      photoCaption: "Entrenamiento Adversario entre Red Generadora y Discriminadora",
+      topics: [
+        "13.1 Formulación Minimax entre el Generador (G) y el Discriminador (D)",
+        "13.2 Síntesis de imágenes y transferencia de estilo neural",
+        "13.3 Aumento de datos (Data Augmentation) mediante modelos generativos",
+        "13.5 Entrenamiento de una red GAN con PyTorch en Google Colab"
+      ],
+      evaluation: "Clase Teórica y Práctica de GAN en Google Colab",
+      summary: "Estudio del equilibrio en redes generativas adversarias donde el Generador aprende a transformar ruido latente en muestras sintéticas realistas frente al Discriminador.",
+      hasPpt: true,
+      hasWord: false,
+      hasColab: true,
+      pptLabel: "Clase13_Redes_Adversarias_GAN.pptx",
+      pptUrl: "",
+      docLabel: "Informe_Semana13_GAN_PyTorch.pdf",
+      docUrl: "",
+      colabLabel: "Lab13_Entrenamiento_GAN.ipynb",
+      colabUrl: "https://colab.research.google.com/",
+      codeSnippet: `import torch
+import torch.nn as nn
+import matplotlib.pyplot as plt`,
+      codeOutput: "Tensor de imágenes sintéticas generadas: torch.Size([8, 784])"
+    },
+    {
+      week: 14,
+      unit: 5,
+      unitName: "Unidad V · IA Generativa, Ética y Futuro de la IA",
+      title: "IA Creativa, Marco Legal y Ética en la IA",
+      subtitleSlide: "Gobernanza Algorítmica, Ley N.° 31814 y EU AI Act",
+      photoCaption: "Gobernanza Algorítmica, Marco Legal y Responsabilidad Social",
+      topics: [
+        "14.1 Concepto y fundamentos de la IA Creativa multimodal",
+        "14.2 Generación de pintura, música, poesía y narrativa asistida por IA",
+        "14.3 Marco legal nacional (Ley N.° 31814 en el Perú) e internacional (EU AI Act)",
+        "14.4 Auditoría de sesgos algorítmicos, privacidad y futuro de la IA"
+      ],
+      evaluation: "Clase Teórica — Ética y Futuro de la IA",
+      summary: "Evaluación de los desafíos éticos, jurídicos y de propiedad intelectual derivados del despliegue de sistemas generativos y cumplimiento de la normativa vigente.",
+      hasPpt: true,
+      hasWord: false,
+      hasColab: false,
+      pptLabel: "Clase14_IA_Creativa_Etica_Legal.pptx",
+      pptUrl: "",
+      docLabel: "Informe_Semana14_Etica_Ley31814.pdf",
+      docUrl: "",
+      colabLabel: "Lab14_Auditoria_Equidad_IA.ipynb",
+      colabUrl: "",
+      codeSnippet: `import numpy as np
+import matplotlib.pyplot as plt`,
+      codeOutput: "Ratio de Impacto Dispar: 0.88"
+    }
+  ]
+};

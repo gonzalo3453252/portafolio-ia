@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<!--
+  =====================================================================
+  MAPA DEL PROYECTO  (todo está en la raíz del repositorio)
+  ---------------------------------------------------------------------
+  index.html .......... estructura de la página (textos fijos, botones, ventanas)
+  css/estilos.css ..... colores, tipografías y animaciones propias
+  js/ ................. la lógica, en orden numérico (00 → 14). Cada archivo
+                        empieza con un comentario que explica qué contiene.
+  js/visores/ ......... visores de PDF y de cuadernos Colab (.ipynb)
+  img/ ................ fotos de la portada y de las unidades
+  datos/portafolio.json  contenido publicado (semanas, nombres, temas)
+  archivos/ ........... tus archivos reales:
+      silabo/ ............. sílabo en PDF
+      semana-01/ … ........ PPT, Word, PDF y Colab de cada semana
+      (la carpeta _vista/ la crea sola GitHub; no la toques)
+  .github/workflows/ .. tarea automática que convierte PPT/Word a PDF
+
+  PANEL DEL CREADOR: abre esta misma página con  #creador  al final del enlace.
+  =====================================================================
+-->
+
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inteligencia Artificial — Portafolio Académico UNMSM</title>
+  <meta name="description" content="Portafolio académico de Inteligencia Artificial — UNMSM, Facultad de Ingeniería de Sistemas e Informática. Semanas teóricas, informes, presentaciones y laboratorios." />
+  <meta name="author" content="Gonzalo Manuel Calero Falcón" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Inteligencia Artificial — Portafolio Académico UNMSM" />
+  <meta property="og:description" content="Semanas teóricas, informes, presentaciones y laboratorios del curso de Inteligencia Artificial (UNMSM - FISI)." />
+  <meta name="theme-color" content="#0f172a" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230f172a'/%3E%3Ctext x='32' y='42' font-family='Arial' font-weight='800' font-size='28' text-anchor='middle' fill='white'%3EIA%3C/text%3E%3C/svg%3E" />
+  <!-- Tailwind (estilos utilitarios) -->
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <!-- Estilos propios -->
+  <link rel="stylesheet" href="css/estilos.css" />
+</head>
+<body id="pageRoot" class="min-h-screen flex flex-col selection:bg-slate-200 selection:text-slate-900">
+
+  <!-- Notificación -->
+  <div id="toastContainer" class="fixed bottom-6 right-6 z-50 hidden bg-[#0f172a] text-white px-5 py-3 rounded-xl text-xs font-semibold tracking-wide shadow-xl">
+    <span id="toastMessage">Acción completada</span>
+  </div>
+
+  <!-- 1. CABECERA MINIMALISTA Y RESPONSIVA -->
+  <header class="bg-white/95 backdrop-blur-xs border-b border-slate-200 sticky top-0 z-40">
+    <div class="max-w-[1320px] mx-auto px-4 sm:px-8 lg:px-12 py-3.5 sm:py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 sm:gap-6">
+      <div id="headerLogoHomeTrigger" class="cursor-pointer flex items-center justify-between">
+        <h1 class="text-xl sm:text-2xl font-extrabold text-[#0f172a] hover:opacity-80 transition-opacity display-heading" id="navTitleText">
+          Inteligencia Artificial
+        </h1>
+        <span class="sm:hidden text-[11px] font-bold uppercase tracking-wider text-slate-400">2026-II</span>
+      </div>
+
+      <p class="hidden" id="navAuthorText" aria-hidden="true">
+        Calero Falcón, Gonzalo Manuel · Huanacuni Gomez, Jean Carlos Josue — Cátedra: Dr. Hugo Froilán Vega Huerta
+      </p>
+
+      <nav class="flex items-center justify-between sm:justify-end gap-6 sm:gap-9 border-t sm:border-t-0 border-slate-100 pt-2 sm:pt-0">
+        <button type="button" id="navBtnPresentacion" class="nav-link nav-link-active cursor-pointer">
+          Inicio
+        </button>
+
+        <div class="static sm:relative" id="syllabusDropdownWrapper">
+          <button type="button" id="heroOpenSyllabusBtn" class="nav-link flex items-center gap-1 text-[#0f172a] cursor-pointer focus:outline-none" aria-expanded="false">
+            <span class="text-xs text-[#0f172a] font-bold">▾</span>
+            <span>Sílabo</span>
+          </button>
+
+          <div id="syllabusDropdownMenu" class="hidden fixed sm:absolute left-3 right-3 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 top-[92px] sm:top-full sm:pt-2.5 sm:w-52 z-50">
+            <div class="bg-[#0f172a] text-white rounded-xl shadow-2xl border border-slate-800 divide-y divide-slate-800/90 overflow-hidden">
+              <span id="syllabusRowFileTitle" class="hidden">Silabo_Inteligencia_Artificial_UNMSM.pdf</span>
+              <button type="button" id="homePreviewSyllabusRowBtn" class="w-full text-center px-4 py-2.5 sm:py-3 text-xs sm:text-[13.5px] hover:bg-slate-800 transition-colors flex items-center justify-center gap-2 cursor-pointer">
+                <svg class="w-4 h-4 shrink-0 text-slate-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/><circle cx="12" cy="12" r="3"/></svg>
+                <span class="font-semibold text-white">Previsualizar</span>
+              </button>
+              <button type="button" id="homeDownloadSyllabusRowBtn" class="w-full text-center px-4 py-2.5 sm:py-3 text-xs sm:text-[13.5px] hover:bg-slate-800 transition-colors flex items-center justify-center gap-2 cursor-pointer">
+                <svg class="w-4 h-4 shrink-0 text-slate-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                <span class="font-semibold text-white">Descargar</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="static sm:relative" id="unitsDropdownWrapper">
+          <button type="button" id="unitsDropdownToggleBtn" class="nav-link flex items-center gap-1 cursor-pointer focus:outline-none" aria-expanded="false">
+            <span class="text-xs text-[#0f172a] font-bold" id="unitsDropdownCaret">▾</span>
+            <span id="unitsDropdownLabel">Unidades</span>
+          </button>
+
+          <div id="unitsDropdownMenu" class="hidden fixed sm:absolute left-3 right-3 sm:left-auto sm:right-0 top-[92px] sm:top-full sm:pt-2.5 sm:w-64 z-50">
+            <div class="bg-[#0f172a] text-white rounded-xl shadow-2xl border border-slate-800 divide-y divide-slate-800/90 overflow-hidden">
+              <button type="button" data-select-unit="1" class="unit-dropdown-item w-full text-center px-4 py-2.5 sm:py-3 text-xs sm:text-[13.5px] hover:bg-slate-800 transition-colors block cursor-pointer">
+                <span class="font-semibold text-white">Unidad I · Fundamentos y Agentes</span>
+              </button>
+              <button type="button" data-select-unit="2" class="unit-dropdown-item w-full text-center px-4 py-2.5 sm:py-3 text-xs sm:text-[13.5px] hover:bg-slate-800 transition-colors block cursor-pointer">
+                <span class="font-semibold text-white">Unidad II · Búsquedas y Juegos</span>
+              </button>
+              <button type="button" data-select-unit="3" class="unit-dropdown-item w-full text-center px-4 py-2.5 sm:py-3 text-xs sm:text-[13.5px] hover:bg-slate-800 transition-colors block cursor-pointer">
+                <span class="font-semibold text-white">Unidad III · Machine Learning</span>
+              </button>
+              <button type="button" data-select-unit="4" class="unit-dropdown-item w-full text-center px-4 py-2.5 sm:py-3 text-xs sm:text-[13.5px] hover:bg-slate-800 transition-colors block cursor-pointer">
+                <span class="font-semibold text-white">Unidad IV · Deep Learning</span>
+              </button>
+              <button type="button" data-select-unit="5" class="unit-dropdown-item w-full text-center px-4 py-2.5 sm:py-3 text-xs sm:text-[13.5px] hover:bg-slate-800 transition-colors block cursor-pointer">
+                <span class="font-semibold text-white">Unidad V · IA Generativa y Ética</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <button type="button" id="mobileMenuBtn" class="hidden text-xs text-slate-600" aria-label="Unidades">
+          Unidades
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="flex-1 max-w-[1320px] px-4 sm:px-8 lg:px-12 w-full mx-auto py-8 sm:py-12">
+
+    <section id="tab-inicio" class="tab-section">
+
+      <!-- =================================================================== -->
+      <!-- PÁGINA 1: PRESENTACIÓN                                              -->
+      <!-- =================================================================== -->
+      <div id="viewPresentacion" class="view-fade space-y-14 sm:space-y-16">
+        <div id="presentacion" class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+          <div class="lg:col-span-6 space-y-5">
+            <div class="flex items-center gap-3">
+              <p class="text-xs sm:text-sm font-bold uppercase tracking-[0.16em] text-slate-500" id="heroGroupBadge">
+                Semestre Académico 2026-II <span id="navSemesterBadge" class="sr-only">2026-II</span>
+              </p>
+              <span class="h-px w-16 bg-slate-200"></span>
+            </div>
+
+            <h2 class="text-3xl sm:text-5xl font-extrabold text-[#0f172a] display-heading leading-[1.12]" id="heroMainTitle">
+              Portafolio de Clases Teóricas, Informes y Laboratorios
+            </h2>
+
+            <div class="space-y-3.5 text-base sm:text-[17px] text-slate-600 font-normal leading-relaxed" id="heroBioText">
+              <p>
+                Repositorio académico desarrollado en la asignatura de <strong class="font-bold text-[#0f172a]">Inteligencia Artificial</strong> de la Facultad de Ingeniería de Sistemas e Informática de la Universidad Nacional Mayor de San Marcos (UNMSM).
+              </p>
+              <p>
+                Reúne de forma ordenada las presentaciones de cada sesión teórica, los informes técnicos y los cuadernos de programación en Python y Google Colab elaborados a lo largo de las cinco unidades del semestre académico.
+              </p>
+            </div>
+
+            <div class="pt-5 border-t border-slate-200 grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div>
+                <p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Autores del Portafolio</p>
+                <div class="font-bold text-[#0f172a] text-base leading-snug space-y-1" id="heroStudentName">
+                  <p>Calero Falcón, Gonzalo Manuel</p>
+                  <p>Huanacuni Gomez, Jean Carlos Josue</p>
+                </div>
+              </div>
+              <div>
+                <p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Docente de la Asignatura</p>
+                <p class="font-bold text-[#0f172a] text-base" id="cardProfName">Dr. Hugo Froilán Vega Huerta</p>
+                <p class="text-xs font-medium text-slate-500 mt-1">EP Ingeniería de Sistemas · FISI UNMSM</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="lg:col-span-6">
+            <figure class="space-y-2.5">
+              <img src="img/facultad-fisi.jpg" alt="Facultad de Ingeniería de Sistemas e Informática UNMSM" class="w-full h-64 sm:h-[380px] object-cover object-center max-w-full rounded-2xl shadow-sm" />
+              <figcaption class="text-xs font-medium text-slate-500 text-center sm:text-left">
+                Facultad de Ingeniería de Sistemas e Informática (FISI) — Ciudad Universitaria, UNMSM.
+              </figcaption>
+            </figure>
+          </div>
+        </div>
+
+
+
+        <!-- Bloque de Dedicatoria al Docente de la Asignatura -->
+        <div id="dedicatoriaDocente" class="pt-12 sm:pt-14 border-t border-slate-200 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+          <div class="lg:col-span-4">
+            <figure class="space-y-2.5">
+              <img src="img/docente.jpg" alt="Docente de Curso: Dr. Hugo Froilán Vega Huerta" class="w-full h-72 sm:h-[360px] object-cover object-top max-w-full rounded-2xl shadow-sm" />
+              <figcaption class="text-xs font-medium text-slate-500">
+                Docente del Curso: Dr. / Ing. Hugo Froilán Vega Huerta
+              </figcaption>
+            </figure>
+          </div>
+
+          <div class="lg:col-span-8 space-y-4">
+            <div class="flex items-center gap-3">
+              <p class="text-xs sm:text-sm font-bold uppercase tracking-[0.16em] text-slate-500">
+                Dedicatoria y Reconocimiento Académico
+              </p>
+              <span class="h-px w-16 bg-slate-200"></span>
+            </div>
+
+            <h3 class="text-2xl sm:text-4xl font-extrabold text-[#0f172a] display-heading leading-tight">
+              Al Dr. Hugo Froilán Vega Huerta
+            </h3>
+
+            <div class="space-y-3.5 text-base sm:text-[17px] text-slate-600 font-normal leading-relaxed">
+              <p>
+                Dedicamos el presente portafolio académico a nuestro docente de cátedra, el <strong class="font-bold text-[#0f172a]">Dr. Hugo Froilán Vega Huerta</strong>, con especial gratitud por su vocación docente, exigencia académica y constante orientación en nuestra formación profesional dentro de la Facultad de Ingeniería de Sistemas e Informática de la Universidad Nacional Mayor de San Marcos.
+              </p>
+              <p>
+                Sus enseñanzas en cada sesión teórica y práctica nos han permitido comprender con rigor los fundamentos de los agentes inteligentes, los algoritmos de búsqueda heurística, el aprendizaje automático, las redes neuronales profundas y la inteligencia artificial generativa, motivándonos a investigar y aplicar la tecnología con ética y excelencia.
+              </p>
+            </div>
+
+            <div class="pt-5 border-t border-slate-200 flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <p class="text-[11px] font-bold uppercase tracking-widest text-slate-400">Con aprecio y respeto académico</p>
+                <p class="text-base font-bold text-[#0f172a] mt-1">
+                  Calero Falcón, Gonzalo Manuel &nbsp;·&nbsp; Huanacuni Gomez, Jean Carlos Josue
+                </p>
+              </div>
+              <span class="text-xs sm:text-sm font-semibold text-slate-500">
+                EP Ingeniería de Sistemas · UNMSM 2026-II
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="viewSilabo" class="hidden" aria-hidden="true">
+        <span id="syllabusViewProfName"></span>
+      </div>
+
+      <!-- =================================================================== -->
+      <!-- PÁGINA 2: TODAS LAS UNIDADES                                        -->
+      <!-- =================================================================== -->
+      <div id="viewTodasUnidades" class="hidden view-fade space-y-8">
+        <div class="border-b border-slate-200 pb-5 flex items-center gap-3">
+          <span class="w-1.5 h-7 rounded-full bg-[#0f172a]"></span>
+          <div>
+            <p class="text-xs font-bold uppercase tracking-[0.16em] text-slate-500">Semestre Académico 2026-II</p>
+            <h2 class="text-2xl sm:text-4xl font-extrabold text-[#0f172a] display-heading">Unidades del Curso</h2>
+          </div>
+        </div>
+
+        <div id="allUnitsOverviewContainer" class="divide-y divide-slate-200"></div>
+      </div>
+
+      <!-- =================================================================== -->
+      <!-- PÁGINA 3: VISTA DE UNA UNIDAD                                       -->
+      <!-- =================================================================== -->
+      <div id="viewUnidadEspecifica" class="hidden view-fade space-y-12">
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center pb-10 border-b border-slate-200">
+          <div class="lg:col-span-6 space-y-4">
+            <div class="flex items-center gap-3">
+              <p id="unitViewBadge" class="text-xs sm:text-sm font-bold uppercase tracking-[0.16em] text-slate-500">
+                UNIDAD I
+              </p>
+              <span class="h-px w-16 bg-slate-200"></span>
+            </div>
+
+            <h2 id="unitViewTitle" class="text-3xl sm:text-5xl font-extrabold text-[#0f172a] display-heading leading-[1.12]">
+              Unidad I: Fundamentos de la IA y Agentes Inteligentes
+            </h2>
+
+            <p id="unitViewSummary" class="text-base sm:text-[17px] font-normal text-slate-600 leading-relaxed"></p>
+
+            <div class="pt-4 border-t border-slate-200 space-y-1.5">
+              <p class="text-xs font-bold uppercase tracking-widest text-slate-400">Logro de la Unidad</p>
+              <p id="unitViewObjective" class="text-slate-700 text-sm sm:text-base font-normal leading-relaxed"></p>
+            </div>
+          </div>
+
+          <div class="lg:col-span-6">
+            <figure class="space-y-2">
+              <img id="unitViewHeroPhoto" src="" alt="Fotografía de la Unidad" class="w-full h-60 sm:h-[330px] object-cover object-center max-w-full rounded-2xl shadow-sm" />
+              <figcaption id="unitViewPhotoCaption" class="text-xs font-medium text-slate-500"></figcaption>
+            </figure>
+          </div>
+        </div>
+
+        <!-- Lista de Semanas de la Unidad -->
+        <div class="space-y-5">
+          <div class="flex items-center gap-3">
+            <span class="w-1.5 h-6 rounded-full bg-[#0f172a]"></span>
+            <h3 class="text-xl sm:text-2xl font-extrabold text-[#0f172a] display-heading">
+              Semanas de la Unidad
+            </h3>
+          </div>
+          <div id="unitWeeksCollapsedList" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+        </div>
+
+      </div>
+
+      <!-- =================================================================== -->
+      <!-- PÁGINA 4: PÁGINA EXCLUSIVA DE LA SEMANA SELECCIONADA                -->
+      <!-- =================================================================== -->
+      <div id="viewSemanaIndividual" class="hidden view-fade space-y-8">
+        <div class="flex flex-wrap items-center justify-between gap-3 pb-2">
+          <div class="flex flex-wrap items-center gap-2 text-xs sm:text-[13.5px] font-medium text-slate-500">
+            <button type="button" id="breadcrumbWeekHomeIconBtn" class="hover:text-[#0f172a] transition-colors cursor-pointer flex items-center" title="Ir a Presentación">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+            </button>
+            <span class="text-slate-300">›</span>
+            <button type="button" id="singleWeekUnitBreadcrumb" class="hover:text-[#0f172a] transition-colors cursor-pointer font-medium">
+              Unidad I · Fundamentos de la IA y Agentes
+            </button>
+            <span class="text-slate-300">›</span>
+            <span id="singleWeekNumberBreadcrumb" class="text-[#0f172a] font-bold">Semana 01</span>
+          </div>
+
+          <div class="hidden" id="unitWeekSelectorTabs" aria-hidden="true"></div>
+
+          <button type="button" id="backToCurrentUnitInfoBtn" class="text-xs sm:text-[13.5px] font-bold text-[#0f172a] hover:underline cursor-pointer">
+            ← Volver a la unidad
+          </button>
+        </div>
+
+        <div id="selectedWeekContainer"></div>
+      </div>
+
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- PANEL DE ADMINISTRACIÓN DEL CREADOR (CMS Funcional Completo)         -->
+    <!-- =================================================================== -->
+    <section id="creatorAdminModal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
+      <div class="bg-white border border-slate-300 rounded-2xl max-w-5xl w-full p-5 sm:p-8 space-y-6 shadow-2xl my-6 max-h-[92vh] overflow-y-auto">
+        <div class="flex items-start justify-between gap-4 border-b border-slate-200 pb-4">
+          <div>
+            <p class="text-xs font-bold uppercase tracking-widest text-slate-500">Panel de Administración del Creador</p>
+            <h3 class="text-xl sm:text-2xl font-extrabold text-[#0f172a] mt-1">Gestión de Sílabo, Unidades, Semanas y Archivos</h3>
+          </div>
+          <button type="button" id="closeCreatorModalBtn" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-xs font-bold text-[#0f172a] cursor-pointer">✕ Cerrar</button>
+        </div>
+
+        <!-- 1. DATOS GENERALES DEL PORTAFOLIO -->
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <h4 class="text-xs font-extrabold uppercase tracking-wider text-[#0f172a]">1. Datos Institucionales del Portafolio</h4>
+            <button type="button" id="saveProfileBtn" class="px-3.5 py-1.5 bg-slate-800 hover:bg-[#0f172a] text-white rounded-lg text-xs font-bold cursor-pointer">
+              Guardar Datos del Portafolio
+            </button>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1" for="inputStudentName">Autores del Portafolio</label>
+              <input id="inputStudentName" type="text" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs font-medium text-[#0f172a] focus:outline-none focus:border-[#0f172a]" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1" for="inputProfName">Docente del Curso</label>
+              <input id="inputProfName" type="text" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs font-medium text-[#0f172a] focus:outline-none focus:border-[#0f172a]" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1" for="inputStudentEmail">Correo de Contacto</label>
+              <input id="inputStudentEmail" type="text" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs font-medium text-[#0f172a] focus:outline-none focus:border-[#0f172a]" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1" for="inputGroupBadge">Semestre Académico</label>
+              <input id="inputGroupBadge" type="text" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs font-medium text-[#0f172a] focus:outline-none focus:border-[#0f172a]" />
+            </div>
+            <div class="hidden">
+              <textarea id="inputTeamMembers" rows="2"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. SÍLABO -->
+        <div class="pt-5 border-t border-slate-200 space-y-3">
+          <div>
+            <h4 class="text-xs font-extrabold uppercase tracking-wider text-[#0f172a]">2. Sílabo de la Asignatura (PDF)</h4>
+            <p class="text-[11px] text-slate-500">Sube tu PDF del sílabo (cualquier nombre). Se muestra nítido, con todas sus páginas. Si subes uno nuevo, reemplaza automáticamente al sílabo oficial incluido.</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-3 p-3.5 bg-emerald-50 border border-emerald-200 rounded-xl">
+            <button type="button" id="uploadSyllabusGithubBtn" class="px-3.5 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg text-xs font-bold cursor-pointer">Subir sílabo a GitHub</button>
+            <p class="text-[11px] text-emerald-900 flex-1 min-w-[220px]">Arrastra tu <b>.pdf</b> y pulsa <b>Commit changes</b>. En 1-2 minutos lo ve todo el mundo. Mientras no subas ninguno se usa el sílabo oficial incluido.</p>
+          </div>
+          
+        </div>
+
+        <!-- 3. GESTIÓN DE SEMANAS (AGREGAR, EDITAR O QUITAR SEMANAS Y SUS ARCHIVOS) -->
+        <div class="pt-5 border-t border-slate-200 space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h4 class="text-xs font-extrabold uppercase tracking-wider text-[#0f172a]">3. Gestión de Semanas y Materiales (Agregar, Editar o Quitar Semanas)</h4>
+              <p class="text-[11px] text-slate-500">Selecciona una semana para editar su contenido y archivos, agrega una nueva semana o elimina la seleccionada.</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+              <button type="button" id="addNewWeekBtn" class="px-3.5 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg text-xs font-bold cursor-pointer">
+                + Agregar Nueva Semana
+              </button>
+              <button type="button" id="deleteSelectedWeekBtn" class="px-3.5 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-bold cursor-pointer">
+                Quitar Semana Seleccionada
+              </button>
+            </div>
+          </div>
+
+          <!-- Formulario para crear una semana nueva (tú eliges número y unidad) -->
+          <div id="newWeekForm" class="hidden p-4 bg-emerald-50 border border-emerald-300 rounded-xl space-y-3">
+            <p class="text-xs font-extrabold uppercase tracking-wider text-emerald-900">Nueva semana</p>
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
+              <div class="md:col-span-2">
+                <label class="block text-xs font-bold text-slate-700 mb-1" for="newWeekNum">N.° de semana</label>
+                <input id="newWeekNum" type="number" min="1" max="32" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-bold text-[#0f172a]" />
+              </div>
+              <div class="md:col-span-4">
+                <label class="block text-xs font-bold text-slate-700 mb-1" for="newWeekUnit">Unidad</label>
+                <select id="newWeekUnit" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-bold text-[#0f172a]">
+                  <option value="1">Unidad I · Fundamentos y Agentes</option>
+                  <option value="2">Unidad II · Búsquedas y Juegos</option>
+                  <option value="3">Unidad III · Machine Learning</option>
+                  <option value="4">Unidad IV · Deep Learning</option>
+                  <option value="5">Unidad V · IA Generativa y Ética</option>
+                </select>
+              </div>
+              <div class="md:col-span-6">
+                <label class="block text-xs font-bold text-slate-700 mb-1" for="newWeekTitle">Título de la semana</label>
+                <input id="newWeekTitle" type="text" placeholder="Ej. Redes Neuronales Convolucionales" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs text-[#0f172a]" />
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <button type="button" id="newWeekCreateBtn" class="px-3.5 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg text-xs font-bold cursor-pointer">Crear semana</button>
+              <button type="button" id="newWeekCancelBtn" class="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold cursor-pointer">Cancelar</button>
+              <span class="text-[11px] text-slate-600">Después completa los temas y el resumen abajo y pulsa «Guardar cambios de esta semana».</span>
+            </div>
+          </div>
+
+          <!-- Selector de semana + Datos principales de la semana -->
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-4 p-4 bg-slate-50 border border-slate-200 rounded-xl">
+            <div class="md:col-span-4">
+              <label class="block text-xs font-bold text-slate-700 mb-1" for="selectWeekEdit">Seleccionar Semana Activa</label>
+              <select id="selectWeekEdit" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-bold text-[#0f172a]"></select>
+            </div>
+
+            <div class="md:col-span-2">
+              <label class="block text-xs font-bold text-slate-700 mb-1" for="editWeekNumberInput">N.° Semana</label>
+              <input id="editWeekNumberInput" type="number" min="1" max="32" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-bold text-[#0f172a]" />
+            </div>
+
+            <div class="md:col-span-3">
+              <label class="block text-xs font-bold text-slate-700 mb-1" for="editWeekUnitSelect">Unidad Asignada</label>
+              <select id="editWeekUnitSelect" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-bold text-[#0f172a]">
+                <option value="1">Unidad I · Fundamentos y Agentes</option>
+                <option value="2">Unidad II · Búsquedas y Juegos</option>
+                <option value="3">Unidad III · Machine Learning</option>
+                <option value="4">Unidad IV · Deep Learning</option>
+                <option value="5">Unidad V · IA Generativa y Ética</option>
+              </select>
+            </div>
+
+            <div class="md:col-span-3">
+              <label class="block text-xs font-bold text-slate-700 mb-1" for="editWeekEvalInput">Actividad / Evaluación</label>
+              <input id="editWeekEvalInput" type="text" placeholder="Ej. Clase Teórica y Laboratorio" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs text-[#0f172a]" />
+            </div>
+
+            <div class="md:col-span-6">
+              <label class="block text-xs font-bold text-slate-700 mb-1" for="editWeekTitleInput">Título de la Semana</label>
+              <input id="editWeekTitleInput" type="text" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-bold text-[#0f172a]" />
+            </div>
+
+            <div class="md:col-span-6">
+              <label class="block text-xs font-bold text-slate-700 mb-1" for="editWeekSummaryInput">Descripción / Resumen de la Sesión</label>
+              <input id="editWeekSummaryInput" type="text" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs text-[#0f172a]" />
+            </div>
+
+            <div class="md:col-span-12">
+              <label class="block text-xs font-bold text-slate-700 mb-1" for="editWeekTopicsInput">Temas Desarrollados en la Sesión (escribe un tema por línea)</label>
+              <textarea id="editWeekTopicsInput" rows="3" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs text-[#0f172a] font-mono leading-relaxed"></textarea>
+            </div>
+          </div>
+
+          <!-- Archivos de la semana seleccionada -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
+            <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+              <label class="flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
+                <input type="checkbox" id="toggleHasPpt" checked />
+                <span>Mostrar Presentación PPT</span>
+              </label>
+              <input id="inputWeekPptLabel" type="text" placeholder="Nombre: Clase01_Fundamentos.pptx" class="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded text-xs font-medium text-[#0f172a]" />
+              <input id="inputWeekPptUrl" type="url" placeholder="URL pública .pptx / .pdf" class="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded text-xs text-[#0f172a]" />
+            </div>
+
+            <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+              <label class="flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
+                <input type="checkbox" id="toggleHasWord" checked />
+                <span>Mostrar Informe PDF / Word</span>
+              </label>
+              <input id="inputWeekDocLabel" type="text" placeholder="Nombre: Tarea01_Informe.pdf" class="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded text-xs font-medium text-[#0f172a]" />
+              <input id="inputWeekDocUrl" type="url" placeholder="URL pública .pdf / .docx" class="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded text-xs text-[#0f172a]" />
+            </div>
+
+            <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+              <label class="flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
+                <input type="checkbox" id="toggleHasColab" checked />
+                <span>Mostrar Google Colab</span>
+              </label>
+              <input id="inputWeekColabLabel" type="text" placeholder="Nombre: Lab01_Notebook.ipynb" class="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded text-xs font-medium text-[#0f172a]" />
+              <input id="inputWeekColabUrl" type="url" placeholder="URL Google Colab / .ipynb" class="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded text-xs text-[#0f172a]" />
+            </div>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-3 p-3.5 bg-emerald-50 border border-emerald-200 rounded-xl">
+            <button type="button" id="uploadWeekFilesBtn" class="px-3.5 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg text-xs font-bold cursor-pointer">Subir archivos de esta semana a GitHub</button>
+            <p class="text-[11px] text-emerald-900 flex-1 min-w-[220px]">Abre la carpeta de la semana en GitHub: arrastra tus <b>.pptx / .docx / .ipynb / .pdf</b> (cualquier nombre) y pulsa <b>Commit changes</b>. En 1-2 minutos los ve todo el mundo.</p>
+          </div>
+        </div>
+
+        <!-- PUBLICAR CAMBIOS DE TEXTO (semanas, unidades, títulos, temas) -->
+        <div class="p-4 bg-sky-50 border border-sky-200 rounded-xl text-[11px] text-sky-900 space-y-2">
+          <p class="font-extrabold uppercase tracking-wider text-xs">Publicar mis cambios de semanas, unidades y textos para todos</p>
+          <p>Lo que editas aquí se ve solo en tu navegador hasta que lo publiques. <span id="pendingChangesNote" class="hidden font-extrabold text-amber-700">● Tienes cambios sin publicar.</span></p>
+          <button type="button" id="publishGithubBtn" class="px-4 py-2 bg-sky-700 hover:bg-sky-800 text-white rounded-lg text-xs font-bold cursor-pointer">Publicar en GitHub</button>
+          <p>Se copian tus cambios y se abre GitHub. Allí: <b>Ctrl+A</b> (seleccionar todo), <b>Ctrl+V</b> (pegar) y el botón verde <b>Commit changes</b> (dos veces). En 1-2 minutos lo ve todo el mundo.</p>
+          <p>Tus PPT, Word y Colab no se publican con este botón: usa «Subir archivos de esta semana a GitHub» (en la sección 3).</p>
+        </div>
+
+        <div class="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-slate-200 text-xs">
+          <div class="flex items-center gap-4">
+            <button type="button" id="resetDefaultsBtn" class="text-slate-600 hover:text-[#0f172a] font-bold underline cursor-pointer">
+              Restaurar Valores Iniciales
+            </button>
+          </div>
+          <div class="flex items-center gap-3">
+            <button type="button" id="saveWeekLinksBtn" class="px-5 py-2.5 bg-[#0f172a] hover:bg-slate-800 text-white rounded-xl font-bold cursor-pointer shadow-sm">
+              Guardar cambios de esta semana
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contenedor Auxiliar Oculto para Compatibilidad -->
+    <div class="hidden" aria-hidden="true">
+      <button type="button" id="fontDecreaseBtn" disabled>A-</button>
+      <button type="button" id="fontResetBtn" disabled>reset</button>
+      <button type="button" id="fontIncreaseBtn" disabled>A+</button>
+      <button type="button" id="heroSyllabusQuickBtn" disabled>Previsualizar o descargar sílabo →</button>
+      <button type="button" disabled>Entendido</button>
+      <button type="button" disabled>Ver ficha de la unidad</button>
+      <button type="button" disabled>← Volver a la ficha de la unidad</button>
+      <div id="syllabusPrintableDoc"></div>
+    <button type="button" disabled>Presentación</button>
+    <button type="button" disabled>X</button>
+      <button type="button" disabled>Ver semanas y recursos de esta unidad →</button>
+      <button type="button" disabled>Información de la unidad</button>
+      <div id="mobileMenuPanel"></div>
+      <div id="tab-personalizar"></div>
+      <div id="tab-guia"></div>
+      <div id="tab-semanas"></div>
+      <div id="tab-visor"></div>
+      <div id="tab-colab"></div>
+      <span id="heroAvatarInitials">GC</span>
+      <span id="visitCounterText">148</span>
+      <span id="breadcrumbCurrent"></span>
+      <span id="cardStudentName">Gonzalo Manuel Calero Falcón</span>
+      <span id="cardStudentRole">EP Ingeniería de Sistemas</span>
+      <span id="cardStudentEmail">calero2020gm@gmail.com</span>
+      <ul id="cardTeamList"></ul>
+      <div id="weeksTableContainer"><tbody id="weeksTableBody"></tbody></div>
+      <div id="colabSelectorList"></div>
+      <span id="activeColabWeekBadge"></span>
+      <span id="activeColabTitle"></span>
+      <p id="activeColabDesc"></p>
+      <div id="activeColabTags"></div>
+      <code id="activeColabCode"></code>
+      <span id="activeColabOutput"></span>
+      <a id="activeColabExternalLink" href="https://colab.research.google.com/">Ejecutar en Colab ↗</a>
+      <select id="previewWeekSelect"></select>
+      <span id="viewerCurrentWeekTag"></span>
+      <span id="viewerCurrentWeekTitle"></span>
+      <div id="viewerModePpt"></div>
+      <div id="viewerModeWord"><div id="wordDocumentPaper"></div></div>
+      <div id="viewerModeColab"><span id="colabViewerFilename"></span><a id="colabViewerOpenExternal" href="https://colab.research.google.com/">Abrir</a><div id="colabViewerCells"></div></div>
+      <span id="pptSlideHeaderCourse"></span>
+      <span id="pptSlideCounter"></span>
+      <div id="pptSlideBody"></div>
+      <span id="pptSlideFooterAuthor"></span>
+      <div id="customPptEmbedBox"></div>
+      <button type="button" disabled id="heroGoWeeksBtn">Explorar las 16 Semanas →</button>
+      <button type="button" disabled id="heroOpenPreviewerBtn">Abrir Visor de Archivos</button>
+      <button type="button" disabled id="cardViewColabBtn">Ver Cuadernos de Google Colab y Código →</button>
+      <button type="button" disabled id="quickEditProfileBtn">Editar datos</button>
+      <button type="button" disabled id="viewCardsBtn">Vista Tarjetas</button>
+      <button type="button" disabled id="viewTableBtn">Vista Tabla Clásica</button>
+      <button type="button" disabled id="copyColabCodeBtn">Copiar Código Python</button>
+      <button type="button" disabled id="downloadPptBtn">⬇ Descargar Presentación PPT</button>
+      <button type="button" disabled id="downloadWordBtn">⬇ Descargar Informe Word (.doc)</button>
+      <button type="button" disabled id="downloadColabBtn">⬇ Descargar Notebook (.ipynb)</button>
+      <button type="button" disabled id="prevSlideBtn">← Anterior</button>
+      <button type="button" disabled id="nextSlideBtn">Siguiente →</button>
+      <button type="button" disabled class="doc-mode-btn" data-docmode="ppt">📊 Ver PPT</button>
+      <button type="button" disabled class="doc-mode-btn" data-docmode="word">📄 Ver Word</button>
+      <button type="button" disabled class="doc-mode-btn" data-docmode="colab">⚡ Ver Colab</button>
+      <button type="button" disabled class="nav-tab-btn" data-tab="inicio">Portafolio (13 Semanas)</button>
+      <button type="button" disabled class="nav-tab-btn" data-tab="personalizar">Subir Archivos / Editar Datos</button>
+      <button type="button" disabled class="nav-tab-btn" data-tab="guia">¿Cómo Publicar?</button>
+      <button type="button" disabled class="nav-tab-btn" data-tab="inicio">Inicio y Curso</button>
+      <button type="button" disabled class="nav-tab-btn" data-tab="semanas">16 Semanas (PPT + Colab)</button>
+      <button type="button" disabled class="nav-tab-btn" data-tab="colab">Laboratorio Colab y Ejercicios</button>
+      <button type="button" disabled class="nav-tab-btn" data-tab="visor">Visor Integrado (PPT · Word · Colab)</button>
+      <button type="button" disabled class="nav-tab-btn" data-tab="personalizar">Editar mis Datos / Links</button>
+      <button type="button" disabled class="nav-tab-btn" data-tab="guia">Guía Paso a Paso</button>
+      <button type="button" disabled class="mobile-tab-btn" data-tab="inicio">Portafolio (13 Semanas Teóricas)</button>
+      <button type="button" disabled class="mobile-tab-btn" data-tab="personalizar">Editar mis Datos y Subir Links</button>
+      <button type="button" disabled class="mobile-tab-btn" data-tab="guia">Guía Paso a Paso para Publicar</button>
+      <button type="button" disabled class="mobile-tab-btn" data-tab="inicio">Inicio y Ficha del Curso</button>
+      <button type="button" disabled class="mobile-tab-btn" data-tab="semanas">Semanas Teóricas (13 Clases: PPT + Word + Colab)</button>
+      <button type="button" disabled class="mobile-tab-btn" data-tab="semanas">Calendario de 16 Semanas (PPT + Tareas + Colab)</button>
+      <button type="button" disabled class="mobile-tab-btn" data-tab="colab">Laboratorio Google Colab y Ejercicios</button>
+      <button type="button" disabled class="mobile-tab-btn" data-tab="visor">Visor y Descarga Directa (PPT · Word · Colab)</button>
+      <button type="button" disabled class="unit-filter-btn" data-unit="all">Todas (16)</button>
+      <button type="button" disabled class="unit-filter-btn" data-unit="1">Unidad I: Fundamentos y Agentes (Sem. 1–2)</button>
+      <button type="button" disabled class="unit-filter-btn" data-unit="2">Unidad II: Búsquedas y Juegos (Sem. 3–4)</button>
+      <button type="button" disabled class="unit-filter-btn" data-unit="3">Unidad III: Machine Learning (Sem. 5–7)</button>
+      <button type="button" disabled class="unit-filter-btn" data-unit="4">Unidad IV: Deep Learning (Sem. 9–11)</button>
+      <button type="button" disabled class="unit-filter-btn" data-unit="5">Unidad V: IA Generativa y Ética (Sem. 12–14)</button>
+      <button type="button" disabled class="unit-filter-btn" data-unit="1">U1 · IA y Agentes (Sem. 1–2)</button>
+      <button type="button" disabled class="unit-filter-btn" data-unit="2">U2 · Búsquedas y Juegos (Sem. 3–4)</button>
+      <button type="button" disabled class="unit-filter-btn" data-unit="3">U3 · Machine Learning (Sem. 5–7)</button>
+      <button type="button" disabled class="unit-filter-btn" data-unit="4">U4 · Deep Learning (Sem. 9–11)</button>
+      <button type="button" disabled class="unit-filter-btn" data-unit="5">U5 · IA Generativa (Sem. 12–14)</button>
+      <button type="button" disabled class="unit-filter-btn" data-unit="1">U1: Fundamentos y Agentes</button>
+      <button type="button" disabled class="unit-filter-btn" data-unit="2">U2: Búsquedas y Juegos</button>
+      <button type="button" disabled class="unit-filter-btn" data-unit="3">U3: Machine Learning</button>
+      <button type="button" disabled class="unit-filter-btn" data-unit="4">U4: Deep Learning</button>
+      <button type="button" disabled class="unit-filter-btn" data-unit="5">U5: IA Generativa</button>
+      <button type="button" disabled class="unit-jump-btn" data-unit-jump="1"><span>UNIDAD I</span> <p>IA y Agentes</p> <p>Sem. 1–2</p></button>
+      <button type="button" disabled class="unit-jump-btn" data-unit-jump="2"><span>UNIDAD II</span> <p>Búsquedas y Juegos</p> <p>Sem. 3–4</p></button>
+      <button type="button" disabled class="unit-jump-btn" data-unit-jump="3"><span>UNIDAD III</span> <p>Machine Learning</p> <p>Sem. 5–7</p></button>
+      <button type="button" disabled class="unit-jump-btn" data-unit-jump="4"><span>UNIDAD IV</span> <p>Deep Learning</p> <p>Sem. 9–11</p></button>
+      <button type="button" disabled class="unit-jump-btn" data-unit-jump="5"><span>Unidad V</span> <p>IA Generativa</p> <p>Semanas 12 – 14</p></button>
+      <button type="button" disabled class="unit-jump-btn" data-unit-jump="5"><span>UNIDAD V</span> <p>IA Generativa y Ética</p> <p>Sem. 12–16</p></button>
+      <button type="button" disabled id="brandHomeBtn">Inteligencia Artificial</button>
+      <button type="button" disabled id="headerBackBtn">← Volver a la pestaña anterior</button>
+      <div id="topPageTabs">
+        <a href="#presentacion" id="topTabPresentacion">Presentación</a>
+        <a href="#cronograma-teorico" id="topTabClases">Clases Teóricas</a>
+        <button type="button" disabled>Unidad I</button>
+        <button type="button" disabled>Unidad II</button>
+        <button type="button" disabled>Unidad III</button>
+        <button type="button" disabled>Unidad IV</button>
+        <button type="button" disabled>Unidad V</button>
+      </div>
+      <button type="button" disabled id="openAllWeeksFromHomeBtn">Ver índice completo de las 13 clases teóricas →</button>
+      <div id="homeUnitsGrid"></div>
+      <div id="pageViewPresentacion"></div>
+      <div id="pageViewUnidad"></div>
+      <div id="pageViewSemana"></div>
+      <div id="pageViewSilabo"></div>
+      <button type="button" disabled id="backToHomeFromUnitBtn">← Volver a Presentación</button>
+      <button type="button" disabled id="breadcrumbHomeUnitBtn">Inicio</button>
+      <span id="unitBreadcrumbLabel"></span>
+      <button type="button" disabled id="prevUnitPageBtn">← Unidad anterior</button>
+      <button type="button" disabled id="nextUnitPageBtn">Siguiente unidad →</button>
+      <div id="activeUnitHeaderBox"></div>
+      <p id="activeUnitBadge"></p>
+      <h2 id="activeUnitTitle"></h2>
+      <p id="activeUnitDescription"></p>
+      <img id="activeUnitHeaderImg" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="" />
+      <div id="cronograma-teorico"></div>
+      <div id="unitFilterButtons">
+        <button type="button" disabled class="unit-filter-btn" data-unit="all">Todas las Clases (13)</button>
+        <button type="button" disabled class="unit-filter-btn" data-unit="1">Unidad I: Fundamentos y Agentes</button>
+        <button type="button" disabled class="unit-filter-btn" data-unit="2">Unidad II: Búsquedas y Juegos</button>
+        <button type="button" disabled class="unit-filter-btn" data-unit="3">Unidad III: Machine Learning</button>
+        <button type="button" disabled class="unit-filter-btn" data-unit="4">Unidad IV: Deep Learning</button>
+        <button type="button" disabled class="unit-filter-btn" data-unit="5">Unidad V: IA Generativa y Ética</button>
+      </div>
+      <input type="text" id="weekSearchInput" />
+      <div id="weeksCardsContainer"></div>
+      <button type="button" disabled id="backToUnitFromWeekBtn"><span id="backToUnitFromWeekLabel">← Volver a la Unidad</span></button>
+      <button type="button" disabled id="backToHomeFromWeekBtn">Ir a Presentación</button>
+      <span id="weekDetailBreadcrumb"></span>
+      <button type="button" disabled id="prevWeekDetailBtn">← Semana anterior</button>
+      <button type="button" disabled id="nextWeekDetailBtn">Siguiente semana →</button>
+      <div id="weekDetailPageContent"></div>
+      <button type="button" disabled id="weekPageSlidePrevBtn">← Lámina anterior</button>
+      <button type="button" disabled id="weekPageSlideNextBtn">Siguiente lámina →</button>
+      <button type="button" disabled id="weekPageDlPptBtn">⬇ Descargar Presentación</button>
+      <button type="button" disabled id="weekPageDlWordBtn">⬇ Descargar Informe Word (.doc)</button>
+      <button type="button" disabled id="weekPageCopyCodeBtn">Copiar código</button>
+      <button type="button" disabled id="weekPageDlColabBtn">⬇ Descargar .ipynb</button>
+      <button type="button" disabled id="backFromSyllabusPageBtn">← Volver a la pestaña anterior</button>
+      <input type="file" id="uploadSyllabusPageInput" />
+      <button type="button" disabled id="downloadSyllabusPageBtn">⬇ Descargar Sílabo Oficial</button>
+      <div id="syllabusPageBody"></div>
+      <p id="unitViewWeeksSummary"></p>
+      <div id="viewUnidad"></div>
+      <button type="button" disabled id="metricOpenUnitsBtn">Ver las 5 unidades →</button>
+      <button type="button" disabled id="metricOpenUnit1Btn">Iniciar en Unidad I →</button>
+      <button type="button" disabled id="metricOpenLabsBtn">Explorar código Python →</button>
+      <button type="button" disabled id="metricOpenProjectBtn">Ver proyecto integrador →</button>
+      <button type="button" disabled id="dropdownShowAllUnitsBtn">Ver todas las Unidades (I – V)</button>
+      <button type="button" disabled id="backToAllUnitsListBtn">Ver todas las unidades (I – V)</button>
+      <button type="button" disabled id="enterUnitWeeksBtn">Ver semanas y recursos de esta unidad →</button>
+      <button type="button" disabled id="unitTitleReturnInfoBtn">UNIDAD I · FUNDAMENTOS Y AGENTES</button>
+      <button type="button" disabled id="viewUnitSummaryLinkBtn">Ver información general de la unidad</button>
+      <div id="viewUnidadInfo"></div>
+      <div id="unitInfoWeeksEntryList"></div>
+      <div id="unitHeroPhotoTrigger"></div>
+      <div id="viewUnidadSemanas"></div>
+      <div id="unitQuickSwitchBar"></div>
+      <button type="button" disabled>Previsualizar o descargar sílabo →</button>
+      <button type="button" disabled>Unidad I · Fundamentos y Agentes Sem. 1–2</button>
+      <button type="button" disabled>Unidad II · Búsquedas y Juegos Sem. 3–4</button>
+      <button type="button" disabled>Unidad III · Machine Learning Sem. 5–7</button>
+      <button type="button" disabled>Unidad IV · Deep Learning Sem. 9–11</button>
+      <button type="button" disabled>Unidad V · IA Generativa y Ética Sem. 12–14</button>
+      <button type="button" disabled>Ver Sílabo Oficial</button>
+      <button type="button" disabled>Ver todas las Unidades (I – V) →</button>
+      <button type="button" disabled id="navBtnProyecto">Proyecto Aplicado</button>
+      <button type="button" disabled id="navBtnBibliografia">Bibliografía</button>
+      <button type="button" disabled id="downloadProjectTemplateBtn">⬇ Descargar Estructura de Informe (.doc)</button>
+      <button type="button" disabled id="goToLabsFromProjectBtn">Revisar cuadernos de código →</button>
+      <button type="button" disabled>Abrir o descargar sílabo →</button>
+      <button type="button" disabled>Sílabo Oficial</button>
+      <div id="viewProyecto"></div>
+      <div id="viewBibliografia"></div>
+      <button type="button" disabled id="navBtnLaboratorios">Laboratorios</button>
+      <div id="viewLaboratorios"><div id="labsIndexSidebar"></div><div id="labsDetailPane"><button type="button" disabled id="labCopyCodeBtn">Copiar</button><button type="button" disabled id="labDownloadIpynbBtn">Descargar</button></div></div>
+    </div>
+
+  </main>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL FLOTANTE CON CABECERA BLANCA LIMPIA E IFRAME IDÉNTICO A LA FOTO -->
+  <!-- ===================================================================== -->
+  <div id="floatingPreviewModal" class="fixed inset-0 z-50 hidden bg-slate-900/55 backdrop-blur-[2px] flex items-center justify-center p-2 sm:p-5">
+    <div class="bg-white border border-slate-200/90 rounded-2xl w-full max-w-[980px] h-[86vh] shadow-2xl flex flex-col overflow-hidden view-fade">
+      <div class="bg-white border-b border-slate-200 px-4 sm:px-6 py-3.5 flex items-center justify-between gap-4 shrink-0">
+        <div class="flex items-center gap-3 min-w-0">
+          <span id="floatingModalViewerBadge" class="hidden"></span>
+          <div id="floatingModalIconBox" class="w-8 h-8 rounded-lg bg-[#e04f33] text-white flex items-center justify-center font-extrabold text-xs shrink-0 shadow-2xs">
+            P
+          </div>
+          <h3 id="floatingModalFileTitle" class="text-sm sm:text-base font-bold text-[#0f172a] truncate">
+            Documento
+          </h3>
+        </div>
+
+        <div class="flex items-center gap-3 shrink-0">
+          <button type="button" id="floatingModalDownloadBtn" class="hidden text-xs font-semibold text-slate-500 hover:text-[#0f172a] cursor-pointer">
+            ⬇ Descargar archivo
+          </button>
+          <button type="button" id="closeFloatingPreviewBtn" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 hover:text-[#0f172a] hover:bg-slate-100 text-lg font-medium transition-colors cursor-pointer" title="Cerrar visor">
+            ✕
+          </button>
+        </div>
+      </div>
+
+      <div class="flex-1 w-full bg-[#f1f5f9] relative">
+        <iframe
+          id="dynamicPreviewIframe"
+          title="Visor de Documentos del Portafolio"
+          class="w-full h-full border-0 bg-white"
+          sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-downloads"
+        ></iframe>
+      </div>
+    </div>
+  </div>
+
+  <!-- PIE DE PÁGINA -->
+  <footer class="border-t border-slate-200 bg-[#f8fafc] text-slate-600 mt-16">
+    <div class="max-w-[1320px] mx-auto px-4 sm:px-8 lg:px-12 py-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs sm:text-sm">
+      <div class="space-y-1 text-center md:text-left">
+        <p class="font-bold text-[#0f172a]">
+          <a href="https://sistemas.unmsm.edu.pe/site/" target="_blank" rel="noopener noreferrer" class="hover:underline">
+            Universidad Nacional Mayor de San Marcos · Facultad de Ingeniería de Sistemas e Informática
+          </a>
+        </p>
+        <p class="font-normal text-slate-500">Escuela Profesional de Ingeniería de Sistemas · Semestre Académico 2026-II</p>
+      </div>
+      <div class="space-y-1 text-center md:text-right">
+        <p class="font-bold text-[#0f172a]" id="footerStudentLine">Autores: Calero Falcón, Gonzalo Manuel · Huanacuni Gomez, Jean Carlos Josue</p>
+        <p class="font-normal text-slate-500">
+          Cátedra: <span class="font-bold text-slate-800" id="footerProfLine">Dr. Hugo Froilán Vega Huerta</span>
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Lógica (el orden importa) -->
+  <script src="js/00-configuracion.js"></script>
+  <script src="js/01-fotos-y-escudo.js"></script>
+  <script src="js/02-temas-y-unidades.js"></script>
+  <script src="js/03-semanas-por-defecto.js"></script>
+  <script src="js/04-estado.js"></script>
+  <script src="js/05-navegacion.js"></script>
+  <script src="js/06-paginas.js"></script>
+  <script src="js/07-diapositivas-demo.js"></script>
+  <script src="js/08-visor-silabo.js"></script>
+  <script src="js/09-visores-demo.js"></script>
+  <script src="js/10-visores-reales.js"></script>
+  <script src="js/11-archivos-github.js"></script>
+  <script src="js/12-panel-creador.js"></script>
+  <script src="js/13-eventos-pagina.js"></script>
+  <script src="js/14-inicio.js"></script>
+</body>
+</html>
