@@ -12,12 +12,20 @@ Se publica gratis con **GitHub Pages** (workflow en `.github/workflows/pages.yml
 - **Visitantes:** solo ven el contenido del portafolio (semanas, informes, PPT, labs, sílabo). No hay ningún botón de administración.
 - **Creador:** entra a `https://TU-SITIO/#creador` para abrir el panel interno. Los cambios que hagas ahí se guardan solo en tu navegador; para publicarlos usa "Exportar index.html" y sube ese archivo a GitHub.
 
-## Cómo actualizar contenido
+## Cómo subir tus PPT, Word y Colab (solo tú)
 
-1. Entra a tu repositorio en GitHub.
-2. Navega a `src/main/resources/static/archivos/semana-XX/`.
-3. **Add file → Upload files**, sube el archivo y pulsa **Commit changes**.
-4. En ~1 minuto el sitio se actualiza solo.
+Solo quien tiene acceso al repositorio de GitHub puede agregar archivos. Los visitantes solo ven y descargan.
+
+1. Entra al repositorio en GitHub y abre `src/main/resources/static/archivos/semana-XX/`.
+2. **Add file → Upload files** y sube tus archivos con estos nombres exactos:
+   - `presentacion.pptx` (o `presentacion.pdf`)
+   - `informe.docx` (o `informe.pdf`)
+   - `laboratorio.ipynb`
+3. **Commit changes**. En ~1 minuto aparecen solos en la semana correspondiente.
+
+Si una semana no tiene archivos, la página muestra una versión de demostración.
+
+> El panel `#creador` guarda los cambios solo en tu navegador; no sirve para publicar archivos a los demás.
 
 ## (Opcional) Ejecutar en tu PC con Java
 

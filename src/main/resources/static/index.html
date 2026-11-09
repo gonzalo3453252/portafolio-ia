@@ -2761,6 +2761,10 @@ import matplotlib.pyplot as plt`,
         triggerDataDownload(w.pptUrl, w.uploadedPptName || w.pptLabel);
         return;
       }
+      if (w.pptUrl && /^https?:\/\//i.test(w.pptUrl)) {
+        triggerLinkDownload(w.pptUrl, w.pptLabel);
+        return;
+      }
       const slides = buildSlidesForWeek(w);
       const slidesHtml = slides.map((s, idx) => `
         <section style="page-break-after:always;padding:44px;border:1px solid #e2e8f0;margin-bottom:28px;background:#ffffff;font-family:sans-serif;">
@@ -2781,6 +2785,10 @@ import matplotlib.pyplot as plt`,
         triggerDataDownload(w.docUrl, w.uploadedDocName || w.docLabel);
         return;
       }
+      if (w.docUrl && /^https?:\/\//i.test(w.docUrl)) {
+        triggerLinkDownload(w.docUrl, w.docLabel);
+        return;
+      }
       const subtemas = w.topics.map((t, idx) => {
         const parsed = parseTopicItem(t, w.week, idx);
         return `<h3>${escapeHtml(parsed.code)} ${escapeHtml(parsed.title)}</h3><p>${escapeHtml(parsed.desc)}</p>`;
@@ -2795,6 +2803,10 @@ import matplotlib.pyplot as plt`,
       const w = appState.weeks.find(item => item.week === weekNum) || appState.weeks[0];
       if (w.colabUrl && w.colabUrl.startsWith("data:")) {
         triggerDataDownload(w.colabUrl, w.uploadedColabName || w.colabLabel);
+        return;
+      }
+      if (w.colabUrl && /^https?:\/\//i.test(w.colabUrl) && /\.ipynb$/i.test(w.colabUrl)) {
+        triggerLinkDownload(w.colabUrl, w.colabLabel);
         return;
       }
       const ipynbObj = {
@@ -2822,6 +2834,67 @@ import matplotlib.pyplot as plt`,
       const blob = new Blob([JSON.stringify(ipynbObj, null, 2)], { type: "application/x-ipynb+json" });
       triggerBlobDownload(blob, w.colabLabel);
       showToast(`Cuaderno ${w.colabLabel} descargado`);
+    }
+
+    function triggerLinkDownload(url, filename) {
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename || "";
+      a.target = "_blank";
+      a.rel = "noopener";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+    // =========================================================================
+    // ARCHIVOS REALES POR CARPETA: archivos/semana-NN/
+    //   presentacion.pptx|.pdf|.ppt   informe.docx|.pdf|.doc   laboratorio.ipynb
+    // Si el archivo existe en el sitio, reemplaza automáticamente la versión demo.
+    // Solo quien tiene acceso al repositorio puede agregar archivos ahí.
+    // =========================================================================
+    const FILE_CONVENTION = [
+      { urlKey: "pptUrl",     flag: "hasPpt",   base: "presentacion", exts: ["pptx", "pdf", "ppt"], label: "pptLabel" },
+      { urlKey: "docUrl",     flag: "hasWord",  base: "informe",      exts: ["docx", "pdf", "doc"], label: "docLabel" },
+      { urlKey: "colabUrl", flag: "hasColab", base: "laboratorio",  exts: ["ipynb"],              label: "colabLabel" }
+    ];
+
+    async function publicFileExists(url) {
+      try {
+        const r = await fetch(url, { method: "HEAD", cache: "no-cache" });
+        const ct = (r.headers.get("content-type") || "").toLowerCase();
+        return r.ok && !ct.includes("text/html");
+      } catch (e) {
+        return false;
+      }
+    }
+
+    async function autoDetectWeekFiles() {
+      let changed = false;
+      await Promise.all(appState.weeks.map(async (w) => {
+        const folder = "archivos/semana-" + String(w.week).padStart(2, "0") + "/";
+        for (const kind of FILE_CONVENTION) {
+          const cur = w[kind.urlKey];
+          const isDefault = !cur || cur === "https://colab.research.google.com/";
+          if (!isDefault) continue;
+          for (const ext of kind.exts) {
+            const rel = folder + kind.base + "." + ext;
+            if (await publicFileExists(rel)) {
+              w[kind.urlKey] = new URL(rel, location.href).href;
+              w[kind.flag] = true;
+              const current = w[kind.label] || (kind.base + "." + ext);
+              w[kind.label] = current.replace(/\.[A-Za-z0-9]+$/, "") + "." + ext;
+              changed = true;
+              break;
+            }
+          }
+        }
+      }));
+      if (changed) {
+        if (activePage === "todas-unidades") renderAllUnitsSummary();
+        if (activePage === "unidad-especifica") renderSpecificUnitView();
+        if (activePage === "semana-individual") renderSingleWeekView();
+      }
     }
 
     function triggerBlobDownload(blob, filename) {
@@ -2933,6 +3006,7 @@ import matplotlib.pyplot as plt`,
       renderProfileHeader();
       populateWeekSelectors();
       showPresentacionPage();
+      autoDetectWeekFiles();
 
       document.getElementById("fontIncreaseBtn").addEventListener("click", () => {
         baseFontScale = Math.min(115, baseFontScale + 5);
