@@ -654,6 +654,16 @@
           </div>
         </div>
 
+        <!-- PUBLICAR CAMBIOS DE TEXTO (semanas, unidades, títulos, temas) -->
+        <div class="p-4 bg-sky-50 border border-sky-200 rounded-xl text-[11px] text-sky-900 space-y-1.5">
+          <p class="font-extrabold uppercase tracking-wider text-xs">Publicar mis cambios de semanas, unidades y textos para todos</p>
+          <p>Lo que editas en este panel se ve solo en tu navegador hasta que lo publiques así:</p>
+          <p><b>1.</b> Pulsa <b>Descargar HTML</b> (abajo). Se baja un archivo <code>index.html</code>.
+             <b>2.</b> <a class="underline font-bold" target="_blank" rel="noopener noreferrer" href="https://github.com/gonzalo3453252/portafolio-ia/upload/main/src/main/resources/static">Abre esta página de GitHub</a> y arrastra ese <code>index.html</code> (reemplaza al anterior).
+             <b>3.</b> Pulsa <b>Commit changes</b>. En 1-2 minutos lo ve todo el mundo.</p>
+          <p>Tus PPT, Word y Colab no se suben aquí: usa los botones verdes de arriba.</p>
+        </div>
+
         <div class="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-slate-200 text-xs">
           <div class="flex items-center gap-4">
             <button type="button" id="resetDefaultsBtn" class="text-slate-600 hover:text-[#0f172a] font-bold underline cursor-pointer">
@@ -1606,9 +1616,24 @@ import matplotlib.pyplot as plt`,
       } catch (e) {}
     }
 
+    // Copia del estado sin los archivos autodetectados de las carpetas de GitHub
+    function stateForPersist() {
+      const c = JSON.parse(JSON.stringify(appState));
+      (c.weeks || []).forEach((w) => {
+        if (w._auto) {
+          FILE_CONVENTION.forEach((kind) => {
+            const o = w._auto[kind.key];
+            if (o) { w[kind.urlKey] = o.url; w[kind.label] = o.label; w[kind.flag] = o.flag; }
+          });
+          delete w._auto;
+        }
+      });
+      return c;
+    }
+
     function saveState() {
       try {
-        localStorage.setItem("unmsm_fisi_ia_editorial_v17", JSON.stringify(appState));
+        localStorage.setItem("unmsm_fisi_ia_editorial_v17", JSON.stringify(stateForPersist()));
       } catch (e) {}
     }
 
@@ -2915,6 +2940,8 @@ import matplotlib.pyplot as plt`,
           if (manifest) {
             const name = manifest[String(w.week)] && manifest[String(w.week)][kind.key];
             if (name) {
+              w._auto = w._auto || {};
+              if (!w._auto[kind.key]) w._auto[kind.key] = { url: cur || "", label: w[kind.label], flag: w[kind.flag] };
               w[kind.urlKey] = new URL(folder + encodeURIComponent(name), location.href).href;
               w[kind.flag] = true;
               w[kind.label] = name;
@@ -2927,6 +2954,8 @@ import matplotlib.pyplot as plt`,
           for (const ext of kind.exts) {
             const rel = folder + kind.base + "." + ext;
             if (await publicFileExists(rel)) {
+              w._auto = w._auto || {};
+              if (!w._auto[kind.key]) w._auto[kind.key] = { url: cur || "", label: w[kind.label], flag: w[kind.flag] };
               w[kind.urlKey] = new URL(rel, location.href).href;
               w[kind.flag] = true;
               const current = w[kind.label] || (kind.base + "." + ext);
@@ -3446,7 +3475,7 @@ print("Laboratorio de la Semana ${pad} listo para ejecución")`,
           existingStateScript.id = "embeddedCustomState";
           document.head.appendChild(existingStateScript);
         }
-        existingStateScript.textContent = "window.__CUSTOM_PORTFOLIO_STATE__ = " + JSON.stringify(appState) + ";";
+        existingStateScript.textContent = "window.__CUSTOM_PORTFOLIO_STATE__ = " + JSON.stringify(stateForPersist()) + ";";
         const clonedDoc = "<!DOCTYPE html>" + String.fromCharCode(10) + document.documentElement.outerHTML;
         const blob = new Blob([clonedDoc], { type: "text/html;charset=utf-8" });
         triggerBlobDownload(blob, "index.html");
