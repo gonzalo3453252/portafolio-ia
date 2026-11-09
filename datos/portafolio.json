@@ -364,33 +364,6 @@
       "colabUrl": "",
       "codeSnippet": "import numpy as np\nimport matplotlib.pyplot as plt",
       "codeOutput": "Ratio de Impacto Dispar: 0.88"
-    },
-    {
-      "week": 15,
-      "unit": 5,
-      "unitName": "Unidad V · IA Generativa, Ética y Futuro de la IA",
-      "title": "semana 15 prueba",
-      "subtitleSlide": "Desarrollo teórico y práctico — Semana 15",
-      "photoCaption": "Sesión 15 — Inteligencia Artificial FISI UNMSM",
-      "topics": [
-        "15.1 Fundamentos conceptuales y modelo teórico de la sesión",
-        "15.2 Algoritmos y formulación computacional",
-        "15.3 Casos de estudio aplicados en Ingeniería de Sistemas",
-        "15.4 Experimentación práctica en Python y Google Colab"
-      ],
-      "evaluation": "Clase Teórica y Práctica de Laboratorio",
-      "summary": "Estudio de los fundamentos teóricos, modelado algorítmico e implementación práctica correspondientes a la Semana 15 de la asignatura de Inteligencia Artificial.",
-      "hasPpt": true,
-      "hasWord": true,
-      "hasColab": true,
-      "pptLabel": "Clase15_Sesion_IA.pptx",
-      "pptUrl": "",
-      "docLabel": "Tarea15_Informe_Academico.pdf",
-      "docUrl": "",
-      "colabLabel": "Lab15_Implementacion_IA.ipynb",
-      "colabUrl": "",
-      "codeSnippet": "# Semana 15 — Laboratorio de Inteligencia Artificial (UNMSM)\nimport numpy as np\nprint(\"Laboratorio de la Semana 15 listo para ejecución\")",
-      "codeOutput": "Laboratorio de la Semana 15 listo para ejecución"
     }
   ]
 }
