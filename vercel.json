@@ -1,4 +1,0 @@
-{
-  "buildCommand": "node scripts/generar-manifiesto.js",
-  "outputDirectory": "src/main/resources/static"
-}

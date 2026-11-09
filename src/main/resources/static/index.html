@@ -2952,9 +2952,75 @@ import matplotlib.pyplot as plt`,
       return null;
     }
 
+    // Misma regla que scripts/generar-manifiesto.js
+    function classifyWeekFiles(names) {
+      const entry = {};
+      const pdfs = [];
+      for (const f of names) {
+        const lower = f.toLowerCase();
+        if (/^readme/.test(lower)) continue;
+        let k = null;
+        if (/\.(pptx|ppt)$/.test(lower)) k = "ppt";
+        else if (/\.(docx|doc)$/.test(lower)) k = "doc";
+        else if (/\.ipynb$/.test(lower)) k = "colab";
+        else if (/\.pdf$/.test(lower)) { pdfs.push(f); continue; }
+        if (!k) continue;
+        const standard = /^(presentacion|informe|laboratorio)\./i.test(f);
+        if (!entry[k] || standard) entry[k] = f;
+      }
+      for (const f of pdfs) {
+        const lower = f.toLowerCase();
+        const looksDoc = /(informe|tarea|reporte|trabajo)/.test(lower) || /\.docx?\b/.test(lower);
+        const standard = /^(presentacion|informe)\./i.test(f);
+        if (looksDoc || /^informe\./i.test(f)) { if (!entry.doc || standard) entry.doc = f; }
+        else if (/^presentacion\./i.test(f)) { if (!entry.ppt || standard) entry.ppt = f; }
+        else if (!entry.ppt) entry.ppt = f;
+        else if (!entry.doc) entry.doc = f;
+      }
+      return entry;
+    }
+
+    // Lista de archivos leída directo del repositorio de GitHub (no depende del hosting ni de ningún build)
+    const GITHUB_REPO = "gonzalo3453252/portafolio-ia";
+    async function loadManifestFromGithub() {
+      try {
+        const cached = sessionStorage.getItem("ia_tree_v1");
+        if (cached) {
+          const c = JSON.parse(cached);
+          if (Date.now() - c.t < 5 * 60 * 1000) return c.m;
+        }
+      } catch (e) {}
+      try {
+        const r = await fetch("https://api.github.com/repos/" + GITHUB_REPO + "/git/trees/main?recursive=1", { headers: { Accept: "application/vnd.github+json" } });
+        if (!r.ok) return null;
+        const d = await r.json();
+        const byWeek = {};
+        for (const it of (d.tree || [])) {
+          if (it.type !== "blob") continue;
+          const m = /^src\/main\/resources\/static\/archivos\/semana-(\d+)\/([^\/]+)$/.exec(it.path);
+          if (!m) continue;
+          const wk = String(parseInt(m[1], 10));
+          if (!byWeek[wk]) byWeek[wk] = [];
+          byWeek[wk].push(m[2]);
+        }
+        const manifest = {};
+        Object.keys(byWeek).forEach((wk) => {
+          const e = classifyWeekFiles(byWeek[wk].sort());
+          if (Object.keys(e).length) manifest[wk] = e;
+        });
+        try { sessionStorage.setItem("ia_tree_v1", JSON.stringify({ t: Date.now(), m: manifest })); } catch (e) {}
+        return manifest;
+      } catch (e) {
+        return null;
+      }
+    }
+
     async function autoDetectWeekFiles() {
       let changed = false;
-      const manifest = await loadFilesManifest();
+      // 1) GitHub (fuente de verdad)  2) lista generada al publicar  3) nombres estándar
+      let manifest = await loadManifestFromGithub();
+      let verify = true;
+      if (!manifest) { manifest = await loadFilesManifest(); verify = false; }
       await Promise.all(appState.weeks.map(async (w) => {
         const folder = "archivos/semana-" + String(w.week).padStart(2, "0") + "/";
         for (const kind of FILE_CONVENTION) {
@@ -2965,9 +3031,12 @@ import matplotlib.pyplot as plt`,
           if (manifest) {
             const name = manifest[String(w.week)] && manifest[String(w.week)][kind.key];
             if (name) {
+              const fileUrl = new URL(folder + encodeURIComponent(name), location.href).href;
+              // El hosting puede tardar 1-2 min en tener el archivo recién subido: solo se muestra si ya existe
+              if (verify && !(await publicFileExists(fileUrl))) continue;
               w._auto = w._auto || {};
               if (!w._auto[kind.key]) w._auto[kind.key] = { url: cur || "", label: w[kind.label], flag: w[kind.flag] };
-              w[kind.urlKey] = new URL(folder + encodeURIComponent(name), location.href).href;
+              w[kind.urlKey] = fileUrl;
               w[kind.flag] = true;
               w[kind.label] = name;
               changed = true;
