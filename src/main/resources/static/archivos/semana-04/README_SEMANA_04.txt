@@ -3,8 +3,8 @@ Sube aquí los archivos REALES de la semana 04. Puedes usar cualquier nombre:
 - .pptx / .ppt  -> aparece como Presentación
 - .docx / .doc  -> aparece como Informe
 - .ipynb        -> aparece como Laboratorio (Colab)
-- .pdf          -> si el nombre tiene "informe", "tarea", "reporte" o "trabajo" es Informe;
-                   si no, es Presentación.
+- .pdf          -> informe si el nombre dice informe, tarea, reporte, trabajo o viene de un .docx;
+                   si no, ocupa el hueco libre (primero Presentación, luego Informe).
 
 Si subes más de un archivo del mismo tipo, se usa el primero por orden alfabético
 (o el que se llame presentacion / informe / laboratorio).

@@ -19,7 +19,7 @@ Solo quien tiene acceso al repositorio de GitHub puede agregar archivos. Los vis
 1. Entra al repositorio en GitHub y abre `src/main/resources/static/archivos/semana-XX/` (o usa los botones del panel `#creador`).
 2. **Add file → Upload files** y sube tus archivos **con el nombre que quieras**:
    - `.pptx` → Presentación · `.docx` → Informe · `.ipynb` → Laboratorio
-   - `.pdf` → Informe si el nombre contiene *informe, tarea, reporte o trabajo*; si no, Presentación.
+   - `.pdf` → Informe si el nombre dice *informe, tarea, reporte, trabajo* o viene de un .docx; si no, ocupa el hueco libre (primero Presentación).
 3. **Commit changes**. En 1-2 minutos aparecen solos en la semana correspondiente.
 
 Si una semana no tiene archivos, la página muestra una versión de demostración.
