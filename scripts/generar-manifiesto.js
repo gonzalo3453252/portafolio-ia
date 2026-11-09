@@ -48,5 +48,12 @@ for (const dir of fs.readdirSync(root)) {
   if (Object.keys(entry).length) manifest[week] = entry;
 }
 
+// Sílabo: PDF dentro de archivos/silabo/ (prefiere el que diga "silabo")
+const silaboDir = path.join(root, "silabo");
+if (fs.existsSync(silaboDir)) {
+  const pdfs = fs.readdirSync(silaboDir).filter((f) => /\.pdf$/i.test(f)).sort();
+  if (pdfs.length) manifest.silabo = pdfs.find((f) => /s[ií]labo/i.test(f)) || pdfs[0];
+}
+
 fs.writeFileSync(path.join(root, "manifest.json"), JSON.stringify(manifest, null, 2));
 console.log("manifest.json generado:", JSON.stringify(manifest));
