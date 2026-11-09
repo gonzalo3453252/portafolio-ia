@@ -472,29 +472,6 @@
           <button type="button" id="closeCreatorModalBtn" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-xs font-bold text-[#0f172a] cursor-pointer">✕ Cerrar</button>
         </div>
 
-        <!-- 0. SUBIR ARCHIVOS REALES (publica para todos los visitantes) -->
-        <div class="space-y-3 p-4 bg-emerald-50 border border-emerald-200 rounded-xl">
-          <div>
-            <h4 class="text-xs font-extrabold uppercase tracking-wider text-emerald-900">Subir mis archivos a una semana (se publican para todos)</h4>
-            <p class="text-[11px] text-emerald-900/80 mt-1">Elige la semana: se abre la página de subida de GitHub (solo tú puedes entrar con tu cuenta). Arrastra tus archivos con el nombre que quieras (.pptx = presentación, .docx = informe, .ipynb = laboratorio; un .pdf es informe si su nombre dice informe, tarea o reporte). Luego pulsa <b>Commit changes</b>; en ~1 minuto aparecen en la página.</p>
-          </div>
-          <div class="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-7 gap-2">
-            <a href="https://github.com/gonzalo3453252/portafolio-ia/upload/main/src/main/resources/static/archivos/semana-01" target="_blank" rel="noopener noreferrer" class="px-3 py-2 rounded-lg bg-white border border-emerald-300 hover:bg-emerald-100 text-xs font-bold text-emerald-900 text-center">Semana 1</a>
-            <a href="https://github.com/gonzalo3453252/portafolio-ia/upload/main/src/main/resources/static/archivos/semana-02" target="_blank" rel="noopener noreferrer" class="px-3 py-2 rounded-lg bg-white border border-emerald-300 hover:bg-emerald-100 text-xs font-bold text-emerald-900 text-center">Semana 2</a>
-            <a href="https://github.com/gonzalo3453252/portafolio-ia/upload/main/src/main/resources/static/archivos/semana-03" target="_blank" rel="noopener noreferrer" class="px-3 py-2 rounded-lg bg-white border border-emerald-300 hover:bg-emerald-100 text-xs font-bold text-emerald-900 text-center">Semana 3</a>
-            <a href="https://github.com/gonzalo3453252/portafolio-ia/upload/main/src/main/resources/static/archivos/semana-04" target="_blank" rel="noopener noreferrer" class="px-3 py-2 rounded-lg bg-white border border-emerald-300 hover:bg-emerald-100 text-xs font-bold text-emerald-900 text-center">Semana 4</a>
-            <a href="https://github.com/gonzalo3453252/portafolio-ia/upload/main/src/main/resources/static/archivos/semana-05" target="_blank" rel="noopener noreferrer" class="px-3 py-2 rounded-lg bg-white border border-emerald-300 hover:bg-emerald-100 text-xs font-bold text-emerald-900 text-center">Semana 5</a>
-            <a href="https://github.com/gonzalo3453252/portafolio-ia/upload/main/src/main/resources/static/archivos/semana-06" target="_blank" rel="noopener noreferrer" class="px-3 py-2 rounded-lg bg-white border border-emerald-300 hover:bg-emerald-100 text-xs font-bold text-emerald-900 text-center">Semana 6</a>
-            <a href="https://github.com/gonzalo3453252/portafolio-ia/upload/main/src/main/resources/static/archivos/semana-07" target="_blank" rel="noopener noreferrer" class="px-3 py-2 rounded-lg bg-white border border-emerald-300 hover:bg-emerald-100 text-xs font-bold text-emerald-900 text-center">Semana 7</a>
-            <a href="https://github.com/gonzalo3453252/portafolio-ia/upload/main/src/main/resources/static/archivos/semana-09" target="_blank" rel="noopener noreferrer" class="px-3 py-2 rounded-lg bg-white border border-emerald-300 hover:bg-emerald-100 text-xs font-bold text-emerald-900 text-center">Semana 9</a>
-            <a href="https://github.com/gonzalo3453252/portafolio-ia/upload/main/src/main/resources/static/archivos/semana-10" target="_blank" rel="noopener noreferrer" class="px-3 py-2 rounded-lg bg-white border border-emerald-300 hover:bg-emerald-100 text-xs font-bold text-emerald-900 text-center">Semana 10</a>
-            <a href="https://github.com/gonzalo3453252/portafolio-ia/upload/main/src/main/resources/static/archivos/semana-11" target="_blank" rel="noopener noreferrer" class="px-3 py-2 rounded-lg bg-white border border-emerald-300 hover:bg-emerald-100 text-xs font-bold text-emerald-900 text-center">Semana 11</a>
-            <a href="https://github.com/gonzalo3453252/portafolio-ia/upload/main/src/main/resources/static/archivos/semana-12" target="_blank" rel="noopener noreferrer" class="px-3 py-2 rounded-lg bg-white border border-emerald-300 hover:bg-emerald-100 text-xs font-bold text-emerald-900 text-center">Semana 12</a>
-            <a href="https://github.com/gonzalo3453252/portafolio-ia/upload/main/src/main/resources/static/archivos/semana-13" target="_blank" rel="noopener noreferrer" class="px-3 py-2 rounded-lg bg-white border border-emerald-300 hover:bg-emerald-100 text-xs font-bold text-emerald-900 text-center">Semana 13</a>
-            <a href="https://github.com/gonzalo3453252/portafolio-ia/upload/main/src/main/resources/static/archivos/semana-14" target="_blank" rel="noopener noreferrer" class="px-3 py-2 rounded-lg bg-white border border-emerald-300 hover:bg-emerald-100 text-xs font-bold text-emerald-900 text-center">Semana 14</a>
-          </div>
-        </div>
-
         <!-- 1. DATOS GENERALES DEL PORTAFOLIO -->
         <div class="space-y-3">
           <div class="flex items-center justify-between">
@@ -576,6 +553,36 @@
             </div>
           </div>
 
+          <!-- Formulario para crear una semana nueva (tú eliges número y unidad) -->
+          <div id="newWeekForm" class="hidden p-4 bg-emerald-50 border border-emerald-300 rounded-xl space-y-3">
+            <p class="text-xs font-extrabold uppercase tracking-wider text-emerald-900">Nueva semana</p>
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
+              <div class="md:col-span-2">
+                <label class="block text-xs font-bold text-slate-700 mb-1" for="newWeekNum">N.° de semana</label>
+                <input id="newWeekNum" type="number" min="1" max="32" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-bold text-[#0f172a]" />
+              </div>
+              <div class="md:col-span-4">
+                <label class="block text-xs font-bold text-slate-700 mb-1" for="newWeekUnit">Unidad</label>
+                <select id="newWeekUnit" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-bold text-[#0f172a]">
+                  <option value="1">Unidad I · Fundamentos y Agentes</option>
+                  <option value="2">Unidad II · Búsquedas y Juegos</option>
+                  <option value="3">Unidad III · Machine Learning</option>
+                  <option value="4">Unidad IV · Deep Learning</option>
+                  <option value="5">Unidad V · IA Generativa y Ética</option>
+                </select>
+              </div>
+              <div class="md:col-span-6">
+                <label class="block text-xs font-bold text-slate-700 mb-1" for="newWeekTitle">Título de la semana</label>
+                <input id="newWeekTitle" type="text" placeholder="Ej. Redes Neuronales Convolucionales" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs text-[#0f172a]" />
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <button type="button" id="newWeekCreateBtn" class="px-3.5 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg text-xs font-bold cursor-pointer">Crear semana</button>
+              <button type="button" id="newWeekCancelBtn" class="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold cursor-pointer">Cancelar</button>
+              <span class="text-[11px] text-slate-600">Después completa los temas y el resumen abajo y pulsa «Guardar cambios de esta semana».</span>
+            </div>
+          </div>
+
           <!-- Selector de semana + Datos principales de la semana -->
           <div class="grid grid-cols-1 md:grid-cols-12 gap-4 p-4 bg-slate-50 border border-slate-200 rounded-xl">
             <div class="md:col-span-4">
@@ -629,7 +636,6 @@
               </label>
               <input id="inputWeekPptLabel" type="text" placeholder="Nombre: Clase01_Fundamentos.pptx" class="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded text-xs font-medium text-[#0f172a]" />
               <input id="inputWeekPptUrl" type="url" placeholder="URL pública .pptx / .pdf" class="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded text-xs text-[#0f172a]" />
-              <input id="fileUploadPpt" type="file" accept=".pptx,.ppt,.pdf" class="block w-full text-[11px] text-slate-600" />
             </div>
 
             <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
@@ -639,7 +645,6 @@
               </label>
               <input id="inputWeekDocLabel" type="text" placeholder="Nombre: Tarea01_Informe.pdf" class="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded text-xs font-medium text-[#0f172a]" />
               <input id="inputWeekDocUrl" type="url" placeholder="URL pública .pdf / .docx" class="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded text-xs text-[#0f172a]" />
-              <input id="fileUploadDoc" type="file" accept=".pdf,.docx,.doc" class="block w-full text-[11px] text-slate-600" />
             </div>
 
             <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
@@ -649,18 +654,22 @@
               </label>
               <input id="inputWeekColabLabel" type="text" placeholder="Nombre: Lab01_Notebook.ipynb" class="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded text-xs font-medium text-[#0f172a]" />
               <input id="inputWeekColabUrl" type="url" placeholder="URL Google Colab / .ipynb" class="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded text-xs text-[#0f172a]" />
-              <input id="fileUploadColab" type="file" accept=".ipynb,.py" class="block w-full text-[11px] text-slate-600" />
             </div>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-3 p-3.5 bg-emerald-50 border border-emerald-200 rounded-xl">
+            <button type="button" id="uploadWeekFilesBtn" class="px-3.5 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg text-xs font-bold cursor-pointer">Subir archivos de esta semana a GitHub</button>
+            <p class="text-[11px] text-emerald-900 flex-1 min-w-[220px]">Abre la carpeta de la semana en GitHub: arrastra tus <b>.pptx / .docx / .ipynb / .pdf</b> (cualquier nombre) y pulsa <b>Commit changes</b>. En 1-2 minutos los ve todo el mundo.</p>
           </div>
         </div>
 
         <!-- PUBLICAR CAMBIOS DE TEXTO (semanas, unidades, títulos, temas) -->
         <div class="p-4 bg-sky-50 border border-sky-200 rounded-xl text-[11px] text-sky-900 space-y-2">
           <p class="font-extrabold uppercase tracking-wider text-xs">Publicar mis cambios de semanas, unidades y textos para todos</p>
-          <p>Lo que editas aquí se ve solo en tu navegador hasta que lo publiques:</p>
+          <p>Lo que editas aquí se ve solo en tu navegador hasta que lo publiques. <span id="pendingChangesNote" class="hidden font-extrabold text-amber-700">● Tienes cambios sin publicar.</span></p>
           <button type="button" id="publishGithubBtn" class="px-4 py-2 bg-sky-700 hover:bg-sky-800 text-white rounded-lg text-xs font-bold cursor-pointer">Publicar en GitHub</button>
           <p>Se copian tus cambios y se abre GitHub. Allí: <b>Ctrl+A</b> (seleccionar todo), <b>Ctrl+V</b> (pegar) y el botón verde <b>Commit changes</b> (dos veces). En 1-2 minutos lo ve todo el mundo.</p>
-          <p>Tus PPT, Word y Colab no se suben aquí: usa los botones verdes de arriba.</p>
+          <p>Tus PPT, Word y Colab no se publican con este botón: usa «Subir archivos de esta semana a GitHub» (en la sección 3).</p>
         </div>
 
         <div class="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-slate-200 text-xs">
@@ -674,7 +683,7 @@
           </div>
           <div class="flex items-center gap-3">
             <button type="button" id="saveWeekLinksBtn" class="px-5 py-2.5 bg-[#0f172a] hover:bg-slate-800 text-white rounded-xl font-bold cursor-pointer shadow-sm">
-              Guardar Enlaces de la Semana Seleccionada
+              Guardar cambios de esta semana
             </button>
           </div>
         </div>
@@ -1597,22 +1606,37 @@ import matplotlib.pyplot as plt`,
     let currentIframeBlobUrl = null;
     let currentModalDownloadHandler = null;
 
+    const PENDING_KEY = "unmsm_fisi_ia_pendientes";
+
     function loadSavedState() {
       try {
-        if (window.__CUSTOM_PORTFOLIO_STATE__) {
-          appState = JSON.parse(JSON.stringify(window.__CUSTOM_PORTFOLIO_STATE__));
-        }
+        const published = window.__CUSTOM_PORTFOLIO_STATE__ ? JSON.parse(JSON.stringify(window.__CUSTOM_PORTFOLIO_STATE__)) : null;
+        if (published) appState = JSON.parse(JSON.stringify(published));
         const saved = localStorage.getItem("unmsm_fisi_ia_editorial_v17");
+        const pending = localStorage.getItem(PENDING_KEY) === "1";
         if (saved) {
           const parsed = JSON.parse(saved);
           if (parsed && parsed.studentName && Array.isArray(parsed.weeks) && parsed.weeks.length > 0) {
-            appState = parsed;
-            if (appState.groupBadge === "Semestre Académico 2026-I") {
-              appState.groupBadge = "Semestre Académico 2026-II";
+            const same = published && JSON.stringify(parsed) === JSON.stringify(published);
+            if (same) {
+              localStorage.removeItem(PENDING_KEY);
+            } else if (!published || pending) {
+              appState = parsed;
+              if (appState.groupBadge === "Semestre Académico 2026-I") {
+                appState.groupBadge = "Semestre Académico 2026-II";
+              }
             }
           }
         }
       } catch (e) {}
+    }
+
+    function refreshPendingNote() {
+      const el = document.getElementById("pendingChangesNote");
+      if (!el) return;
+      let pending = false;
+      try { pending = localStorage.getItem(PENDING_KEY) === "1"; } catch (e) {}
+      el.classList.toggle("hidden", !pending);
     }
 
     // Copia del estado sin los archivos autodetectados de las carpetas de GitHub
@@ -1633,7 +1657,9 @@ import matplotlib.pyplot as plt`,
     function saveState() {
       try {
         localStorage.setItem("unmsm_fisi_ia_editorial_v17", JSON.stringify(stateForPersist()));
+        localStorage.setItem(PENDING_KEY, "1");
       } catch (e) {}
+      refreshPendingNote();
     }
 
     function showToast(msg) {
@@ -3030,6 +3056,8 @@ import matplotlib.pyplot as plt`,
 
       document.getElementById("editWeekNumberInput").value = found.week;
       document.getElementById("editWeekUnitSelect").value = String(found.unit || 1);
+      const upBtn = document.getElementById("uploadWeekFilesBtn");
+      if (upBtn) upBtn.textContent = `Subir archivos de la Semana ${String(found.week).padStart(2, "0")} a GitHub`;
       document.getElementById("editWeekTitleInput").value = found.title || "";
       document.getElementById("editWeekEvalInput").value = found.evaluation || "";
       document.getElementById("editWeekSummaryInput").value = found.summary || "";
@@ -3297,6 +3325,7 @@ import matplotlib.pyplot as plt`,
       function openCreatorFromHash() {
         if (location.hash.toLowerCase() === "#creador") {
           populateWeekSelectors(activeWeekNum);
+          refreshPendingNote();
           document.getElementById("creatorAdminModal").classList.remove("hidden");
         }
       }
@@ -3323,27 +3352,21 @@ import matplotlib.pyplot as plt`,
 
       document.getElementById("selectWeekEdit").addEventListener("change", loadSelectedWeekIntoInputs);
 
-      // Agregar una Nueva Semana
-      document.getElementById("addNewWeekBtn").addEventListener("click", () => {
-        const existingNums = appState.weeks.map(w => w.week);
-        let nextNum = 1;
-        while (existingNums.includes(nextNum)) {
-          nextNum++;
-        }
-        const selectedUnit = parseInt(document.getElementById("editWeekUnitSelect").value, 10) || activeUnitNum || 5;
-        const pad = String(nextNum).padStart(2, "0");
-        const newWeekObj = {
-          week: nextNum,
-          unit: selectedUnit,
-          unitName: UNIT_FULL_NAMES[selectedUnit] || UNIT_FULL_NAMES[1],
-          title: `Sesión Académica de la Semana ${pad}`,
+      // Agregar una Nueva Semana (tú eliges número y unidad)
+      function buildNewWeek(num, unit, titleVal) {
+        const pad = String(num).padStart(2, "0");
+        return {
+          week: num,
+          unit: unit,
+          unitName: UNIT_FULL_NAMES[unit] || UNIT_FULL_NAMES[1],
+          title: titleVal || `Sesión Académica de la Semana ${pad}`,
           subtitleSlide: `Desarrollo teórico y práctico — Semana ${pad}`,
           photoCaption: `Sesión ${pad} — Inteligencia Artificial FISI UNMSM`,
           topics: [
-            `${nextNum}.1 Fundamentos conceptuales y modelo teórico de la sesión`,
-            `${nextNum}.2 Algoritmos y formulación computacional`,
-            `${nextNum}.3 Casos de estudio aplicados en Ingeniería de Sistemas`,
-            `${nextNum}.4 Experimentación práctica en Python y Google Colab`
+            `${num}.1 Fundamentos conceptuales y modelo teórico de la sesión`,
+            `${num}.2 Algoritmos y formulación computacional`,
+            `${num}.3 Casos de estudio aplicados en Ingeniería de Sistemas`,
+            `${num}.4 Experimentación práctica en Python y Google Colab`
           ],
           evaluation: "Clase Teórica y Práctica de Laboratorio",
           summary: `Estudio de los fundamentos teóricos, modelado algorítmico e implementación práctica correspondientes a la Semana ${pad} de la asignatura de Inteligencia Artificial.`,
@@ -3361,15 +3384,50 @@ import numpy as np
 print("Laboratorio de la Semana ${pad} listo para ejecución")`,
           codeOutput: `Laboratorio de la Semana ${pad} listo para ejecución`
         };
+      }
 
-        appState.weeks.push(newWeekObj);
+      document.getElementById("addNewWeekBtn").addEventListener("click", () => {
+        const used = appState.weeks.map(w => w.week);
+        let suggested = 1;
+        while (used.includes(suggested)) suggested++;
+        document.getElementById("newWeekNum").value = suggested;
+        document.getElementById("newWeekUnit").value = String(parseInt(document.getElementById("editWeekUnitSelect").value, 10) || 1);
+        document.getElementById("newWeekTitle").value = "";
+        document.getElementById("newWeekForm").classList.remove("hidden");
+        document.getElementById("newWeekNum").focus();
+      });
+
+      document.getElementById("newWeekCancelBtn").addEventListener("click", () => {
+        document.getElementById("newWeekForm").classList.add("hidden");
+      });
+
+      document.getElementById("newWeekCreateBtn").addEventListener("click", () => {
+        const num = parseInt(document.getElementById("newWeekNum").value, 10);
+        const unit = parseInt(document.getElementById("newWeekUnit").value, 10) || 1;
+        const titleVal = document.getElementById("newWeekTitle").value.trim();
+        if (!Number.isInteger(num) || num < 1 || num > 32) {
+          showToast("El número de semana debe estar entre 1 y 32");
+          return;
+        }
+        if (appState.weeks.some(w => w.week === num)) {
+          showToast(`Ya existe la Semana ${num}. Elige otro número.`);
+          return;
+        }
+        appState.weeks.push(buildNewWeek(num, unit, titleVal));
         sortWeeksInPlace();
         saveState();
-        populateWeekSelectors(nextNum);
+        populateWeekSelectors(num);
+        document.getElementById("newWeekForm").classList.add("hidden");
         if (activePage === "todas-unidades") renderAllUnitsSummary();
         if (activePage === "unidad-especifica") renderSpecificUnitView();
         if (activePage === "semana-individual") renderSingleWeekView();
-        showToast(`Semana ${pad} agregada en la Unidad ${selectedUnit}`);
+        showToast(`Semana ${String(num).padStart(2, "0")} creada en la Unidad ${unit}. Completa sus datos y pulsa «Publicar en GitHub»`);
+      });
+
+      document.getElementById("uploadWeekFilesBtn").addEventListener("click", () => {
+        const weekNum = parseInt(document.getElementById("selectWeekEdit").value, 10) || 1;
+        const pad = String(weekNum).padStart(2, "0");
+        window.open("https://github.com/gonzalo3453252/portafolio-ia/upload/main/src/main/resources/static/archivos/semana-" + pad, "_blank", "noopener");
       });
 
       // Quitar / Eliminar la Semana Seleccionada
@@ -3449,29 +3507,6 @@ print("Laboratorio de la Semana ${pad} listo para ejecución")`,
         if (colabInputUrl) { target.colabUrl = colabInputUrl; target.hasColab = true; }
         else if (!target.colabUrl || !target.colabUrl.startsWith("data:")) { target.colabUrl = ""; }
 
-        const pptFile = document.getElementById("fileUploadPpt").files[0];
-        const docFile = document.getElementById("fileUploadDoc").files[0];
-        const colabFile = document.getElementById("fileUploadColab").files[0];
-
-        if (pptFile) {
-          target.pptUrl = await readFileAsDataUrl(pptFile);
-          target.uploadedPptName = pptFile.name;
-          target.pptLabel = pptFile.name;
-          target.hasPpt = true;
-        }
-        if (docFile) {
-          target.docUrl = await readFileAsDataUrl(docFile);
-          target.uploadedDocName = docFile.name;
-          target.docLabel = docFile.name;
-          target.hasWord = true;
-        }
-        if (colabFile) {
-          target.colabUrl = await readFileAsDataUrl(colabFile);
-          target.uploadedColabName = colabFile.name;
-          target.colabLabel = colabFile.name;
-          target.hasColab = true;
-        }
-
         activeWeekNum = target.week;
         activeUnitNum = target.unit;
         sortWeeksInPlace();
@@ -3484,15 +3519,17 @@ print("Laboratorio de la Semana ${pad} listo para ejecución")`,
       });
 
       document.getElementById("resetDefaultsBtn").addEventListener("click", () => {
-        appState = JSON.parse(JSON.stringify(DEFAULT_STATE));
+        appState = JSON.parse(JSON.stringify(window.__CUSTOM_PORTFOLIO_STATE__ || DEFAULT_STATE));
         saveState();
+        try { localStorage.removeItem(PENDING_KEY); } catch (e) {}
+        refreshPendingNote();
         renderProfileHeader();
         if (activePage === "silabo") showSilaboPage();
         if (activePage === "todas-unidades") renderAllUnitsSummary();
         if (activePage === "unidad-especifica") renderSpecificUnitView();
         if (activePage === "semana-individual") renderSingleWeekView();
         populateWeekSelectors();
-        showToast("Valores iniciales restaurados");
+        showToast("Se restauró la versión publicada");
       });
 
       document.getElementById("publishGithubBtn").addEventListener("click", publishToGithub);
