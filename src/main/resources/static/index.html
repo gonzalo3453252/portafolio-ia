@@ -655,12 +655,11 @@
         </div>
 
         <!-- PUBLICAR CAMBIOS DE TEXTO (semanas, unidades, títulos, temas) -->
-        <div class="p-4 bg-sky-50 border border-sky-200 rounded-xl text-[11px] text-sky-900 space-y-1.5">
+        <div class="p-4 bg-sky-50 border border-sky-200 rounded-xl text-[11px] text-sky-900 space-y-2">
           <p class="font-extrabold uppercase tracking-wider text-xs">Publicar mis cambios de semanas, unidades y textos para todos</p>
-          <p>Lo que editas en este panel se ve solo en tu navegador hasta que lo publiques así:</p>
-          <p><b>1.</b> Pulsa <b>Descargar HTML</b> (abajo). Se baja un archivo <code>index.html</code>.
-             <b>2.</b> <a class="underline font-bold" target="_blank" rel="noopener noreferrer" href="https://github.com/gonzalo3453252/portafolio-ia/upload/main/src/main/resources/static">Abre esta página de GitHub</a> y arrastra ese <code>index.html</code> (reemplaza al anterior).
-             <b>3.</b> Pulsa <b>Commit changes</b>. En 1-2 minutos lo ve todo el mundo.</p>
+          <p>Lo que editas aquí se ve solo en tu navegador hasta que lo publiques:</p>
+          <button type="button" id="publishGithubBtn" class="px-4 py-2 bg-sky-700 hover:bg-sky-800 text-white rounded-lg text-xs font-bold cursor-pointer">Publicar en GitHub</button>
+          <p>Se copian tus cambios y se abre GitHub. Allí: <b>Ctrl+A</b> (seleccionar todo), <b>Ctrl+V</b> (pegar) y el botón verde <b>Commit changes</b> (dos veces). En 1-2 minutos lo ve todo el mundo.</p>
           <p>Tus PPT, Word y Colab no se suben aquí: usa los botones verdes de arriba.</p>
         </div>
 
@@ -3077,7 +3076,36 @@ import matplotlib.pyplot as plt`,
       showToast("Sílabo Oficial PDF descargado");
     }
 
-    window.addEventListener("DOMContentLoaded", () => {
+    // Estado publicado por el creador (lo guarda el botón "Publicar en GitHub" del panel)
+    async function loadPublishedState() {
+      try {
+        const r = await fetch("datos/portafolio.json", { cache: "no-cache" });
+        const ct = (r.headers.get("content-type") || "").toLowerCase();
+        if (r.ok && ct.includes("json")) {
+          const d = await r.json();
+          if (d && Array.isArray(d.weeks) && d.weeks.length > 0 && d.studentName) {
+            window.__CUSTOM_PORTFOLIO_STATE__ = d;
+          }
+        }
+      } catch (e) {}
+    }
+
+    // Publicar: copia los datos y abre el editor de GitHub en el archivo correcto
+    async function publishToGithub() {
+      const json = JSON.stringify(stateForPersist(), null, 2);
+      let copied = false;
+      try { await navigator.clipboard.writeText(json); copied = true; } catch (e) {}
+      if (!copied) {
+        triggerBlobDownload(new Blob([json], { type: "application/json" }), "portafolio.json");
+        showToast("No pude copiar: se descargó portafolio.json. Pégalo/arrástralo en GitHub");
+      } else {
+        showToast("Copiado. En GitHub: Ctrl+A, Ctrl+V y Commit changes");
+      }
+      window.open("https://github.com/gonzalo3453252/portafolio-ia/edit/main/src/main/resources/static/datos/portafolio.json", "_blank", "noopener");
+    }
+
+    window.addEventListener("DOMContentLoaded", async () => {
+      await loadPublishedState();
       loadSavedState();
       renderProfileHeader();
       populateWeekSelectors();
@@ -3466,6 +3494,8 @@ print("Laboratorio de la Semana ${pad} listo para ejecución")`,
         populateWeekSelectors();
         showToast("Valores iniciales restaurados");
       });
+
+      document.getElementById("publishGithubBtn").addEventListener("click", publishToGithub);
 
       document.getElementById("exportHtmlBtn").addEventListener("click", () => {
         document.getElementById("creatorAdminModal").classList.add("hidden");
