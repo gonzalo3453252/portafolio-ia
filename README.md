@@ -16,14 +16,14 @@ Se publica gratis con **GitHub Pages** (workflow en `.github/workflows/pages.yml
 
 Solo quien tiene acceso al repositorio de GitHub puede agregar archivos. Los visitantes solo ven y descargan.
 
-1. Entra al repositorio en GitHub y abre `src/main/resources/static/archivos/semana-XX/`.
-2. **Add file → Upload files** y sube tus archivos con estos nombres exactos:
-   - `presentacion.pptx` (o `presentacion.pdf`)
-   - `informe.docx` (o `informe.pdf`)
-   - `laboratorio.ipynb`
-3. **Commit changes**. En ~1 minuto aparecen solos en la semana correspondiente.
+1. Entra al repositorio en GitHub y abre `src/main/resources/static/archivos/semana-XX/` (o usa los botones del panel `#creador`).
+2. **Add file → Upload files** y sube tus archivos **con el nombre que quieras**:
+   - `.pptx` → Presentación · `.docx` → Informe · `.ipynb` → Laboratorio
+   - `.pdf` → Informe si el nombre contiene *informe, tarea, reporte o trabajo*; si no, Presentación.
+3. **Commit changes**. En 1-2 minutos aparecen solos en la semana correspondiente.
 
 Si una semana no tiene archivos, la página muestra una versión de demostración.
+La lista de archivos la genera `scripts/generar-manifiesto.js` automáticamente al publicar.
 
 > El panel `#creador` guarda los cambios solo en tu navegador; no sirve para publicar archivos a los demás.
 

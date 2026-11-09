@@ -25,6 +25,7 @@ jobs:
       - uses: actions/configure-pages@v5
       - name: Preparar sitio estático
         run: |
+          node scripts/generar-manifiesto.js
           mkdir _site
           cp -r src/main/resources/static/. _site/
           touch _site/.nojekyll

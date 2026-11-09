@@ -1,0 +1,3 @@
+[build]
+  command = "node scripts/generar-manifiesto.js"
+  publish = "src/main/resources/static"

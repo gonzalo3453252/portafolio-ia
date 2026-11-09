@@ -476,7 +476,7 @@
         <div class="space-y-3 p-4 bg-emerald-50 border border-emerald-200 rounded-xl">
           <div>
             <h4 class="text-xs font-extrabold uppercase tracking-wider text-emerald-900">Subir mis archivos a una semana (se publican para todos)</h4>
-            <p class="text-[11px] text-emerald-900/80 mt-1">Elige la semana: se abre la página de subida de GitHub (solo tú puedes entrar con tu cuenta). Arrastra tus archivos con estos nombres exactos: <b>presentacion.pptx</b> (o .pdf), <b>informe.docx</b> (o .pdf), <b>laboratorio.ipynb</b>. Luego pulsa <b>Commit changes</b>; en ~1 minuto aparecen en la página.</p>
+            <p class="text-[11px] text-emerald-900/80 mt-1">Elige la semana: se abre la página de subida de GitHub (solo tú puedes entrar con tu cuenta). Arrastra tus archivos con el nombre que quieras (.pptx = presentación, .docx = informe, .ipynb = laboratorio; un .pdf es informe si su nombre dice informe, tarea o reporte). Luego pulsa <b>Commit changes</b>; en ~1 minuto aparecen en la página.</p>
           </div>
           <div class="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-7 gap-2">
             <a href="https://github.com/gonzalo3453252/portafolio-ia/upload/main/src/main/resources/static/archivos/semana-01" target="_blank" rel="noopener noreferrer" class="px-3 py-2 rounded-lg bg-white border border-emerald-300 hover:bg-emerald-100 text-xs font-bold text-emerald-900 text-center">Semana 1</a>
@@ -2877,9 +2877,9 @@ import matplotlib.pyplot as plt`,
     // Solo quien tiene acceso al repositorio puede agregar archivos ahí.
     // =========================================================================
     const FILE_CONVENTION = [
-      { urlKey: "pptUrl",     flag: "hasPpt",   base: "presentacion", exts: ["pptx", "pdf", "ppt"], label: "pptLabel" },
-      { urlKey: "docUrl",     flag: "hasWord",  base: "informe",      exts: ["docx", "pdf", "doc"], label: "docLabel" },
-      { urlKey: "colabUrl", flag: "hasColab", base: "laboratorio",  exts: ["ipynb"],              label: "colabLabel" }
+      { key: "ppt",   urlKey: "pptUrl",   flag: "hasPpt",   base: "presentacion", exts: ["pptx", "pdf", "ppt"], label: "pptLabel" },
+      { key: "doc",   urlKey: "docUrl",   flag: "hasWord",  base: "informe",      exts: ["docx", "pdf", "doc"], label: "docLabel" },
+      { key: "colab", urlKey: "colabUrl", flag: "hasColab", base: "laboratorio",  exts: ["ipynb"],              label: "colabLabel" }
     ];
 
     async function publicFileExists(url) {
@@ -2892,14 +2892,38 @@ import matplotlib.pyplot as plt`,
       }
     }
 
+    // Lista de archivos reales (la genera scripts/generar-manifiesto.js al publicar). Cualquier nombre sirve.
+    async function loadFilesManifest() {
+      try {
+        const r = await fetch("archivos/manifest.json", { cache: "no-cache" });
+        const ct = (r.headers.get("content-type") || "").toLowerCase();
+        if (r.ok && ct.includes("json")) return await r.json();
+      } catch (e) {}
+      return null;
+    }
+
     async function autoDetectWeekFiles() {
       let changed = false;
+      const manifest = await loadFilesManifest();
       await Promise.all(appState.weeks.map(async (w) => {
         const folder = "archivos/semana-" + String(w.week).padStart(2, "0") + "/";
         for (const kind of FILE_CONVENTION) {
           const cur = w[kind.urlKey];
           const isDefault = !cur || cur === "https://colab.research.google.com/";
           if (!isDefault) continue;
+
+          if (manifest) {
+            const name = manifest[String(w.week)] && manifest[String(w.week)][kind.key];
+            if (name) {
+              w[kind.urlKey] = new URL(folder + encodeURIComponent(name), location.href).href;
+              w[kind.flag] = true;
+              w[kind.label] = name;
+              changed = true;
+            }
+            continue;
+          }
+
+          // Sin manifiesto (por ejemplo en tu PC): se buscan los nombres estándar
           for (const ext of kind.exts) {
             const rel = folder + kind.base + "." + ext;
             if (await publicFileExists(rel)) {
