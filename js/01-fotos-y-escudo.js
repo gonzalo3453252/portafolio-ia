@@ -12,33 +12,36 @@
    ============================================================================= */
 
 // Fotografías de cada unidad (están en la carpeta img/)
+// Cada unidad y cada semana tiene su propia ilustración (img/unidad-N.jpg e img/semana-NN.jpg),
+// dibujada con el tema de esa clase. Se generan con herramientas/gen_imagenes.py y gen_unidades.py.
 const FOTOS_UNIDAD = {
-  u1: "img/unidad-1-robotica-agentes.jpg",
-  u2: "img/unidad-2-busquedas-juegos.jpg",
-  u3: "img/unidad-3-machine-learning.jpg",
-  u4: "img/unidad-4-deep-learning.jpg",
-  u5: "img/unidad-5-ia-generativa-etica.jpg",
+  u1: "img/unidad-1.jpg",
+  u2: "img/unidad-2.jpg",
+  u3: "img/unidad-3.jpg",
+  u4: "img/unidad-4.jpg",
+  u5: "img/unidad-5.jpg",
   alt: "img/red-neuronal.jpg"
 };
 
-// Foto que se muestra para cada semana. Para cambiar la foto de una semana,
-// cambia el valor aquí (u1…u5 o alt). Las semanas que no aparecen usan u1.
+// Semanas que ya tienen su ilustración propia en img/semana-NN.jpg
+const SEMANAS_CON_IMAGEN = [1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 14];
+
+// Foto que se muestra para cada semana: su ilustración propia; si la semana es nueva y todavía
+// no tiene, la de su unidad. Para usar otra, sube img/semana-NN.jpg (la página la detecta sola).
 function getWeekPhotoSrc(weekNum, unitNum) {
   const abs = (ruta) => new URL(ruta, location.href).href;
-  const p1 = abs(FOTOS_UNIDAD.u1), p2 = abs(FOTOS_UNIDAD.u2), p3 = abs(FOTOS_UNIDAD.u3);
-  const p4 = abs(FOTOS_UNIDAD.u4), p5 = abs(FOTOS_UNIDAD.u5), pAlt = abs(FOTOS_UNIDAD.alt);
-  const weekPool = {
-    1: p1, 2: pAlt, 3: p2, 4: p1, 5: p3, 6: p2, 7: pAlt,
-    9: pAlt, 10: p4, 11: p3, 12: p5, 13: p4, 14: p5
-  };
-  const porDefecto = weekPool[weekNum] || p1;
-  const propia = fotosPersonalizadas["semana-" + String(weekNum).padStart(2, "0")];
+  const nn = String(weekNum).padStart(2, "0");
+  let porDefecto;
+  if (SEMANAS_CON_IMAGEN.indexOf(weekNum) >= 0) porDefecto = abs("img/semana-" + nn + ".jpg");
+  else porDefecto = abs(FOTOS_UNIDAD["u" + unitNum] || FOTOS_UNIDAD.u1);
+  const propia = fotosPersonalizadas["semana-" + nn];
   return propia || porDefecto;
 }
 
-// Foto de una unidad: la personalizada (unidad-N) o, si no hay, la de su primera semana
+// Foto de una unidad: la personalizada (unidad-N) o, si no hay, la ilustración de la unidad
 function getUnitPhotoSrc(unitNum, primeraSemana) {
-  return fotosPersonalizadas["unidad-" + unitNum] || getWeekPhotoSrc(primeraSemana || 1, unitNum);
+  const ruta = FOTOS_UNIDAD["u" + unitNum] || FOTOS_UNIDAD.u1;
+  return fotosPersonalizadas["unidad-" + unitNum] || new URL(ruta, location.href).href;
 }
 
 // ---------------------------------------------------------------------------
