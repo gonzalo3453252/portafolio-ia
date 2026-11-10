@@ -330,9 +330,29 @@ print("Laboratorio de la Semana ${pad} listo para ejecución")`,
     if (summaryVal) target.summary = summaryVal;
     if (topicsLines.length > 0) target.topics = topicsLines;
 
-    target.hasPpt = document.getElementById("toggleHasPpt").checked;
-    target.hasWord = document.getElementById("toggleHasWord").checked;
-    target.hasColab = document.getElementById("toggleHasColab").checked;
+    // Las casillas mandan. Si desmarcas algo que se estaba mostrando, queda en "ocultos" para que
+    // la detección automática de archivos (que busca en las carpetas de GitHub) no lo vuelva a activar.
+    const antes = {
+      ppt: target.hasPpt !== false,
+      doc: Boolean(target.hasWord),
+      colab: target.hasColab !== false
+    };
+    const ahora = {
+      ppt: document.getElementById("toggleHasPpt").checked,
+      doc: document.getElementById("toggleHasWord").checked,
+      colab: document.getElementById("toggleHasColab").checked
+    };
+    target.ocultos = target.ocultos || {};
+    Object.keys(ahora).forEach((k) => {
+      if (ahora[k]) delete target.ocultos[k];
+      else if (antes[k]) target.ocultos[k] = true;
+    });
+    if (!Object.keys(target.ocultos).length) delete target.ocultos;
+    target.hasPpt = ahora.ppt;
+    target.hasWord = ahora.doc;
+    target.hasColab = ahora.colab;
+
+    const urlAntes = { ppt: target.pptUrl || "", doc: target.docUrl || "", colab: target.colabUrl || "" };
 
     const pptLabelVal = document.getElementById("inputWeekPptLabel").value.trim();
     const docLabelVal = document.getElementById("inputWeekDocLabel").value.trim();
@@ -345,14 +365,17 @@ print("Laboratorio de la Semana ${pad} listo para ejecución")`,
     const docInputUrl = document.getElementById("inputWeekDocUrl").value.trim();
     const colabInputUrl = document.getElementById("inputWeekColabUrl").value.trim();
 
-    if (pptInputUrl) { target.pptUrl = pptInputUrl; target.hasPpt = true; }
+    // Pegar una URL NUEVA activa ese archivo. Si la URL es la misma que ya estaba en la casilla
+    // (por ejemplo la que se autodetectó de GitHub), la casilla marcada/desmarcada decide.
+    if (pptInputUrl) { target.pptUrl = pptInputUrl; if (pptInputUrl !== urlAntes.ppt) { target.hasPpt = true; if (target.ocultos) delete target.ocultos.ppt; } }
     else if (!target.pptUrl || !target.pptUrl.startsWith("data:")) { target.pptUrl = ""; }
 
-    if (docInputUrl) { target.docUrl = docInputUrl; target.hasWord = true; }
+    if (docInputUrl) { target.docUrl = docInputUrl; if (docInputUrl !== urlAntes.doc) { target.hasWord = true; if (target.ocultos) delete target.ocultos.doc; } }
     else if (!target.docUrl || !target.docUrl.startsWith("data:")) { target.docUrl = ""; }
 
-    if (colabInputUrl) { target.colabUrl = colabInputUrl; target.hasColab = true; }
+    if (colabInputUrl) { target.colabUrl = colabInputUrl; if (colabInputUrl !== urlAntes.colab) { target.hasColab = true; if (target.ocultos) delete target.ocultos.colab; } }
     else if (!target.colabUrl || !target.colabUrl.startsWith("data:")) { target.colabUrl = ""; }
+    if (target.ocultos && !Object.keys(target.ocultos).length) delete target.ocultos;
 
     activeWeekNum = target.week;
     activeUnitNum = target.unit;

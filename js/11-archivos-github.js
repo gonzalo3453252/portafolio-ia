@@ -125,6 +125,8 @@ async function autoDetectWeekFiles() {
       const cur = w[kind.urlKey];
       const isDefault = !cur || cur === "https://colab.research.google.com/";
       if (!isDefault) continue;
+      // Lo que ocultaste a propósito en el panel no se vuelve a activar solo
+      if (w.ocultos && w.ocultos[kind.key]) continue;
 
       if (manifest) {
         const name = manifest[String(w.week)] && manifest[String(w.week)][kind.key];

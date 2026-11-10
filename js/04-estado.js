@@ -53,7 +53,11 @@ function stateForPersist() {
     if (w._auto) {
       FILE_CONVENTION.forEach((kind) => {
         const o = w._auto[kind.key];
-        if (o) { w[kind.urlKey] = o.url; w[kind.label] = o.label; w[kind.flag] = o.flag; }
+        if (o) {
+          w[kind.urlKey] = o.url; w[kind.label] = o.label;
+          // Si lo ocultaste tú, se guarda como oculto (no se restaura el valor anterior a la autodetección)
+          w[kind.flag] = (w.ocultos && w.ocultos[kind.key]) ? false : o.flag;
+        }
       });
       delete w._auto;
     }
