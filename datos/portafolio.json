@@ -379,14 +379,14 @@
       "subtitleSlide": "Gobernanza Algorítmica, Ley N.° 31814 y EU AI Act",
       "photoCaption": "Gobernanza Algorítmica, Marco Legal y Responsabilidad Social",
       "topics": [
-        "14.1 Concepto y fundamentos de la IA Creativa multimodal",
-        "14.2 Generación de pintura, música, poesía y narrativa asistida por IA",
-        "14.3 Marco legal nacional (Ley N.° 31814 en el Perú) e internacional (EU AI Act)",
-        "14.4 Auditoría de sesgos algorítmicos, privacidad y futuro de la IA"
+        "14.1 Concepto y fundamentos de la IA Creativa multimodal | Sinergia humano-máquina en procesos de diseño, composición artística y exploración conceptual asistida por modelos multimodales.",
+        "14.2 Generación de pintura, música, poesía y narrativa asistida por IA | Síntesis de artes visuales por difusión latente, composición musical algorítmica y estructuración de guiones y narrativa literaria.",
+        "14.3 Marco legal nacional (Ley N.° 31814 en el Perú) e internacional (EU AI Act) | Análisis de los principios rectores de la Ley N.° 31814 en el Perú y los niveles de riesgo regulados por el EU AI Act europeo.",
+        "14.4 Auditoría de sesgos algorítmicos, privacidad y futuro de la IA | Evaluación de impacto dispar, equidad algorítmica, trazabilidad, protección de datos personales y desafíos futuros de la IA."
       ],
       "evaluation": "Clase Teórica — Ética y Futuro de la IA",
       "summary": "Evaluación de los desafíos éticos, jurídicos y de propiedad intelectual derivados del despliegue de sistemas generativos y cumplimiento de la normativa vigente.",
-      "hasPpt": true,
+      "hasPpt": false,
       "hasWord": false,
       "hasColab": false,
       "pptLabel": "Clase14_IA_Creativa_Etica_Legal.pptx",
@@ -399,7 +399,8 @@
       "codeOutput": "Ratio de Impacto Dispar: 0.88",
       "ocultos": {
         "doc": true,
-        "colab": true
+        "colab": true,
+        "ppt": true
       }
     }
   ]
