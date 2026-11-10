@@ -45,10 +45,10 @@
       "subtitleSlide": "Arquitecturas Racionales y Especificación PEAS",
       "photoCaption": "Arquitectura de Percepción y Acción — Agentes Racionales PEAS",
       "topics": [
-        "2.1 Conceptos de Agente, Sensor, Actuador y Entorno",
-        "2.2 Tipos y Arquitecturas: Reactivo, Basado en Modelos, Objetivos y Utilidad",
-        "2.3 Especificación formal PEAS y propiedades del entorno",
-        "2.4 Aplicaciones de agentes autónomos e inteligentes"
+        "2.1 Conceptos de Agente, Sensor, Actuador y Entorno | Definición del ciclo de percepción-acción donde el agente captura señales mediante sensores y ejecuta decisiones con actuadores.",
+        "2.2 Tipos y Arquitecturas: Reactivo, Basado en Modelos, Objetivos y Utilidad | Comparación estructural entre agentes reactivos simples, con estado interno, orientados a metas y maximizadores de utilidad esperada.",
+        "2.3 Especificación formal PEAS y propiedades del entorno | Formulación de medidas de rendimiento y clasificación de entornos observables, deterministas, dinámicos, discretos y multiagente.",
+        "2.4 Aplicaciones de agentes autónomos e inteligentes | Despliegue de agentes autónomos en navegación vehicular, comercio electrónico automatizado, monitoreo industrial y logística."
       ],
       "evaluation": "Exposición Grupal y Diseño PEAS",
       "summary": "Análisis formal del ciclo percepción-acción y diseño de arquitecturas de agentes autónomos racionales (reactivos simples, basados en modelos, orientados a metas y maximizadores de utilidad) bajo el marco PEAS.",
@@ -67,20 +67,20 @@
     {
       "week": 3,
       "unit": 2,
-      "unitName": "Unidad II · Búsquedas y Juegos de Estrategia",
+      "unitName": "Unidad II · Búsquedas en Espacios de Estados y Juegos",
       "title": "Búsquedas en Espacios de Estados",
       "subtitleSlide": "Búsqueda Ciega (BFS/DFS) e Informada (Algoritmo A*)",
       "photoCaption": "Exploración de Grafos y Heurísticas Admisibles con A*",
       "topics": [
-        "3.1 Formulación de problemas mediante búsqueda en grafos",
-        "3.2 Representación de espacios de estados y árboles de búsqueda",
-        "3.3 Estrategias de búsqueda ciega (BFS Anchura y DFS Profundidad)",
-        "3.4 Estrategias de búsqueda informada (Greedy Best-First y Algoritmo A*)"
+        "3.1 Formulación de problemas mediante búsqueda en grafos | Abstracción de problemas complejos definiendo estado inicial, función sucesora, test de meta y costo de ruta en grafos.",
+        "3.2 Representación de espacios de estados y árboles de búsqueda | Construcción de árboles de exploración, manejo de la frontera de nodos abiertos y control de estados repetidos en memoria.",
+        "3.3 Estrategias de búsqueda ciega (BFS Anchura y DFS Profundidad) | Análisis de completitud, optimalidad y consumo de memoria entre Búsqueda en Anchura (BFS) y Búsqueda en Profundidad (DFS).",
+        "3.4 Estrategias de búsqueda informada (Greedy Best-First y Algoritmo A*) | Diseño de funciones heurísticas admisibles y consistentes h(n) para hallar caminos de costo mínimo con el algoritmo A*."
       ],
       "evaluation": "Clase Teórica y Laboratorio de Búsqueda A*",
       "summary": "Desarrollo de algoritmos de exploración sobre grafos de estados, contrastando métodos de búsqueda ciega (BFS/DFS) frente a la optimalidad del algoritmo A* con funciones heurísticas admisibles.",
       "hasPpt": true,
-      "hasWord": false,
+      "hasWord": true,
       "hasColab": true,
       "pptLabel": "Clase03_Busquedas_Espacio_Estados.pptx",
       "pptUrl": "",
