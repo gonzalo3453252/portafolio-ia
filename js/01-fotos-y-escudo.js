@@ -128,8 +128,28 @@ function aplicarFotosPersonalizadas() {
 }
 
 // Vigila la página: cada vez que se dibuja una foto con data-foto, busca la suya
+// Cuando la página ya terminó de cargar, baja en segundo plano las fotos de las demás semanas y
+// unidades (son livianas) para que al navegar ya estén listas. Se omite con "ahorro de datos".
+function precargarFotosEnSegundoPlano() {
+  if (!FOTOS_LISTA) return;
+  try { if (navigator.connection && navigator.connection.saveData) return; } catch (e) {}
+  const urls = Object.keys(fotosPersonalizadas).map((k) => fotosPersonalizadas[k]).filter(Boolean);
+  let i = 0;
+  const siguiente = () => {
+    if (i >= urls.length) return;
+    const im = new Image();
+    im.decoding = "async";
+    im.src = urls[i++];
+    setTimeout(siguiente, 120);   // de a una, sin saturar la conexión
+  };
+  const arrancar = () => (window.requestIdleCallback ? requestIdleCallback(siguiente, { timeout: 3000 }) : setTimeout(siguiente, 800));
+  if (document.readyState === "complete") arrancar();
+  else window.addEventListener("load", arrancar, { once: true });
+}
+
 function iniciarFotosPersonalizadas() {
   window.__fotosIniciado = true;
+  precargarFotosEnSegundoPlano();
   let pendiente = false;
   const programar = () => {
     if (pendiente) return;

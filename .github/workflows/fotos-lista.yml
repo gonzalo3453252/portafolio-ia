@@ -2,6 +2,7 @@ name: Generar lista de fotos
 
 # Cada vez que subes, cambias o borras una foto en img/, se actualiza datos/fotos.js.
 # La página lo lee al abrir y así muestra al instante la foto correcta de cada semana y unidad.
+# Además crea una versión liviana (WebP, ~70 KB) de las fotos pesadas en img/_web/ para que carguen rápido.
 on:
   push:
     branches: [main]
@@ -22,6 +23,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Instalar Pillow (para las versiones livianas)
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y --no-install-recommends python3-pil
+
       # Se parte siempre de la última versión de main y se vuelve a generar la lista desde ahí;
       # si el push choca con otra ejecución, se repite. Si no logra guardar, el paso falla (no finge éxito).
       - name: Generar y guardar la lista
@@ -32,7 +38,7 @@ jobs:
             git fetch origin main
             git reset --hard origin/main
             python3 .github/scripts/generar_fotos_lista.py
-            git add datos/fotos.js
+            git add -A datos/fotos.js img/_web
             if git diff --cached --quiet; then echo "Sin cambios"; exit 0; fi
             git commit -m "Lista de fotos generada automáticamente"
             if git push origin HEAD:main; then echo "Lista guardada"; exit 0; fi
