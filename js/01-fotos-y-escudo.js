@@ -23,7 +23,8 @@ const FOTOS_UNIDAD = {
 
 // Foto que se muestra para cada semana. Para cambiar la foto de una semana,
 // cambia el valor aquí (u1…u5 o alt). Las semanas que no aparecen usan u1.
-function getWeekPhotoSrc(weekNum, unitNum) {
+// Foto por defecto de una semana (la de siempre, sin mirar las fotos personalizadas)
+function getDefaultWeekPhotoSrc(weekNum) {
   const abs = (ruta) => new URL(ruta, location.href).href;
   const p1 = abs(FOTOS_UNIDAD.u1), p2 = abs(FOTOS_UNIDAD.u2), p3 = abs(FOTOS_UNIDAD.u3);
   const p4 = abs(FOTOS_UNIDAD.u4), p5 = abs(FOTOS_UNIDAD.u5), pAlt = abs(FOTOS_UNIDAD.alt);
@@ -31,14 +32,18 @@ function getWeekPhotoSrc(weekNum, unitNum) {
     1: p1, 2: pAlt, 3: p2, 4: p1, 5: p3, 6: p2, 7: pAlt,
     9: pAlt, 10: p4, 11: p3, 12: p5, 13: p4, 14: p5
   };
-  const porDefecto = weekPool[weekNum] || p1;
-  const propia = fotosPersonalizadas["semana-" + String(weekNum).padStart(2, "0")];
-  return propia || porDefecto;
+  return weekPool[weekNum] || p1;
 }
 
-// Foto de una unidad: la personalizada (unidad-N) o, si no hay, la de su primera semana
+function getWeekPhotoSrc(weekNum, unitNum) {
+  const propia = fotosPersonalizadas["semana-" + String(weekNum).padStart(2, "0")];
+  return propia || getDefaultWeekPhotoSrc(weekNum);
+}
+
+// Foto de una unidad: la personalizada (unidad-N) o, si no hay, la de siempre de esa unidad.
+// NO usa la foto personalizada de su primera semana: así subir semana-01.jpg solo cambia la semana 1.
 function getUnitPhotoSrc(unitNum, primeraSemana) {
-  return fotosPersonalizadas["unidad-" + unitNum] || getWeekPhotoSrc(primeraSemana || 1, unitNum);
+  return fotosPersonalizadas["unidad-" + unitNum] || getDefaultWeekPhotoSrc(primeraSemana || 1);
 }
 
 // ---------------------------------------------------------------------------
