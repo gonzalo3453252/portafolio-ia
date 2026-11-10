@@ -125,16 +125,16 @@
       "subtitleSlide": "Clasificación, Regresión y Ensambles Random Forest",
       "photoCaption": "Modelado Predictivo, Clasificación y Ensambles de Árboles",
       "topics": [
-        "5.1 Fundamentos de Machine Learning y partición de datos",
-        "5.2 Aprendizaje supervisado: Clasificación y Regresión",
-        "5.3 Equilibrio sesgo-varianza, regularización y validación cruzada",
-        "5.4 Algoritmos: Árboles de Decisión, Random Forest, SVM y KNN",
-        "5.5 Implementación de modelos supervisados con Scikit-Learn"
+        "5.1 Fundamentos de Machine Learning y partición de datos | Flujo de preprocesamiento, limpieza de atributos y división estratificada en conjuntos de entrenamiento, validación y prueba.",
+        "5.2 Aprendizaje supervisado: Clasificación y Regresión | Modelado de variables objetivo discretas (clasificación multiclase o binaria) y estimación de variables continuas (regresión).",
+        "5.3 Equilibrio sesgo-varianza, regularización y validación cruzada | Diagnóstico de subajuste y sobreajuste (overfitting) aplicando penalización L1/L2 y validación cruzada K-Fold.",
+        "5.4 Algoritmos: Árboles de Decisión, Random Forest, SVM y KNN | Fundamentos geométricos y probabilísticos de particiones por ganancia de información, ensambles bagging, hiperplanos SVM y distancias KNN.",
+        "5.5 Implementación de modelos supervisados con Scikit-Learn | Entrenamiento de tuberías (pipelines) en Scikit-Learn evaluando matrices de confusión, curvas ROC-AUC, Precision, Recall y F1-Score."
       ],
       "evaluation": "Tarea Académica 5 y Laboratorio con Python",
       "summary": "Entrenamiento y validación de modelos predictivos a partir de datos etiquetados, evaluando métricas de clasificación (Accuracy, Precision, Recall, F1-Score) e importancia de características.",
       "hasPpt": true,
-      "hasWord": true,
+      "hasWord": false,
       "hasColab": true,
       "pptLabel": "Clase05_Aprendizaje_Supervisado.pptx",
       "pptUrl": "",
