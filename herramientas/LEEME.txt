@@ -1,6 +1,0 @@
-Generadores de las ilustraciones de img/ (semana-NN.jpg y unidad-N.jpg).
-  python3 herramientas/gen_imagenes.py img            -> todas las semanas
-  python3 herramientas/gen_imagenes.py img 10 11      -> solo las semanas 10 y 11
-  python3 herramientas/gen_unidades.py img            -> las 5 unidades
-Necesitan Python con Pillow y numpy. Los textos y colores se editan en los .py.
-La página usa estas imágenes sola; no hay que tocar nada más.
