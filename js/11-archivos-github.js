@@ -137,10 +137,11 @@ async function autoDetectWeekFiles() {
           w[kind.urlKey] = fileUrl;
           w[kind.flag] = true;
           w[kind.label] = name;
-          const viewName = kind.viewKey && manifest[String(w.week)][kind.viewKey];
-          if (viewName) {
+          if (kind.viewKey && !/\.pdf$/i.test(name)) {
+            // Vista PDF: si el manifiesto (que puede estar en caché 5 min) no la lista, se prueba la ruta directa
+            const viewName = manifest[String(w.week)][kind.viewKey] || (name + ".pdf");
             const viewUrl = new URL(folder + "_vista/" + encodeURIComponent(viewName), location.href).href;
-            if (!verify || await publicFileExists(viewUrl)) w[kind.viewKey] = viewUrl;
+            if (await publicFileExists(viewUrl)) w[kind.viewKey] = viewUrl;
           }
           changed = true;
         }
