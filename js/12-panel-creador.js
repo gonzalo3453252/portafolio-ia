@@ -52,6 +52,35 @@ function populateWeekSelectors(selectedWeekNum) {
     editSel.value = String(selectedWeekNum);
   }
   loadSelectedWeekIntoInputs();
+  poblarDestinosFoto();
+}
+
+// Lista del panel «Cambiar fotos»: portada, unidades y semanas, con el nombre que debe tener el archivo
+function poblarDestinosFoto() {
+  const sel = document.getElementById("selectFotoDestino");
+  if (!sel) return;
+  const previo = sel.value;
+  const opciones = [
+    ["portada-facultad", "Portada · foto de la facultad"],
+    ["portada-docente", "Portada · foto del docente"]
+  ];
+  [1, 2, 3, 4, 5].forEach(u => opciones.push(["unidad-" + u, UNITS_INFO[u].roman + " · " + UNITS_INFO[u].title]));
+  appState.weeks.forEach(w => opciones.push(["semana-" + String(w.week).padStart(2, "0"), "Semana " + String(w.week).padStart(2, "0") + " · " + w.title]));
+  sel.innerHTML = "";
+  opciones.forEach(([valor, texto]) => {
+    const opt = document.createElement("option");
+    opt.value = valor;
+    opt.textContent = texto;
+    sel.appendChild(opt);
+  });
+  if (previo && opciones.some(o => o[0] === previo)) sel.value = previo;
+  actualizarNombreFoto();
+}
+
+function actualizarNombreFoto() {
+  const sel = document.getElementById("selectFotoDestino");
+  const el = document.getElementById("fotoNombreSugerido");
+  if (sel && el) el.textContent = sel.value + ".jpg";
 }
 
 function loadSelectedWeekIntoInputs() {
@@ -239,6 +268,10 @@ print("Laboratorio de la Semana ${pad} listo para ejecución")`,
     window.open(githubUrlSubir(RUTA_SILABO), "_blank", "noopener");
   });
 
+  document.getElementById("selectFotoDestino").addEventListener("change", actualizarNombreFoto);
+  document.getElementById("uploadPhotoBtn").addEventListener("click", () => {
+    window.open(githubUrlSubir(RUTA_IMAGENES), "_blank", "noopener");
+  });
   document.getElementById("uploadWeekFilesBtn").addEventListener("click", () => {
     const weekNum = parseInt(document.getElementById("selectWeekEdit").value, 10) || 1;
     window.open(githubUrlSubir(carpetaSemana(weekNum)), "_blank", "noopener");

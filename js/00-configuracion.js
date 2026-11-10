@@ -11,6 +11,7 @@ const GITHUB_RAMA = "main";
 // Rutas dentro del repositorio (la página está en la raíz)
 const RUTA_DATOS_PUBLICADOS = "datos/portafolio.json";   // contenido que editas con el panel
 const RUTA_ARCHIVOS = "archivos";                          // carpeta de tus archivos reales
+const RUTA_IMAGENES = "img";                               // fotos de la portada, unidades y semanas
 const RUTA_SILABO = RUTA_ARCHIVOS + "/silabo";             // aquí va tu sílabo en PDF
 const SILABO_OFICIAL = "Silabo_Inteligencia_Artificial_UNMSM.pdf";  // el que viene incluido
 

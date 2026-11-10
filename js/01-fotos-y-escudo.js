@@ -1,6 +1,14 @@
 /* =============================================================================
    FOTOS DE UNIDADES Y ESCUDO
-   Qué foto usa cada semana y el escudo (SVG) que aparece en las diapositivas de ejemplo.
+   Qué foto usa cada semana y unidad, fotos personalizadas y el escudo (SVG) de las diapositivas.
+
+   FOTOS PERSONALIZADAS (sin tocar código): sube a la carpeta img/ una imagen con
+   uno de estos nombres y la página la usará sola en lugar de la foto por defecto:
+       portada-facultad.jpg  portada-docente.jpg   → fotos de la portada
+       unidad-1.jpg … unidad-5.jpg                  → foto de cada unidad
+       semana-01.jpg … semana-15.jpg                → foto de cada semana
+   Formatos aceptados: .jpg  .jpeg  .png  .webp
+   Si no existe la foto con ese nombre, se usa la de siempre.
    ============================================================================= */
 
 // Fotografías de cada unidad (están en la carpeta img/)
@@ -23,7 +31,69 @@ function getWeekPhotoSrc(weekNum, unitNum) {
     1: p1, 2: pAlt, 3: p2, 4: p1, 5: p3, 6: p2, 7: pAlt,
     9: pAlt, 10: p4, 11: p3, 12: p5, 13: p4, 14: p5
   };
-  return weekPool[weekNum] || p1;
+  const porDefecto = weekPool[weekNum] || p1;
+  const propia = fotosPersonalizadas["semana-" + String(weekNum).padStart(2, "0")];
+  return propia || porDefecto;
+}
+
+// Foto de una unidad: la personalizada (unidad-N) o, si no hay, la de su primera semana
+function getUnitPhotoSrc(unitNum, primeraSemana) {
+  return fotosPersonalizadas["unidad-" + unitNum] || getWeekPhotoSrc(primeraSemana || 1, unitNum);
+}
+
+// ---------------------------------------------------------------------------
+// Búsqueda de fotos personalizadas en img/ (una sola vez por foto)
+// ---------------------------------------------------------------------------
+const EXTENSIONES_FOTO = ["jpg", "jpeg", "png", "webp"];
+const fotosPersonalizadas = {};   // nombre -> URL encontrada (o null si no existe)
+const fotosEnBusqueda = {};       // nombre -> promesa en curso
+
+function probarImagen(url) {
+  return new Promise(resolve => {
+    const im = new Image();
+    im.onload = () => resolve(true);
+    im.onerror = () => resolve(false);
+    im.src = url;
+  });
+}
+
+// Devuelve la URL de img/<nombre>.<ext> si existe, o null
+function buscarFotoPersonalizada(nombre) {
+  if (nombre in fotosPersonalizadas && fotosPersonalizadas[nombre] !== undefined) {
+    return Promise.resolve(fotosPersonalizadas[nombre]);
+  }
+  if (fotosEnBusqueda[nombre]) return fotosEnBusqueda[nombre];
+  const urls = EXTENSIONES_FOTO.map(ext => new URL(RUTA_IMAGENES + "/" + nombre + "." + ext, location.href).href);
+  fotosEnBusqueda[nombre] = Promise.all(urls.map(probarImagen)).then(resultados => {
+    const i = resultados.indexOf(true);
+    fotosPersonalizadas[nombre] = i >= 0 ? urls[i] : null;
+    return fotosPersonalizadas[nombre];
+  });
+  return fotosEnBusqueda[nombre];
+}
+
+// Recorre las <img data-foto="nombre"> de la página y cambia su foto si hay una personalizada
+function aplicarFotosPersonalizadas() {
+  document.querySelectorAll("img[data-foto]").forEach(img => {
+    const nombre = img.dataset.foto;
+    buscarFotoPersonalizada(nombre).then(url => {
+      if (url && img.dataset.foto === nombre && img.src !== url) img.src = url;
+    });
+  });
+}
+
+// Vigila la página: cada vez que se dibuja una foto con data-foto, busca la suya
+function iniciarFotosPersonalizadas() {
+  let pendiente = false;
+  const programar = () => {
+    if (pendiente) return;
+    pendiente = true;
+    requestAnimationFrame(() => { pendiente = false; aplicarFotosPersonalizadas(); });
+  };
+  new MutationObserver(programar).observe(document.body, {
+    childList: true, subtree: true, attributes: true, attributeFilter: ["data-foto"]
+  });
+  aplicarFotosPersonalizadas();
 }
 
 // Escudo de la universidad (dibujo vectorial)

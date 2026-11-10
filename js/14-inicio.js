@@ -9,6 +9,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   renderProfileHeader();
   populateWeekSelectors();
   showPresentacionPage();
+  iniciarFotosPersonalizadas();    // usa tus fotos de img/ (semana-01.jpg, unidad-1.jpg, portada-…)
   autoDetectWeekFiles();           // 3) busca tus archivos reales en GitHub
 
   iniciarEventosPagina();

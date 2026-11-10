@@ -8,7 +8,8 @@
   js/ ................. la lógica, en orden numérico (00 → 14). Cada archivo
                         empieza con un comentario que explica qué contiene.
   js/visores/ ......... visores de PDF y de cuadernos Colab (.ipynb)
-  img/ ................ fotos de la portada y de las unidades
+  img/ ................ fotos de la portada, unidades y semanas
+                        (portada-facultad.jpg, unidad-1.jpg, semana-01.jpg … las usa sola)
   datos/portafolio.json  contenido publicado (semanas, nombres, temas)
   archivos/ ........... tus archivos reales:
       silabo/ ............. sílabo en PDF
@@ -170,7 +171,7 @@
 
           <div class="lg:col-span-6">
             <figure class="space-y-2.5">
-              <img src="img/facultad-fisi.jpg" alt="Facultad de Ingeniería de Sistemas e Informática UNMSM" class="w-full h-64 sm:h-[380px] object-cover object-center max-w-full rounded-2xl shadow-sm" />
+              <img src="img/facultad-fisi.jpg" data-foto="portada-facultad" alt="Facultad de Ingeniería de Sistemas e Informática UNMSM" class="w-full h-64 sm:h-[380px] object-cover object-center max-w-full rounded-2xl shadow-sm" />
               <figcaption class="text-xs font-medium text-slate-500 text-center sm:text-left">
                 Facultad de Ingeniería de Sistemas e Informática (FISI) — Ciudad Universitaria, UNMSM.
               </figcaption>
@@ -184,7 +185,7 @@
         <div id="dedicatoriaDocente" class="pt-12 sm:pt-14 border-t border-slate-200 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           <div class="lg:col-span-4">
             <figure class="space-y-2.5">
-              <img src="img/docente.jpg" alt="Docente de Curso: Dr. Hugo Froilán Vega Huerta" class="w-full h-72 sm:h-[360px] object-cover object-top max-w-full rounded-2xl shadow-sm" />
+              <img src="img/docente.jpg" data-foto="portada-docente" alt="Docente de Curso: Dr. Hugo Froilán Vega Huerta" class="w-full h-72 sm:h-[360px] object-cover object-top max-w-full rounded-2xl shadow-sm" />
               <figcaption class="text-xs font-medium text-slate-500">
                 Docente del Curso: Dr. / Ing. Hugo Froilán Vega Huerta
               </figcaption>
@@ -504,6 +505,18 @@
             <button type="button" id="uploadWeekFilesBtn" class="px-3.5 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg text-xs font-bold cursor-pointer">Subir archivos de esta semana a GitHub</button>
             <p class="text-[11px] text-emerald-900 flex-1 min-w-[220px]">Abre la carpeta de la semana en GitHub: arrastra tus <b>.pptx / .docx / .ipynb / .pdf</b> (cualquier nombre) y pulsa <b>Commit changes</b>. En 1-2 minutos los ve todo el mundo.</p>
           </div>
+        </div>
+
+        <!-- CAMBIAR FOTOS (portada, unidades y semanas) -->
+        <div class="p-4 bg-violet-50 border border-violet-200 rounded-xl text-[11px] text-violet-900 space-y-2.5">
+          <p class="font-extrabold uppercase tracking-wider text-xs">Cambiar fotos (portada, unidades y semanas)</p>
+          <div class="flex flex-wrap items-center gap-2">
+            <select id="selectFotoDestino" class="px-2.5 py-1.5 bg-white border border-slate-300 rounded text-xs font-medium text-[#0f172a] max-w-full"></select>
+            <button type="button" id="uploadPhotoBtn" class="px-3.5 py-2 bg-violet-700 hover:bg-violet-800 text-white rounded-lg text-xs font-bold cursor-pointer">Subir foto a GitHub</button>
+          </div>
+          <p>Antes de subir, renombra tu foto en tu equipo exactamente así: <b id="fotoNombreSugerido" class="select-all">portada-facultad.jpg</b> (también vale .jpeg, .png o .webp).</p>
+          <p>En GitHub arrastra la foto y pulsa <b>Commit changes</b> (dos veces). En 1-2 minutos se ve en la página, refresca con Ctrl+F5. Si subes otra con el mismo nombre, reemplaza a la anterior; si borras la foto en GitHub, vuelve la de siempre.</p>
+          <p>Consejo: fotos horizontales de menos de 200 KB cargan rápido. Esto no necesita «Publicar en GitHub».</p>
         </div>
 
         <!-- PUBLICAR CAMBIOS DE TEXTO (semanas, unidades, títulos, temas) -->

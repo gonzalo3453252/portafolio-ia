@@ -15,13 +15,13 @@ function renderAllUnitsSummary() {
   [1, 2, 3, 4, 5].forEach(uNum => {
     const uInfo = UNITS_INFO[uNum];
     const unitWeeks = appState.weeks.filter(w => w.unit === uNum);
-    const photoSrc = getWeekPhotoSrc(unitWeeks[0]?.week || 1, uNum);
+    const photoSrc = getUnitPhotoSrc(uNum, unitWeeks[0]?.week);
 
     const row = document.createElement("article");
     row.className = "py-8 sm:py-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center cursor-pointer group";
     row.innerHTML = `
       <div class="lg:col-span-5 overflow-hidden rounded-2xl">
-        <img src="${photoSrc}" alt="${escapeHtml(uInfo.title)}" class="w-full h-56 sm:h-64 object-cover object-center max-w-full rounded-2xl shadow-xs group-hover:scale-[1.01] transition-transform duration-300" />
+        <img src="${photoSrc}" data-foto="unidad-${uNum}" alt="${escapeHtml(uInfo.title)}" class="w-full h-56 sm:h-64 object-cover object-center max-w-full rounded-2xl shadow-xs group-hover:scale-[1.01] transition-transform duration-300" />
       </div>
       <div class="lg:col-span-7 flex flex-col justify-between space-y-4">
         <div class="space-y-2">
@@ -60,7 +60,8 @@ function renderSpecificUnitView() {
   document.getElementById("unitViewObjective").textContent = uInfo.objective;
 
   const photoEl = document.getElementById("unitViewHeroPhoto");
-  photoEl.src = getWeekPhotoSrc(unitWeeks[0]?.week || 1, activeUnitNum);
+  photoEl.src = getUnitPhotoSrc(activeUnitNum, unitWeeks[0]?.week);
+  photoEl.dataset.foto = "unidad-" + activeUnitNum;
   photoEl.alt = uInfo.title;
   document.getElementById("unitViewPhotoCaption").textContent = uInfo.caption;
 
@@ -74,7 +75,7 @@ function renderSpecificUnitView() {
     item.innerHTML = `
       <div class="space-y-4">
         <div class="overflow-hidden rounded-xl">
-          <img src="${wPhoto}" alt="${escapeHtml(w.title)}" class="w-full h-48 object-cover object-center max-w-full rounded-xl group-hover:scale-[1.02] transition-transform duration-300" />
+          <img src="${wPhoto}" data-foto="semana-${String(w.week).padStart(2, "0")}" alt="${escapeHtml(w.title)}" class="w-full h-48 object-cover object-center max-w-full rounded-xl group-hover:scale-[1.02] transition-transform duration-300" />
         </div>
         <div class="space-y-2">
           <div class="flex items-center justify-between text-xs">
@@ -246,7 +247,7 @@ function renderSingleWeekView() {
         </div>
 
         <div class="lg:col-span-6">
-          <img src="${photoSrc}" alt="${escapeHtml(w.title)}" class="w-full h-64 sm:h-[310px] object-cover object-center max-w-full rounded-2xl shadow-sm" />
+          <img src="${photoSrc}" data-foto="semana-${String(w.week).padStart(2, "0")}" alt="${escapeHtml(w.title)}" class="w-full h-64 sm:h-[310px] object-cover object-center max-w-full rounded-2xl shadow-sm" />
         </div>
       </div>
 
