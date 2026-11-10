@@ -75,20 +75,43 @@ const TOPIC_DESCRIPTIONS = {
   "14.4": "Evaluación de impacto dispar, equidad algorítmica, trazabilidad, protección de datos personales y desafíos futuros de la IA."
 };
 
+// Un tema se escribe en el panel así:   1.1 Título del tema | Frase que se muestra debajo
+// Lo que va después de la barra | es la frase propia del tema. Si no hay barra,
+// se usa la frase de TOPIC_DESCRIPTIONS (arriba) y, si tampoco existe, una frase genérica.
+function separarTema(rawTopic) {
+  const partes = String(rawTopic || "").split("|");
+  return { texto: partes[0].trim(), fraseDelTema: partes.slice(1).join("|").trim() };
+}
+
+// Solo el título del tema, sin la frase (para listas y diapositivas)
+function tituloDeTema(rawTopic) {
+  return separarTema(rawTopic).texto;
+}
+
+// Lo que se muestra en la caja de temas del panel: «título | frase» (con la frase actual ya escrita)
+function topicParaEditar(rawTopic) {
+  const { texto, fraseDelTema } = separarTema(rawTopic);
+  if (fraseDelTema) return texto + " | " + fraseDelTema;
+  const m = texto.match(/^(\d+\.\d+)\s/);
+  const base = m && TOPIC_DESCRIPTIONS[m[1]];
+  return base ? texto + " | " + base : texto;
+}
+
 function parseTopicItem(rawTopic, weekNum, idx) {
-  const match = String(rawTopic || "").match(/^(\d+\.\d+)\s+(.*)$/);
+  const { texto, fraseDelTema } = separarTema(rawTopic);
+  const match = texto.match(/^(\d+\.\d+)\s+(.*)$/);
   const numBadge = String((idx || 0) + 1).padStart(2, "0") + ".";
   if (match) {
     const code = match[1];
     const title = match[2];
-    const desc = TOPIC_DESCRIPTIONS[code] || `Análisis conceptual y práctico de ${title.toLowerCase()} en la sesión ${weekNum}.`;
+    const desc = fraseDelTema || TOPIC_DESCRIPTIONS[code] || `Análisis conceptual y práctico de ${title.toLowerCase()} en la sesión ${weekNum}.`;
     return { code, numBadge, title, desc };
   }
   return {
     code: `S${weekNum}`,
     numBadge,
-    title: rawTopic,
-    desc: `Desarrollo conceptual y aplicado de ${String(rawTopic).toLowerCase()}.`
+    title: texto,
+    desc: fraseDelTema || `Desarrollo conceptual y aplicado de ${texto.toLowerCase()}.`
   };
 }
 

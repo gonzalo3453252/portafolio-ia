@@ -18,7 +18,7 @@ function buildSlidesForWeek(w) {
       section: "AGENDA DE LA SESIÓN",
       title: "Contenido Temático de la Semana " + w.week,
       subtitle: w.unitName,
-      bullets: w.topics
+      bullets: w.topics.map(tituloDeTema)
     },
     {
       section: "INTRODUCCIÓN Y CONTEXTO",

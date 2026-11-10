@@ -96,7 +96,7 @@ function loadSelectedWeekIntoInputs() {
   document.getElementById("editWeekTitleInput").value = found.title || "";
   document.getElementById("editWeekEvalInput").value = found.evaluation || "";
   document.getElementById("editWeekSummaryInput").value = found.summary || "";
-  document.getElementById("editWeekTopicsInput").value = Array.isArray(found.topics) ? found.topics.join(String.fromCharCode(10)) : "";
+  document.getElementById("editWeekTopicsInput").value = Array.isArray(found.topics) ? found.topics.map(topicParaEditar).join(String.fromCharCode(10)) : "";
 
   document.getElementById("toggleHasPpt").checked = found.hasPpt !== false;
   document.getElementById("toggleHasWord").checked = Boolean(found.hasWord);
