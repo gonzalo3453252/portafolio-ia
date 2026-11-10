@@ -219,17 +219,17 @@
       "subtitleSlide": "Perceptrón Multicapa, Activaciones y Backpropagation",
       "photoCaption": "Perceptrón Multicapa, Retropropagación y Convergencia del Error",
       "topics": [
-        "9.1 Fundamentos del Aprendizaje Profundo y representación jerárquica",
-        "9.2 Diferencias con el Machine Learning clásico",
-        "9.3 Aplicaciones y requerimientos computacionales",
-        "9.4 Redes Neuronales Multicapa (MLP), funciones de activación y Backpropagation",
-        "9.5 Visualización de la curva de convergencia del error en Python"
+        "9.1 Fundamentos del Aprendizaje Profundo y representación jerárquica | Aprendizaje automático de representaciones jerárquicas mediante múltiples capas ocultas de procesamiento no lineal.",
+        "9.2 Diferencias con el Machine Learning clásico | Ventajas de la extracción automática de características en grandes volúmenes de datos frente a la ingeniería manual de atributos.",
+        "9.3 Aplicaciones y requerimientos computacionales | Aceleración matricial sobre GPUs/TPUs y aplicaciones de alto impacto en bioinformática, voz y sistemas de recomendación.",
+        "9.4 Redes Neuronales Multicapa (MLP), funciones de activación y Backpropagation | Cálculo del paso hacia adelante (forward pass), activaciones ReLU/Sigmoid/Softmax y retropropagación de gradientes (Backpropagation).",
+        "9.5 Visualización de la curva de convergencia del error en Python | Monitoreo época por época de la función de pérdida (Loss) y ajuste de hiperparámetros con optimizadores SGD y Adam."
       ],
       "evaluation": "Clase Teórica y Laboratorio de Convergencia ANN",
       "summary": "Estudio formal del Perceptrón Multicapa, funciones de activación no lineales (ReLU, Sigmoide, Softmax) y retropropagación del error mediante descenso de gradiente.",
       "hasPpt": true,
       "hasWord": false,
-      "hasColab": false,
+      "hasColab": true,
       "pptLabel": "Clase09_Fundamentos_DeepLearning_ANN.pptx",
       "pptUrl": "",
       "docLabel": "Informe_Semana09_Redes_ANN.pdf",
@@ -239,8 +239,7 @@
       "codeSnippet": "import numpy as np\nimport matplotlib.pyplot as plt\nfrom sklearn.neural_network import MLPClassifier",
       "codeOutput": "Épocas ejecutadas: 150 | Error final (Loss): 0.0148",
       "ocultos": {
-        "doc": true,
-        "colab": true
+        "doc": true
       }
     },
     {
@@ -251,17 +250,17 @@
       "subtitleSlide": "Visión por Computadora, Kernels y MaxPooling",
       "photoCaption": "Visión Computacional, Filtros Convolucionales y Mapas de Características",
       "topics": [
-        "10.1 Introducción a las CNN en visión por computadora",
-        "10.2 Aplicaciones en diagnóstico médico e inspección industrial",
-        "10.3 Operaciones de Convolución, Padding, Stride, Pooling y Flatten",
-        "10.4 Arquitecturas clásicas: LeNet-5, AlexNet, VGG-16 y ResNet",
-        "10.5 Construcción y entrenamiento de una CNN en Python"
+        "10.1 Introducción a las CNN en visión por computadora | Representación tensorial de imágenes digitales (canales RGB) y preservación de la topología espacial mediante campos receptivos locales.",
+        "10.2 Aplicaciones en diagnóstico médico e inspección industrial | Detección automatizada de patologías en radiografías, control de calidad en líneas de manufactura y reconocimiento biométrico.",
+        "10.3 Operaciones de Convolución, Padding, Stride, Pooling y Flatten | Aplicación de filtros convolucionales (kernels), control de bordes (padding), paso de desplazamiento (stride) y reducción MaxPooling.",
+        "10.4 Arquitecturas clásicas: LeNet-5, AlexNet, VGG-16 y ResNet | Evolución de la profundidad y conexiones residuales desde LeNet-5 y AlexNet hasta VGG-16 y ResNet en competencias ImageNet.",
+        "10.5 Construcción y entrenamiento de una CNN en Python | Implementación de un clasificador visual completo evaluando su exactitud y mapas de activación sobre conjuntos de imágenes."
       ],
       "evaluation": "Clase Teórica y Laboratorio CNN en Python",
       "summary": "Extracción jerárquica de características espaciales en imágenes digitales mediante kernels convolucionales y reducción dimensional con MaxPooling.",
       "hasPpt": true,
       "hasWord": false,
-      "hasColab": false,
+      "hasColab": true,
       "pptLabel": "Clase10_Redes_Convolucionales_CNN.pptx",
       "pptUrl": "",
       "docLabel": "Informe_Semana10_CNN.pdf",
@@ -271,8 +270,7 @@
       "codeSnippet": "import numpy as np\nimport tensorflow as tf\nfrom tensorflow.keras import layers, models",
       "codeOutput": "Total de parámetros entrenables en la CNN: 12810",
       "ocultos": {
-        "doc": true,
-        "colab": true
+        "doc": true
       }
     },
     {
