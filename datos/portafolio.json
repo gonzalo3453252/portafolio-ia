@@ -135,7 +135,7 @@
       "summary": "Entrenamiento y validación de modelos predictivos a partir de datos etiquetados, evaluando métricas de clasificación (Accuracy, Precision, Recall, F1-Score) e importancia de características.",
       "hasPpt": true,
       "hasWord": false,
-      "hasColab": true,
+      "hasColab": false,
       "pptLabel": "Clase05_Aprendizaje_Supervisado.pptx",
       "pptUrl": "",
       "docLabel": "Tarea05_Informe_Supervisado.pdf",
@@ -143,7 +143,11 @@
       "colabLabel": "Lab05_Random_Forest_Sklearn.ipynb",
       "colabUrl": "https://colab.research.google.com/",
       "codeSnippet": "import numpy as np\nfrom sklearn.datasets import load_iris\nfrom sklearn.ensemble import RandomForestClassifier\n\nX, y = load_iris(return_X_y=True)\nmodelo_rf = RandomForestClassifier(n_estimators=100, random_state=42).fit(X, y)",
-      "codeOutput": "Exactitud en conjunto de prueba: 100.00%"
+      "codeOutput": "Exactitud en conjunto de prueba: 100.00%",
+      "ocultos": {
+        "doc": true,
+        "colab": true
+      }
     },
     {
       "week": 6,
@@ -161,8 +165,8 @@
       "evaluation": "Tarea Académica 6 — Segmentación con K-Means y PCA",
       "summary": "Extracción de patrones intrínsecos y estructuras de agrupamiento en datos no etiquetados combinando particionamiento K-Means con Análisis de Componentes Principales (PCA).",
       "hasPpt": true,
-      "hasWord": true,
-      "hasColab": true,
+      "hasWord": false,
+      "hasColab": false,
       "pptLabel": "Clase06_Aprendizaje_No_Supervisado.pptx",
       "pptUrl": "",
       "docLabel": "Tarea06_Informe_Clustering.pdf",
@@ -170,7 +174,11 @@
       "colabLabel": "Lab06_KMeans_PCA.ipynb",
       "colabUrl": "https://colab.research.google.com/",
       "codeSnippet": "import numpy as np\nimport matplotlib.pyplot as plt\nfrom sklearn.cluster import KMeans",
-      "codeOutput": "Inercia intra-cluster: 332.48 | Coeficiente de Silueta: 0.8432"
+      "codeOutput": "Inercia intra-cluster: 332.48 | Coeficiente de Silueta: 0.8432",
+      "ocultos": {
+        "doc": true,
+        "colab": true
+      }
     },
     {
       "week": 7,
@@ -188,8 +196,8 @@
       "evaluation": "Tarea Académica 7 — Entrenamiento de Agente con Q-Learning",
       "summary": "Aprendizaje secuencial mediante interacción con el entorno, actualizando la tabla de valores acción-estado Q(s,a) para converger hacia la política óptima.",
       "hasPpt": true,
-      "hasWord": true,
-      "hasColab": true,
+      "hasWord": false,
+      "hasColab": false,
       "pptLabel": "Clase07_Aprendizaje_Por_Refuerzo.pptx",
       "pptUrl": "",
       "docLabel": "Tarea07_Informe_QLearning.pdf",
@@ -197,7 +205,11 @@
       "colabLabel": "Lab07_Agente_QLearning.ipynb",
       "colabUrl": "https://colab.research.google.com/",
       "codeSnippet": "import numpy as np\nimport matplotlib.pyplot as plt\n\nQ = np.zeros((4, 2))\nalfa, gamma = 0.5, 0.9",
-      "codeOutput": "Valores Q óptimos por estado: [ 8.1  9.  10.   0. ]"
+      "codeOutput": "Valores Q óptimos por estado: [ 8.1  9.  10.   0. ]",
+      "ocultos": {
+        "doc": true,
+        "colab": true
+      }
     },
     {
       "week": 9,
@@ -217,7 +229,7 @@
       "summary": "Estudio formal del Perceptrón Multicapa, funciones de activación no lineales (ReLU, Sigmoide, Softmax) y retropropagación del error mediante descenso de gradiente.",
       "hasPpt": true,
       "hasWord": false,
-      "hasColab": true,
+      "hasColab": false,
       "pptLabel": "Clase09_Fundamentos_DeepLearning_ANN.pptx",
       "pptUrl": "",
       "docLabel": "Informe_Semana09_Redes_ANN.pdf",
@@ -225,7 +237,11 @@
       "colabLabel": "Lab09_MLP_Convergencia_Error.ipynb",
       "colabUrl": "https://colab.research.google.com/",
       "codeSnippet": "import numpy as np\nimport matplotlib.pyplot as plt\nfrom sklearn.neural_network import MLPClassifier",
-      "codeOutput": "Épocas ejecutadas: 150 | Error final (Loss): 0.0148"
+      "codeOutput": "Épocas ejecutadas: 150 | Error final (Loss): 0.0148",
+      "ocultos": {
+        "doc": true,
+        "colab": true
+      }
     },
     {
       "week": 10,
@@ -245,7 +261,7 @@
       "summary": "Extracción jerárquica de características espaciales en imágenes digitales mediante kernels convolucionales y reducción dimensional con MaxPooling.",
       "hasPpt": true,
       "hasWord": false,
-      "hasColab": true,
+      "hasColab": false,
       "pptLabel": "Clase10_Redes_Convolucionales_CNN.pptx",
       "pptUrl": "",
       "docLabel": "Informe_Semana10_CNN.pdf",
@@ -253,7 +269,11 @@
       "colabLabel": "Lab10_Clasificador_Imagenes_CNN.ipynb",
       "colabUrl": "https://colab.research.google.com/",
       "codeSnippet": "import numpy as np\nimport tensorflow as tf\nfrom tensorflow.keras import layers, models",
-      "codeOutput": "Total de parámetros entrenables en la CNN: 12810"
+      "codeOutput": "Total de parámetros entrenables en la CNN: 12810",
+      "ocultos": {
+        "doc": true,
+        "colab": true
+      }
     },
     {
       "week": 11,
@@ -273,7 +293,7 @@
       "summary": "Procesamiento de datos secuenciales y series cronológicas mediante estados ocultos recurrentes y celdas LSTM equipadas con compuertas de memoria.",
       "hasPpt": true,
       "hasWord": false,
-      "hasColab": true,
+      "hasColab": false,
       "pptLabel": "Clase11_Redes_Recurrentes_LSTM.pptx",
       "pptUrl": "",
       "docLabel": "Informe_Semana11_RNN_LSTM.pdf",
@@ -281,7 +301,11 @@
       "colabLabel": "Lab11_Prediccion_Series_LSTM.ipynb",
       "colabUrl": "https://colab.research.google.com/",
       "codeSnippet": "import torch\nimport torch.nn as nn\nimport numpy as np",
-      "codeOutput": "Forma del tensor de salida predicho: torch.Size([4, 1])"
+      "codeOutput": "Forma del tensor de salida predicho: torch.Size([4, 1])",
+      "ocultos": {
+        "doc": true,
+        "colab": true
+      }
     },
     {
       "week": 12,
@@ -309,7 +333,11 @@
       "colabLabel": "Lab12_Transformer_SelfAttention.ipynb",
       "colabUrl": "",
       "codeSnippet": "import torch\nimport torch.nn.functional as F\nimport math",
-      "codeOutput": "Suma de pesos de atención por fila: tensor([[1., 1., 1., 1.]])"
+      "codeOutput": "Suma de pesos de atención por fila: tensor([[1., 1., 1., 1.]])",
+      "ocultos": {
+        "doc": true,
+        "colab": true
+      }
     },
     {
       "week": 13,
@@ -328,7 +356,7 @@
       "summary": "Estudio del equilibrio en redes generativas adversarias donde el Generador aprende a transformar ruido latente en muestras sintéticas realistas frente al Discriminador.",
       "hasPpt": true,
       "hasWord": false,
-      "hasColab": true,
+      "hasColab": false,
       "pptLabel": "Clase13_Redes_Adversarias_GAN.pptx",
       "pptUrl": "",
       "docLabel": "Informe_Semana13_GAN_PyTorch.pdf",
@@ -336,7 +364,11 @@
       "colabLabel": "Lab13_Entrenamiento_GAN.ipynb",
       "colabUrl": "https://colab.research.google.com/",
       "codeSnippet": "import torch\nimport torch.nn as nn\nimport matplotlib.pyplot as plt",
-      "codeOutput": "Tensor de imágenes sintéticas generadas: torch.Size([8, 784])"
+      "codeOutput": "Tensor de imágenes sintéticas generadas: torch.Size([8, 784])",
+      "ocultos": {
+        "doc": true,
+        "colab": true
+      }
     },
     {
       "week": 14,
@@ -363,7 +395,11 @@
       "colabLabel": "Lab14_Auditoria_Equidad_IA.ipynb",
       "colabUrl": "",
       "codeSnippet": "import numpy as np\nimport matplotlib.pyplot as plt",
-      "codeOutput": "Ratio de Impacto Dispar: 0.88"
+      "codeOutput": "Ratio de Impacto Dispar: 0.88",
+      "ocultos": {
+        "doc": true,
+        "colab": true
+      }
     }
   ]
 }
