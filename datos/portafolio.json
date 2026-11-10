@@ -347,14 +347,14 @@
       "subtitleSlide": "Equilibrio Minimax entre Generador y Discriminador",
       "photoCaption": "Entrenamiento Adversario entre Red Generadora y Discriminadora",
       "topics": [
-        "13.1 Formulación Minimax entre el Generador (G) y el Discriminador (D)",
-        "13.2 Síntesis de imágenes y transferencia de estilo neural",
-        "13.3 Aumento de datos (Data Augmentation) mediante modelos generativos",
-        "13.5 Entrenamiento de una red GAN con PyTorch en Google Colab"
+        "13.1 Formulación Minimax entre el Generador (G) y el Discriminador (D) | Juego competitivo de suma cero donde el Generador busca sintetizar muestras indistinguibles de las reales frente al Discriminador.",
+        "13.2 Síntesis de imágenes y transferencia de estilo neural | Generación fotorrealista de rostros, superresolución de imágenes médicas y traslación de estilos pictóricos entre dominios.",
+        "13.3 Aumento de datos (Data Augmentation) mediante modelos generativos | Enriquecimiento de conjuntos de datos desbalanceados mediante la creación controlada de ejemplos sintéticos de entrenamiento.",
+        "13.5 Entrenamiento de una red GAN con PyTorch en Google Colab | Diseño en PyTorch de las redes Generadora y Discriminadora, estabilizando el entrenamiento adversario con funciones de pérdida BCE."
       ],
       "evaluation": "Clase Teórica y Práctica de GAN en Google Colab",
       "summary": "Estudio del equilibrio en redes generativas adversarias donde el Generador aprende a transformar ruido latente en muestras sintéticas realistas frente al Discriminador.",
-      "hasPpt": true,
+      "hasPpt": false,
       "hasWord": false,
       "hasColab": false,
       "pptLabel": "Clase13_Redes_Adversarias_GAN.pptx",
@@ -367,7 +367,8 @@
       "codeOutput": "Tensor de imágenes sintéticas generadas: torch.Size([8, 784])",
       "ocultos": {
         "doc": true,
-        "colab": true
+        "colab": true,
+        "ppt": true
       }
     },
     {
