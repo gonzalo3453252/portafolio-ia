@@ -1,0 +1,43 @@
+name: Generar lista de fotos
+
+# Cada vez que subes, cambias o borras una foto en img/, se actualiza datos/fotos.js.
+# La página lo lee al abrir y así muestra al instante la foto correcta de cada semana y unidad.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'img/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: fotos-lista
+  cancel-in-progress: false
+
+jobs:
+  listar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Se parte siempre de la última versión de main y se vuelve a generar la lista desde ahí;
+      # si el push choca con otra ejecución, se repite. Si no logra guardar, el paso falla (no finge éxito).
+      - name: Generar y guardar la lista
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          for i in 1 2 3 4 5; do
+            git fetch origin main
+            git reset --hard origin/main
+            python3 .github/scripts/generar_fotos_lista.py
+            git add datos/fotos.js
+            if git diff --cached --quiet; then echo "Sin cambios"; exit 0; fi
+            git commit -m "Lista de fotos generada automáticamente"
+            if git push origin HEAD:main; then echo "Lista guardada"; exit 0; fi
+            echo "Intento $i falló; se reintenta desde la última versión de main"
+            sleep $((i * 5))
+          done
+          echo "::error::No se pudo guardar la lista de fotos después de 5 intentos"
+          exit 1

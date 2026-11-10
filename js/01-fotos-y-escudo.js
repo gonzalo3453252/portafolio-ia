@@ -64,6 +64,15 @@ function guardarCacheFotos() {
   try { localStorage.setItem(FOTOS_CACHE_KEY, JSON.stringify(fotosPersonalizadas)); } catch (e) {}
 }
 
+// Lista de fotos propias que genera GitHub solo al subir imágenes (datos/fotos.js). Llega ANTES de
+// dibujar la página, así cualquiera (también un visitante nuevo) ve la foto correcta al instante.
+// Si ese archivo no existe, se usa el método de respaldo de abajo (memoria del navegador + comprobar).
+const FOTOS_LISTA = (typeof window !== "undefined" && window.__FOTOS_LISTA && typeof window.__FOTOS_LISTA === "object") ? window.__FOTOS_LISTA : null;
+if (FOTOS_LISTA) {
+  Object.keys(fotosPersonalizadas).forEach((k) => { delete fotosPersonalizadas[k]; });
+  Object.keys(FOTOS_LISTA).forEach((k) => { fotosPersonalizadas[k] = new URL(FOTOS_LISTA[k], location.href).href; });
+}
+
 function probarImagen(url) {
   return new Promise(resolve => {
     const im = new Image();
@@ -76,6 +85,7 @@ function probarImagen(url) {
 // Devuelve la URL de img/<nombre>.<ext> si existe, o null
 // (se comprueba una sola vez por visita, aunque la memoria del navegador ya tenga una respuesta)
 function buscarFotoPersonalizada(nombre) {
+  if (FOTOS_LISTA) return Promise.resolve(fotosPersonalizadas[nombre] || null);   // la lista ya lo dice
   if (fotosEnBusqueda[nombre]) return fotosEnBusqueda[nombre];
   const urls = EXTENSIONES_FOTO.map(ext => new URL(RUTA_IMAGENES + "/" + nombre + "." + ext, location.href).href);
   fotosEnBusqueda[nombre] = Promise.all(urls.map(probarImagen)).then(resultados => {
@@ -107,7 +117,9 @@ function aplicarFotosPersonalizadas() {
       if (url && img.src !== url) img.src = url;
       marcarFotoLista(img, nombre);
     };
-    // Si el navegador ya sabe la respuesta (visita anterior), se usa de inmediato, sin esperar
+    // Con la lista de GitHub la respuesta es inmediata y definitiva: sin esperas ni comprobaciones
+    if (FOTOS_LISTA) { poner(fotosPersonalizadas[nombre] || null); return; }
+    // Respaldo: si el navegador ya sabe la respuesta (visita anterior), se usa de inmediato
     if (nombre in fotosPersonalizadas) poner(fotosPersonalizadas[nombre]);
     // Primera visita (o foto nueva): se espera la comprobación, con un tope por si algo falla
     buscarFotoPersonalizada(nombre).then(poner);
