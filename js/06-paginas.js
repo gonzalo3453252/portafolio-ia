@@ -60,6 +60,7 @@ function renderSpecificUnitView() {
   document.getElementById("unitViewObjective").textContent = uInfo.objective;
 
   const photoEl = document.getElementById("unitViewHeroPhoto");
+  photoEl.removeAttribute("data-listo");   // esta foto se reutiliza entre unidades: se oculta hasta tener la correcta
   photoEl.src = getUnitPhotoSrc(activeUnitNum, unitWeeks[0]?.week);
   photoEl.dataset.foto = "unidad-" + activeUnitNum;
   photoEl.alt = uInfo.title;

@@ -162,3 +162,16 @@ h1, h2, h3, h4, h5, .display-heading {
 .divider-line {
   border-color: var(--line-soft);
 }
+
+/* Fotos de portada, unidades y semanas: ocultas hasta saber cuál es la definitiva
+   (evita ver un instante la foto de antes). El tope de seguridad está en js/01-fotos-y-escudo.js */
+html.fotos-js img[data-foto]:not([data-listo]) {
+  opacity: 0;
+}
+html.fotos-js img[data-foto][data-listo] {
+  animation: fotoAparece 0.25s ease-out;
+}
+@keyframes fotoAparece {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

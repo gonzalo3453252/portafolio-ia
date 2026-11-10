@@ -53,6 +53,17 @@ const EXTENSIONES_FOTO = ["jpg", "jpeg", "png", "webp"];
 const fotosPersonalizadas = {};   // nombre -> URL encontrada (o null si no existe)
 const fotosEnBusqueda = {};       // nombre -> promesa en curso
 
+// Memoria del navegador: recuerda qué fotos propias existen para dibujarlas bien desde el primer
+// instante (sin que se vea un momento la foto de antes). Igual se comprueba de nuevo en segundo plano.
+const FOTOS_CACHE_KEY = "ia_fotos_v1";
+try {
+  const guardadas = JSON.parse(localStorage.getItem(FOTOS_CACHE_KEY) || "{}");
+  Object.keys(guardadas).forEach((k) => { fotosPersonalizadas[k] = guardadas[k]; });
+} catch (e) {}
+function guardarCacheFotos() {
+  try { localStorage.setItem(FOTOS_CACHE_KEY, JSON.stringify(fotosPersonalizadas)); } catch (e) {}
+}
+
 function probarImagen(url) {
   return new Promise(resolve => {
     const im = new Image();
@@ -63,32 +74,50 @@ function probarImagen(url) {
 }
 
 // Devuelve la URL de img/<nombre>.<ext> si existe, o null
+// (se comprueba una sola vez por visita, aunque la memoria del navegador ya tenga una respuesta)
 function buscarFotoPersonalizada(nombre) {
-  if (nombre in fotosPersonalizadas && fotosPersonalizadas[nombre] !== undefined) {
-    return Promise.resolve(fotosPersonalizadas[nombre]);
-  }
   if (fotosEnBusqueda[nombre]) return fotosEnBusqueda[nombre];
   const urls = EXTENSIONES_FOTO.map(ext => new URL(RUTA_IMAGENES + "/" + nombre + "." + ext, location.href).href);
   fotosEnBusqueda[nombre] = Promise.all(urls.map(probarImagen)).then(resultados => {
     const i = resultados.indexOf(true);
-    fotosPersonalizadas[nombre] = i >= 0 ? urls[i] : null;
-    return fotosPersonalizadas[nombre];
+    const nueva = i >= 0 ? urls[i] : null;
+    const cambio = fotosPersonalizadas[nombre] !== nueva;
+    fotosPersonalizadas[nombre] = nueva;
+    if (cambio) guardarCacheFotos();
+    return nueva;
   });
   return fotosEnBusqueda[nombre];
+}
+
+// La foto se muestra (se quita el "oculto") cuando ya es la definitiva y terminó de cargar.
+// Mientras tanto el CSS la mantiene transparente, así nunca se ve primero la foto de antes.
+function marcarFotoLista(img, nombre) {
+  const listo = () => { if (img.dataset.foto === nombre) img.setAttribute("data-listo", nombre); };
+  if (img.complete && img.naturalWidth > 0) listo();
+  else { img.addEventListener("load", listo, { once: true }); img.addEventListener("error", listo, { once: true }); }
 }
 
 // Recorre las <img data-foto="nombre"> de la página y cambia su foto si hay una personalizada
 function aplicarFotosPersonalizadas() {
   document.querySelectorAll("img[data-foto]").forEach(img => {
     const nombre = img.dataset.foto;
-    buscarFotoPersonalizada(nombre).then(url => {
-      if (url && img.dataset.foto === nombre && img.src !== url) img.src = url;
-    });
+    if (img.dataset.listo === nombre) return;               // ya resuelta
+    const poner = (url) => {
+      if (img.dataset.foto !== nombre) return;
+      if (url && img.src !== url) img.src = url;
+      marcarFotoLista(img, nombre);
+    };
+    // Si el navegador ya sabe la respuesta (visita anterior), se usa de inmediato, sin esperar
+    if (nombre in fotosPersonalizadas) poner(fotosPersonalizadas[nombre]);
+    // Primera visita (o foto nueva): se espera la comprobación, con un tope por si algo falla
+    buscarFotoPersonalizada(nombre).then(poner);
+    setTimeout(() => { if (img.dataset.foto === nombre && !img.hasAttribute("data-listo")) img.setAttribute("data-listo", nombre); }, 3000);
   });
 }
 
 // Vigila la página: cada vez que se dibuja una foto con data-foto, busca la suya
 function iniciarFotosPersonalizadas() {
+  window.__fotosIniciado = true;
   let pendiente = false;
   const programar = () => {
     if (pendiente) return;

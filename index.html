@@ -33,6 +33,11 @@
   <meta property="og:description" content="Semanas teóricas, informes, presentaciones y laboratorios del curso de Inteligencia Artificial (UNMSM - FISI)." />
   <meta name="theme-color" content="#0f172a" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230f172a'/%3E%3Ctext x='32' y='42' font-family='Arial' font-weight='800' font-size='28' text-anchor='middle' fill='white'%3EIA%3C/text%3E%3C/svg%3E" />
+  <!-- Mantiene ocultas las fotos hasta que se sabe cuál mostrar (ver css/estilos.css). Si el script principal no arranca, se muestran igual a los 4 s. -->
+  <script>
+    document.documentElement.classList.add("fotos-js");
+    setTimeout(function () { if (!window.__fotosIniciado) document.documentElement.classList.remove("fotos-js"); }, 4000);
+  </script>
   <!-- Tailwind (estilos utilitarios) -->
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
