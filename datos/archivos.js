@@ -21,7 +21,8 @@ window.__ARCHIVOS_LISTA = {
    "Semana_4_algoritmo_A_ (2).ipynb"
   ],
   "5": [
-   "Métodos Supervisados en Machine Learning (Semana 5) UNMSM FISI.pptx"
+   "Métodos Supervisados en Machine Learning (Semana 5) UNMSM FISI.pptx",
+   "semana_5_Aprendizaje_supervisado (1).ipynb"
   ],
   "6": [
    "APRENDISAJE NO SUPERVISADO_SEMANA 6.pptx"
