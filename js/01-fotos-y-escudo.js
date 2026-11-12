@@ -133,18 +133,26 @@ function aplicarFotosPersonalizadas() {
 function precargarFotosEnSegundoPlano() {
   if (!FOTOS_LISTA) return;
   try { if (navigator.connection && navigator.connection.saveData) return; } catch (e) {}
-  const urls = Object.keys(fotosPersonalizadas).map((k) => fotosPersonalizadas[k]).filter(Boolean);
-  let i = 0;
+  // Fotos de semanas y unidades propias + las de siempre de cada unidad (todas son livianas)
+  const urls = [];
+  const agregar = (u) => { if (u && urls.indexOf(u) < 0) urls.push(u); };
+  Object.keys(fotosPersonalizadas).forEach((k) => agregar(fotosPersonalizadas[k]));
+  Object.keys(FOTOS_UNIDAD).forEach((k) => agregar(new URL(FOTOS_UNIDAD[k], location.href).href));
+  let i = 0, activas = 0;
   const siguiente = () => {
-    if (i >= urls.length) return;
-    const im = new Image();
-    im.decoding = "async";
-    im.src = urls[i++];
-    setTimeout(siguiente, 120);   // de a una, sin saturar la conexión
+    while (activas < 3 && i < urls.length) {          // de a 3 a la vez: rápido pero sin saturar la conexión
+      activas++;
+      const im = new Image();
+      im.decoding = "async";
+      const fin = () => { activas--; siguiente(); };
+      im.onload = fin; im.onerror = fin;
+      im.src = urls[i++];
+    }
   };
-  const arrancar = () => (window.requestIdleCallback ? requestIdleCallback(siguiente, { timeout: 3000 }) : setTimeout(siguiente, 800));
-  if (document.readyState === "complete") arrancar();
-  else window.addEventListener("load", arrancar, { once: true });
+  // Arranca apenas la página está lista (las portadas ya pidieron lo suyo antes), sin esperar al evento "load"
+  const arrancar = () => setTimeout(siguiente, 300);
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", arrancar, { once: true });
+  else arrancar();
 }
 
 function iniciarFotosPersonalizadas() {

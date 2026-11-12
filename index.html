@@ -45,6 +45,20 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <!-- Lista de fotos propias (la genera GitHub). Va aquí arriba para que las portadas empiecen a bajar de inmediato -->
+  <script src="datos/fotos.js"></script>
+  <script>
+    // Las dos fotos de la portada se piden YA (con prioridad), sin esperar a que cargue el resto de la página
+    (function () {
+      var L = window.__FOTOS_LISTA || {};
+      [["portada-facultad", "img/facultad-fisi.jpg"], ["portada-docente", "img/docente.jpg"]].forEach(function (f) {
+        var l = document.createElement("link");
+        l.rel = "preload"; l.as = "image"; l.href = L[f[0]] || f[1];
+        l.setAttribute("fetchpriority", "high");
+        document.head.appendChild(l);
+      });
+    })();
+  </script>
   <!-- Estilos propios -->
   <link rel="stylesheet" href="css/estilos.css" />
   <!-- Estilos de Tailwind (van después de los propios, como antes) ya generados (css/tailwind.css). Los rehace sola la tarea automática de GitHub; ya no se descarga nada de otro servidor. -->
@@ -804,7 +818,19 @@
   </footer>
 
   <!-- Lógica (el orden importa) -->
-  <script src="datos/fotos.js"></script>
+  <script>
+    // Con la lista de fotos ya conocida, las fotos de la portada se muestran en cuanto llegan,
+    // sin esperar a que cargue el resto de los scripts.
+    (function () {
+      var L = window.__FOTOS_LISTA;
+      if (!L) return;
+      document.querySelectorAll("img[data-foto]").forEach(function (im) {
+        var n = im.getAttribute("data-foto"), u = L[n];
+        if (u) { var abs = new URL(u, location.href).href; if (im.src !== abs) im.src = abs; }
+        im.setAttribute("data-listo", n);
+      });
+    })();
+  </script>
   <script src="datos/archivos.js"></script>
   <script src="js/00-configuracion.js"></script>
   <script src="js/01-fotos-y-escudo.js"></script>

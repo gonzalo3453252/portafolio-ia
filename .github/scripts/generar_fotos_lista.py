@@ -5,7 +5,7 @@ La página la lee al instante (antes de dibujar nada) y así sabe qué foto va e
 sin tener que ir a comprobarlo. Reconoce estos nombres (jpg, jpeg, png o webp):
     portada-facultad, portada-docente, unidad-1 ... unidad-5, semana-01 ... semana-15
 Las fotos pesadas (más de 150 KB, p. ej. un PNG de 2 MB) se convierten a una versión WebP
-liviana de 1280 px en img/_web/ (unos 70 KB) y la página usa esa: carga al instante.
+liviana de 1000 px en img/_web/ (unos 55 KB) y la página usa esa: carga al instante.
 Tu archivo original NO se toca ni se borra. El nombre de la versión liviana lleva la huella
 del original, así que si reemplazas una foto por otra con el mismo nombre se rehace sola y
 nadie ve la vieja guardada en su navegador.
@@ -22,8 +22,8 @@ IMG = os.path.join(RAIZ, "img")
 WEB = os.path.join(IMG, "_web")
 SALIDA = os.path.join(RAIZ, "datos", "fotos.js")
 UMBRAL = 150 * 1024       # desde este peso se crea la versión liviana
-ANCHO = 1280              # px de ancho máximo (sobra para tarjetas y pantallas retina)
-CALIDAD = 82
+ANCHO = 1000              # px de ancho máximo (las fotos se ven a unos 570 px: sobra incluso en pantallas retina)
+CALIDAD = 80
 PATRON = re.compile(r"^(portada-facultad|portada-docente|unidad-\d+|semana-\d+)\.(jpg|jpeg|png|webp)$", re.I)
 ORDEN = {"jpg": 0, "jpeg": 1, "png": 2, "webp": 3}   # igual que antes: si hay varias, gana la primera
 
@@ -59,7 +59,7 @@ for clave in sorted(mejor):
     huella = hashlib.sha1(datos).hexdigest()[:8]
     lista[clave] = "img/" + archivo + "?v=" + huella            # por defecto: el original
     if len(datos) > UMBRAL:
-        nombre_web = clave + "." + huella + ".webp"
+        nombre_web = clave + "." + huella + "-" + str(ANCHO) + ".webp"   # el tamaño va en el nombre: si cambia, el navegador baja la nueva
         destino = os.path.join(WEB, nombre_web)
         try:
             if not os.path.exists(destino):
