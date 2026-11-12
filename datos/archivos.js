@@ -29,7 +29,8 @@ window.__ARCHIVOS_LISTA = {
    "UrbanLens_Semana6_Colab (1).ipynb"
   ],
   "7": [
-   "Métodos por Refuerzo y Detección de Patrones en Papa Peruana (Semana 7) UNMSM FISI.pptx"
+   "Métodos por Refuerzo y Detección de Patrones en Papa Peruana (Semana 7) UNMSM FISI.pptx",
+   "Semana_7_Deteccion_Patrones_Papa_Dataset.ipynb"
   ],
   "9": [
    "Semana 9 - Fundamentos del Deep Learning (UNMSM - FISI).pptx",
