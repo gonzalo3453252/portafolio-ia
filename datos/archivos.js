@@ -25,7 +25,8 @@ window.__ARCHIVOS_LISTA = {
    "semana_5_Aprendizaje_supervisado (1).ipynb"
   ],
   "6": [
-   "APRENDISAJE NO SUPERVISADO_SEMANA 6.pptx"
+   "APRENDISAJE NO SUPERVISADO_SEMANA 6.pptx",
+   "UrbanLens_Semana6_Colab (1).ipynb"
   ],
   "7": [
    "Métodos por Refuerzo y Detección de Patrones en Papa Peruana (Semana 7) UNMSM FISI.pptx"
