@@ -17,7 +17,8 @@ window.__ARCHIVOS_LISTA = {
    "Semana_3_Metodo_de_Busqueda_en_Espacios_de_Estados (1) (1).ipynb"
   ],
   "4": [
-   "Juegos de Estrategia (Semana 4) .pptx"
+   "Juegos de Estrategia (Semana 4) .pptx",
+   "Semana_4_algoritmo_A_ (2).ipynb"
   ],
   "5": [
    "Métodos Supervisados en Machine Learning (Semana 5) UNMSM FISI.pptx"
