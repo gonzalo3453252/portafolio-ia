@@ -74,7 +74,9 @@ jobs:
               d=$(dirname "$(dirname "$v")"); src="$d/$(basename "$v" .pdf)"
               [ -f "$src" ] || { echo "Borrando vista huérfana: $v"; rm -f "$v"; }
             done
-            git add -A archivos
+            # la lista de archivos (datos/archivos.js) se rehace aquí, ya con los PDF nuevos incluidos
+            python3 .github/scripts/generar_archivos_lista.py
+            git add -A archivos datos/archivos.js
             if git diff --cached --quiet; then echo "Sin cambios"; exit 0; fi
             git commit -m "Vistas PDF generadas automáticamente"
             if git push origin HEAD:main; then echo "Vistas guardadas"; exit 0; fi

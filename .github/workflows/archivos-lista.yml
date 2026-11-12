@@ -1,0 +1,46 @@
+name: Generar lista de archivos
+
+# Cada vez que subes, cambias o borras un archivo en archivos/ (cuadernos .ipynb, PDF, sílabo...),
+# se actualiza datos/archivos.js. La página lo lee al abrir para saber qué hay en cada semana,
+# sin preguntarle a la API de GitHub (que limita a ~60 consultas por hora por conexión).
+# Los .pptx/.docx los atiende "Generar vistas PDF", que además crea el PDF de vista y rehace esta lista.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'archivos/**'
+      - '!archivos/**/_vista/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: archivos-lista
+  cancel-in-progress: false
+
+jobs:
+  listar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Se parte siempre de la última versión de main, se vuelve a generar la lista y, si el push choca
+      # con otra ejecución, se repite. Si no logra guardar, el paso falla (no finge éxito).
+      - name: Generar y guardar la lista
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          for i in 1 2 3 4 5; do
+            git fetch origin main
+            git reset --hard origin/main
+            python3 .github/scripts/generar_archivos_lista.py
+            git add datos/archivos.js
+            if git diff --cached --quiet; then echo "Sin cambios"; exit 0; fi
+            git commit -m "Lista de archivos generada automáticamente"
+            if git push origin HEAD:main; then echo "Lista guardada"; exit 0; fi
+            echo "Intento $i falló; se reintenta desde la última versión de main"
+            sleep $((i * 5))
+          done
+          echo "::error::No se pudo guardar la lista de archivos después de 5 intentos"
+          exit 1

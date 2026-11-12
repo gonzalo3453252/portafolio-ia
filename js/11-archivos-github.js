@@ -54,8 +54,40 @@ function classifyWeekFiles(names) {
   return entry;
 }
 
-// Lista de archivos leída directo del repositorio de GitHub (no depende del hosting ni de ningún build)
+// Convierte las listas de archivos (por semana, vistas PDF y sílabos) en el "manifiesto" que usa la página
+function armarManifiesto(byWeek, viewsByWeek, silabos) {
+  const manifest = {};
+  if (silabos.length) {
+    const orden = silabos.slice().sort();
+    // Si subes tu propio sílabo, tiene prioridad sobre el oficial incluido
+    const propios = orden.filter((n) => n !== SILABO_OFICIAL);
+    const lista = propios.length ? propios : orden;
+    manifest.silabo = lista.find((n) => /s[ií]labo/i.test(n)) || lista[0];
+  }
+  Object.keys(byWeek).forEach((wk) => {
+    const e = classifyWeekFiles(byWeek[wk].slice().sort());
+    const vs = viewsByWeek[wk] || [];
+    if (e.ppt && vs.indexOf(e.ppt + ".pdf") >= 0) e.pptView = e.ppt + ".pdf";
+    if (e.doc && vs.indexOf(e.doc + ".pdf") >= 0) e.docView = e.doc + ".pdf";
+    if (Object.keys(e).length) manifest[wk] = e;
+  });
+  return manifest;
+}
+
+// true cuando el manifiesto salió de datos/archivos.js (generado por GitHub): ya es fiable y no hace falta
+// comprobar archivo por archivo que existan.
+let manifiestoDeLista = false;
+
+// Lista de archivos. Primero la que genera GitHub al subir archivos (datos/archivos.js): llega antes de dibujar,
+// no gasta la cuota de la API (60 por hora por conexión) y no depende de nadie. Si no existe, se pregunta a la API.
 async function loadManifestFromGithub() {
+  try {
+    const L = window.__ARCHIVOS_LISTA;
+    if (L && typeof L === "object" && L.semanas) {
+      manifiestoDeLista = true;
+      return armarManifiesto(L.semanas, L.vistas || {}, L.silabos || []);
+    }
+  } catch (e) {}
   try {
     const cached = sessionStorage.getItem("ia_tree_v2");
     if (cached) {
@@ -69,8 +101,11 @@ async function loadManifestFromGithub() {
     const d = await r.json();
     const byWeek = {};
     const viewsByWeek = {};
+    const silabos = [];
     for (const it of (d.tree || [])) {
       if (it.type !== "blob") continue;
+      const ms = /^archivos\/silabo\/([^\/]+\.pdf)$/i.exec(it.path);
+      if (ms) { silabos.push(ms[1]); continue; }
       const mv = /^archivos\/semana-(\d+)\/_vista\/([^\/]+\.pdf)$/.exec(it.path);
       if (mv) {
         const vwk = String(parseInt(mv[1], 10));
@@ -84,27 +119,7 @@ async function loadManifestFromGithub() {
       if (!byWeek[wk]) byWeek[wk] = [];
       byWeek[wk].push(m[2]);
     }
-    const manifest = {};
-    const silabos = [];
-    for (const it of (d.tree || [])) {
-      if (it.type !== "blob") continue;
-      const ms = /^archivos\/silabo\/([^\/]+\.pdf)$/i.exec(it.path);
-      if (ms) silabos.push(ms[1]);
-    }
-    if (silabos.length) {
-      silabos.sort();
-      // Si subes tu propio sílabo, tiene prioridad sobre el oficial incluido
-      const propios = silabos.filter((n) => n !== SILABO_OFICIAL);
-      const lista = propios.length ? propios : silabos;
-      manifest.silabo = lista.find((n) => /s[ií]labo/i.test(n)) || lista[0];
-    }
-    Object.keys(byWeek).forEach((wk) => {
-      const e = classifyWeekFiles(byWeek[wk].sort());
-      const vs = viewsByWeek[wk] || [];
-      if (e.ppt && vs.indexOf(e.ppt + ".pdf") >= 0) e.pptView = e.ppt + ".pdf";
-      if (e.doc && vs.indexOf(e.doc + ".pdf") >= 0) e.docView = e.doc + ".pdf";
-      if (Object.keys(e).length) manifest[wk] = e;
-    });
+    const manifest = armarManifiesto(byWeek, viewsByWeek, silabos);
     try { sessionStorage.setItem("ia_tree_v2", JSON.stringify({ t: Date.now(), m: manifest })); } catch (e) {}
     return manifest;
   } catch (e) {
@@ -117,7 +132,7 @@ async function autoDetectWeekFiles() {
   // 1) La lista de archivos se lee de GitHub (cualquier nombre sirve)
   // 2) Si GitHub no responde, se buscan los nombres estándar (presentacion.pptx, informe.docx, laboratorio.ipynb)
   const manifest = await loadManifestFromGithub();
-  const verify = true;
+  const verify = !manifiestoDeLista;   // con la lista de GitHub no hace falta preguntar por cada archivo
   detectSyllabus(manifest, verify);
   await Promise.all(appState.weeks.map(async (w) => {
     const folder = carpetaSemana(w.week) + "/";
@@ -140,10 +155,11 @@ async function autoDetectWeekFiles() {
           w[kind.flag] = true;
           w[kind.label] = name;
           if (kind.viewKey && !/\.pdf$/i.test(name)) {
-            // Vista PDF: si el manifiesto (que puede estar en caché 5 min) no la lista, se prueba la ruta directa
-            const viewName = manifest[String(w.week)][kind.viewKey] || (name + ".pdf");
+            // Vista PDF: la lista dice si existe. Si el manifiesto (API, en caché) no la trae, se prueba la ruta directa
+            const listed = manifest[String(w.week)][kind.viewKey];
+            const viewName = listed || (name + ".pdf");
             const viewUrl = new URL(folder + "_vista/" + encodeURIComponent(viewName), location.href).href;
-            if (await publicFileExists(viewUrl)) w[kind.viewKey] = viewUrl;
+            if ((listed && manifiestoDeLista) || await publicFileExists(viewUrl)) w[kind.viewKey] = viewUrl;
           }
           changed = true;
         }
