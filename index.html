@@ -25,6 +25,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Seguridad: impide que se cambie la base de los enlaces, que se carguen plugins/objetos y que formularios envíen datos a otros sitios -->
+  <meta http-equiv="Content-Security-Policy" content="base-uri 'self'; object-src 'none'; form-action 'self'" />
   <title>Inteligencia Artificial — Portafolio Académico UNMSM</title>
   <meta name="description" content="Portafolio académico de Inteligencia Artificial — UNMSM, Facultad de Ingeniería de Sistemas e Informática. Semanas teóricas, informes, presentaciones y laboratorios." />
   <meta name="author" content="Gonzalo Manuel Calero Falcón" />

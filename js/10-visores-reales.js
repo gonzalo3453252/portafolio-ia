@@ -241,6 +241,10 @@ function triggerLinkDownload(url, filename) {
 // =========================================================================
 
 window.addEventListener("message", (e) => {
+  // Solo se atienden mensajes del visor propio (la ventana de vista previa), nunca de otra página
+  const visor = document.getElementById("dynamicPreviewIframe");
+  const vieneDelVisor = visor && visor.contentWindow && e.source === visor.contentWindow;
+  if (!vieneDelVisor || e.origin !== location.origin) return;
   if (e.data && e.data.action === "downloadModalFile" && typeof currentModalDownloadHandler === "function") {
     currentModalDownloadHandler();
   }
