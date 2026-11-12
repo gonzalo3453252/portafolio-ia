@@ -3,7 +3,7 @@
 (function () {
   var cfg = window.__VIEW__, nb = cfg.nb || {};
   var root = document.getElementById("nb");
-  var MARKED = "https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js";
+  var MARKED = cfg.vendor + "marked.min.js";
 
   function esc(t) { return String(t == null ? "" : t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
   function join(v) { return Array.isArray(v) ? v.join("") : (v == null ? "" : String(v)); }

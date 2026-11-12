@@ -1,0 +1,4 @@
+Librerías de terceros, copiadas aquí para que la página no dependa de ningún servidor externo (más rápido y más seguro):
+  pdf.min.js, pdf.worker.min.js ... pdf.js 3.11.174 (Mozilla)  - muestra los PDF
+  marked.min.js ................... marked 4.3.0                - muestra el texto de los cuadernos Colab
+No las edites.

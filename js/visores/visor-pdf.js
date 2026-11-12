@@ -2,8 +2,8 @@
    Dibuja todas las páginas con pdf.js, con zoom y número de página. */
 (function () {
   var cfg = window.__VIEW__;
-  var PDFJS = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";
-  var WORKER = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+  var PDFJS = cfg.vendor + "pdf.min.js";
+  var WORKER = cfg.vendor + "pdf.worker.min.js";
   var box = document.getElementById("pages");
   var indicator = document.getElementById("pageIndicator");
   var zoomLabel = document.getElementById("zoomLabel");

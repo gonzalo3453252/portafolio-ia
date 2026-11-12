@@ -40,9 +40,12 @@ const VISORES_URL = {
   cuaderno: new URL("js/visores/visor-cuaderno.js", location.href).href
 };
 
+// Librerías de terceros alojadas en este mismo sitio (js/vendor/), sin depender de servidores externos
+const VENDOR_URL = new URL("js/vendor/", location.href).href;
+
 function buildPdfViewerHtml(url, title) {
   const abs = /^data:/i.test(url) ? url : new URL(url, location.href).href;
-  const cfg = JSON.stringify({ url: abs, title: title || "" }).replace(/</g, "\\u003c");
+  const cfg = JSON.stringify({ url: abs, title: title || "", vendor: VENDOR_URL }).replace(/</g, "\\u003c");
   const openLink = /^https?:/i.test(abs) ? "<a class='btn' href='" + abs.replace(/'/g, "%27") + "' target='_blank' rel='noopener'>Abrir en pestaña nueva</a>" : "";
   return "<!DOCTYPE html><html lang='es'><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width,initial-scale=1'><style>" + VIEWER_BASE_CSS + PDF_VIEWER_CSS + "</style></head><body>"
     + "<div class='bar'><span class='badge' id='pageIndicator'>- / -</span><button id='zoomOut' title='Alejar'>&minus;</button><span class='badge' id='zoomLabel'>100%</span><button id='zoomIn' title='Acercar'>+</button><span class='sp'></span>" + openLink + "<button id='dl'>&#11015; Descargar</button></div>"
@@ -51,7 +54,7 @@ function buildPdfViewerHtml(url, title) {
 }
 
 function buildNotebookViewerHtml(nb, title, colabUrl) {
-  const cfg = JSON.stringify({ nb: nb, title: title || "", colabUrl: colabUrl || "" }).replace(/</g, "\\u003c");
+  const cfg = JSON.stringify({ nb: nb, title: title || "", colabUrl: colabUrl || "", vendor: VENDOR_URL }).replace(/</g, "\\u003c");
   const open = colabUrl ? "<a class='btn' href='" + colabUrl.replace(/'/g, "%27") + "' target='_blank' rel='noopener'>Abrir en Google Colab</a>" : "";
   return "<!DOCTYPE html><html lang='es'><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width,initial-scale=1'><style>" + VIEWER_BASE_CSS + NB_VIEWER_CSS + "</style></head><body>"
     + "<div class='bar'><span class='ttl'>" + escapeHtml(title || "Cuaderno") + "</span><span class='badge' id='count'></span><span class='sp'></span>" + open + "<button id='dl'>&#11015; Descargar</button></div>"
