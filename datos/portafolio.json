@@ -156,16 +156,16 @@
       "subtitleSlide": "Agrupamiento K-Means, DBSCAN y Reducción PCA",
       "photoCaption": "Agrupamiento Latente (Clustering) y Reducción Dimensional PCA",
       "topics": [
-        "6.1 Fundamentos del aprendizaje no supervisado sobre datos no etiquetados",
-        "6.2 Aplicaciones en segmentación de perfiles y detección de anomalías",
-        "6.3 Algoritmos de Clustering (K-Means, Jerárquico, DBSCAN) y PCA",
-        "6.4 Evaluación interna mediante Inercia y Coeficiente de Silueta en Python"
+        "6.1 Fundamentos del aprendizaje no supervisado sobre datos no etiquetados | Identificación de estructuras subyacentes y distribuciones intrínsecas en repositorios de datos que carecen de variable objetivo.",
+        "6.2 Aplicaciones en segmentación de perfiles y detección de anomalías | Agrupamiento de perfiles de consumidores, compresión de información visual y detección de transacciones atípicas o fraudulentas.",
+        "6.3 Algoritmos de Clustering (K-Means, Jerárquico, DBSCAN) y PCA | Particionamiento iterativo por centroides (K-Means), agrupamiento por densidad (DBSCAN) y proyección ortogonal de varianza (PCA).",
+        "6.4 Evaluación interna mediante Inercia y Coeficiente de Silueta en Python | Determinación del número óptimo de clústeres mediante la curva del método del codo (inercia) y el índice de cohesión de Silueta."
       ],
       "evaluation": "Tarea Académica 6 — Segmentación con K-Means y PCA",
       "summary": "Extracción de patrones intrínsecos y estructuras de agrupamiento en datos no etiquetados combinando particionamiento K-Means con Análisis de Componentes Principales (PCA).",
       "hasPpt": true,
       "hasWord": false,
-      "hasColab": false,
+      "hasColab": true,
       "pptLabel": "Clase06_Aprendizaje_No_Supervisado.pptx",
       "pptUrl": "",
       "docLabel": "Tarea06_Informe_Clustering.pdf",
@@ -175,8 +175,7 @@
       "codeSnippet": "import numpy as np\nimport matplotlib.pyplot as plt\nfrom sklearn.cluster import KMeans",
       "codeOutput": "Inercia intra-cluster: 332.48 | Coeficiente de Silueta: 0.8432",
       "ocultos": {
-        "doc": true,
-        "colab": true
+        "doc": true
       }
     },
     {
@@ -187,16 +186,16 @@
       "subtitleSlide": "Procesos de Decisión de Markov y Algoritmo Q-Learning",
       "photoCaption": "Procesos de Decisión de Markov (MDP) y Optimización de Bellman",
       "topics": [
-        "7.1 Fundamentos del aprendizaje por refuerzo y Procesos de Decisión de Markov",
-        "7.2 Exploración vs. Explotación (ε-greedy) y Ecuación de Bellman",
-        "7.3 Algoritmos de diferencia temporal: Q-Learning y SARSA",
-        "7.4 Entrenamiento de agentes autónomos en entornos discretos con Python"
+        "7.1 Fundamentos del aprendizaje por refuerzo y Procesos de Decisión de Markov | Modelado de toma de decisiones secuenciales mediante estados, acciones, probabilidades de transición y señales de recompensa.",
+        "7.2 Exploración vs. Explotación (ε-greedy) y Ecuación de Bellman | Balance entre descubrir nuevas rutas (exploración ε-greedy) y aprovechar el conocimiento adquirido bajo la ecuación de optimalidad de Bellman.",
+        "7.3 Algoritmos de diferencia temporal: Q-Learning y SARSA | Actualización iterativa de valores acción-estado fuera de política (Q-Learning) y dentro de política (SARSA) sin modelo previo del entorno.",
+        "7.4 Entrenamiento de agentes autónomos en entornos discretos con Python | Simulación en Python de un agente que converge hacia la política óptima superando obstáculos y maximizando el retorno descontado."
       ],
       "evaluation": "Tarea Académica 7 — Entrenamiento de Agente con Q-Learning",
       "summary": "Aprendizaje secuencial mediante interacción con el entorno, actualizando la tabla de valores acción-estado Q(s,a) para converger hacia la política óptima.",
       "hasPpt": true,
       "hasWord": false,
-      "hasColab": false,
+      "hasColab": true,
       "pptLabel": "Clase07_Aprendizaje_Por_Refuerzo.pptx",
       "pptUrl": "",
       "docLabel": "Tarea07_Informe_QLearning.pdf",
@@ -206,8 +205,7 @@
       "codeSnippet": "import numpy as np\nimport matplotlib.pyplot as plt\n\nQ = np.zeros((4, 2))\nalfa, gamma = 0.5, 0.9",
       "codeOutput": "Valores Q óptimos por estado: [ 8.1  9.  10.   0. ]",
       "ocultos": {
-        "doc": true,
-        "colab": true
+        "doc": true
       }
     },
     {
