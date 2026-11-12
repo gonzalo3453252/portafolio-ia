@@ -1,0 +1,52 @@
+name: Generar estilos de Tailwind
+
+# Cada vez que cambias index.html o algo en js/, se rehace css/tailwind.css con las clases que usas.
+# Así la página no descarga Tailwind de otro servidor (más rápido y más seguro).
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'js/**'
+      - '!js/vendor/**'
+      - 'tailwind.config.js'
+      - 'css/tailwind-entrada.css'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: tailwind
+  cancel-in-progress: false
+
+jobs:
+  estilos:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Instalar Tailwind (versión fija)
+        run: npm install --prefix "$RUNNER_TEMP/tw" tailwindcss@3.4.17 --no-audit --no-fund
+
+      # Se parte siempre de la última versión de main, se genera el CSS y se guarda.
+      # Si el push falla (otra ejecución guardó antes), se repite desde cero. Si no se logra, el paso FALLA.
+      - name: Generar y guardar css/tailwind.css
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          for i in 1 2 3 4 5; do
+            git fetch origin main
+            git reset --hard origin/main
+            "$RUNNER_TEMP/tw/node_modules/.bin/tailwindcss" -c tailwind.config.js -i css/tailwind-entrada.css -o css/tailwind.css --minify
+            git add css/tailwind.css
+            if git diff --cached --quiet; then echo "Sin cambios"; exit 0; fi
+            git commit -m "Estilos de Tailwind generados automáticamente"
+            if git push origin HEAD:main; then echo "Estilos guardados"; exit 0; fi
+            echo "Intento $i falló; se reintenta desde la última versión de main"
+            sleep $((i * 5))
+          done
+          echo "::error::No se pudo guardar css/tailwind.css después de 5 intentos"
+          exit 1

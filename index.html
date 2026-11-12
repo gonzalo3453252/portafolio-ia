@@ -5,6 +5,7 @@
   ---------------------------------------------------------------------
   index.html .......... estructura de la página (textos fijos, botones, ventanas)
   css/estilos.css ..... colores, tipografías y animaciones propias
+  css/tailwind.css .... estilos de Tailwind (los genera sola GitHub al cambiar index.html o js/; no lo edites)
   js/ ................. la lógica, en orden numérico (00 → 14). Cada archivo
                         empieza con un comentario que explica qué contiene.
   js/visores/ ......... visores de PDF y de cuadernos Colab (.ipynb)
@@ -40,13 +41,14 @@
     document.documentElement.classList.add("fotos-js");
     setTimeout(function () { if (!window.__fotosIniciado) document.documentElement.classList.remove("fotos-js"); }, 4000);
   </script>
-  <!-- Tailwind (estilos utilitarios) -->
-  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <!-- Estilos propios -->
   <link rel="stylesheet" href="css/estilos.css" />
+  <!-- Estilos de Tailwind (van después de los propios, como antes) ya generados (css/tailwind.css). Los rehace sola la tarea automática de GitHub; ya no se descarga nada de otro servidor. -->
+  <link rel="stylesheet" href="css/tailwind.css" />
 </head>
 <body id="pageRoot" class="min-h-screen flex flex-col selection:bg-slate-200 selection:text-slate-900">
 
