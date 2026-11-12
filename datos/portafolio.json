@@ -135,7 +135,7 @@
       "summary": "Entrenamiento y validación de modelos predictivos a partir de datos etiquetados, evaluando métricas de clasificación (Accuracy, Precision, Recall, F1-Score) e importancia de características.",
       "hasPpt": true,
       "hasWord": false,
-      "hasColab": false,
+      "hasColab": true,
       "pptLabel": "Clase05_Aprendizaje_Supervisado.pptx",
       "pptUrl": "",
       "docLabel": "Tarea05_Informe_Supervisado.pdf",
@@ -145,8 +145,7 @@
       "codeSnippet": "import numpy as np\nfrom sklearn.datasets import load_iris\nfrom sklearn.ensemble import RandomForestClassifier\n\nX, y = load_iris(return_X_y=True)\nmodelo_rf = RandomForestClassifier(n_estimators=100, random_state=42).fit(X, y)",
       "codeOutput": "Exactitud en conjunto de prueba: 100.00%",
       "ocultos": {
-        "doc": true,
-        "colab": true
+        "doc": true
       }
     },
     {
