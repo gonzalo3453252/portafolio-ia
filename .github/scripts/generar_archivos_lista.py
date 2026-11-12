@@ -40,7 +40,7 @@ datos = {
 }
 contenido = (
     "/* Generado automáticamente al subir archivos a archivos/ (.github/workflows). No lo edites. */\n"
-    "window.__ARCHIVOS_LISTA = " + json.dumps(datos, ensure_ascii=False, indent=1) + ";\n"
+    "window.__FILE_LIST = " + json.dumps(datos, ensure_ascii=False, indent=1) + ";\n"
 )
 os.makedirs(os.path.dirname(SALIDA), exist_ok=True)
 anterior = open(SALIDA, encoding="utf-8").read() if os.path.exists(SALIDA) else None

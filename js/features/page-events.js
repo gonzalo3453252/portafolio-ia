@@ -4,7 +4,7 @@
    ============================================================================= */
 
 // Conecta los botones y menús de la página pública
-function iniciarEventosPagina() {
+function bindPageEvents() {
   document.getElementById("fontIncreaseBtn").addEventListener("click", () => {
     baseFontScale = Math.min(115, baseFontScale + 5);
     document.documentElement.style.fontSize = `${baseFontScale}%`;

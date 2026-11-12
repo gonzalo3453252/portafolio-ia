@@ -1,7 +1,7 @@
 /* =============================================================================
    VISORES REALES (PDF y Colab) Y DESCARGAS
    Previsualización de los archivos que subes: PDF (todas las páginas), cuadernos .ipynb,
-   el sílabo, y los botones de descarga. El código de los visores está en js/visores/.
+   el sílabo, y los botones de descarga. El código de los visores está en js/viewers/.
    ============================================================================= */
 
 // =========================================================================
@@ -34,10 +34,10 @@ function simpleMessagePage(msg, linkUrl, linkText) {
   return "<!DOCTYPE html><html lang='es'><head><meta charset='UTF-8'><style>" + VIEWER_BASE_CSS + NB_VIEWER_CSS + "</style></head><body><div class='msg'><p>" + escapeHtml(msg) + "</p>" + link + "</div></body></html>";
 }
 
-// Los visores viven en js/visores/. Se cargan dentro del cuadro de previsualización.
+// Los visores viven en js/viewers/. Se cargan dentro del cuadro de previsualización.
 const VISORES_URL = {
-  pdf: new URL("js/visores/visor-pdf.js", location.href).href,
-  cuaderno: new URL("js/visores/visor-cuaderno.js", location.href).href
+  pdf: new URL("js/viewers/pdf-viewer.js", location.href).href,
+  cuaderno: new URL("js/viewers/notebook-viewer.js", location.href).href
 };
 
 // Librerías de terceros alojadas en este mismo sitio (js/vendor/), sin depender de servidores externos
@@ -97,24 +97,24 @@ function openRealNotebook(w) {
 // Sílabo real: el PDF que subas a archivos/silabo/ (si no subes ninguno, se usa el oficial incluido)
 let syllabusDetected = null;
 function syllabusDisplayName() {
-  return syllabusDetected ? syllabusDetected.name : (appState.syllabusFileName || SILABO_OFICIAL);
+  return syllabusDetected ? syllabusDetected.name : (appState.syllabusFileName || OFFICIAL_SYLLABUS);
 }
 function syllabusPdfUrl() {
   if (syllabusDetected) return syllabusDetected.url;
   if (appState.syllabusDataUrl && appState.syllabusDataUrl.startsWith("data:application/pdf")) return appState.syllabusDataUrl;
   if (appState.syllabusUrl && /^https?:\/\/.+\.pdf(\?.*)?$/i.test(appState.syllabusUrl)) return appState.syllabusUrl;
-  return new URL(RUTA_SILABO + "/" + SILABO_OFICIAL, location.href).href;
+  return new URL(SYLLABUS_PATH + "/" + OFFICIAL_SYLLABUS, location.href).href;
 }
 async function detectSyllabus(manifest, verify) {
   let name = manifest && manifest.silabo;
   let url = "";
   if (name) {
-    url = new URL(RUTA_SILABO + "/" + encodeURIComponent(name), location.href).href;
+    url = new URL(SYLLABUS_PATH + "/" + encodeURIComponent(name), location.href).href;
     if (verify && !(await publicFileExists(url))) url = "";
   }
   if (!url) {
-    const def = new URL(RUTA_SILABO + "/" + SILABO_OFICIAL, location.href).href;
-    if (await publicFileExists(def)) { url = def; name = SILABO_OFICIAL; }
+    const def = new URL(SYLLABUS_PATH + "/" + OFFICIAL_SYLLABUS, location.href).href;
+    if (await publicFileExists(def)) { url = def; name = OFFICIAL_SYLLABUS; }
   }
   if (url) {
     syllabusDetected = { url: url, name: name };
@@ -184,7 +184,7 @@ function downloadWordByWeek(weekNum) {
     return;
   }
   const subtemas = w.topics.map((t, idx) => {
-    const parsed = parseTopicItem(t, w.week, idx);
+    const parsed = parseTopic(t, w.week, idx);
     return `<h3>${escapeHtml(parsed.code)} ${escapeHtml(parsed.title)}</h3><p>${escapeHtml(parsed.desc)}</p>`;
   }).join("");
   const docHtml = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Informe Semana ${w.week}</title></head><body style="font-family:'Times New Roman',serif;font-size:12pt;line-height:1.5;"><h1 style="text-align:center;">UNIVERSIDAD NACIONAL MAYOR DE SAN MARCOS</h1><p style="text-align:center;">Facultad de Ingeniería de Sistemas e Informática</p><h2 style="text-align:center;">INFORME ACADÉMICO: ${escapeHtml(w.title)}</h2><p><strong>Autores:</strong> ${escapeHtml(appState.studentName)}<br><strong>Docente:</strong> ${escapeHtml(appState.profName)}</p><hr><p>${escapeHtml(w.summary)}</p>${subtemas}</body></html>`;

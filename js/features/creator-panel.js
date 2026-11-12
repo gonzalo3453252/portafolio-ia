@@ -52,11 +52,11 @@ function populateWeekSelectors(selectedWeekNum) {
     editSel.value = String(selectedWeekNum);
   }
   loadSelectedWeekIntoInputs();
-  poblarDestinosFoto();
+  populatePhotoTargets();
 }
 
 // Lista del panel «Cambiar fotos»: portada, unidades y semanas, con el nombre que debe tener el archivo
-function poblarDestinosFoto() {
+function populatePhotoTargets() {
   const sel = document.getElementById("selectFotoDestino");
   if (!sel) return;
   const previo = sel.value;
@@ -74,10 +74,10 @@ function poblarDestinosFoto() {
     sel.appendChild(opt);
   });
   if (previo && opciones.some(o => o[0] === previo)) sel.value = previo;
-  actualizarNombreFoto();
+  updateSuggestedPhotoName();
 }
 
-function actualizarNombreFoto() {
+function updateSuggestedPhotoName() {
   const sel = document.getElementById("selectFotoDestino");
   const el = document.getElementById("fotoNombreSugerido");
   if (sel && el) el.textContent = sel.value + ".jpg";
@@ -96,7 +96,7 @@ function loadSelectedWeekIntoInputs() {
   document.getElementById("editWeekTitleInput").value = found.title || "";
   document.getElementById("editWeekEvalInput").value = found.evaluation || "";
   document.getElementById("editWeekSummaryInput").value = found.summary || "";
-  document.getElementById("editWeekTopicsInput").value = Array.isArray(found.topics) ? found.topics.map(topicParaEditar).join(String.fromCharCode(10)) : "";
+  document.getElementById("editWeekTopicsInput").value = Array.isArray(found.topics) ? found.topics.map(topicForEditing).join(String.fromCharCode(10)) : "";
 
   document.getElementById("toggleHasPpt").checked = found.hasPpt !== false;
   document.getElementById("toggleHasWord").checked = Boolean(found.hasWord);
@@ -133,7 +133,7 @@ function downloadSyllabusFile() {
 // Estado publicado por el creador (lo guarda el botón "Publicar en GitHub" del panel)
 async function loadPublishedState() {
   try {
-    const r = await fetch(RUTA_DATOS_PUBLICADOS, { cache: "no-cache" });
+    const r = await fetch(PUBLISHED_DATA_PATH, { cache: "no-cache" });
     const ct = (r.headers.get("content-type") || "").toLowerCase();
     if (r.ok && ct.includes("json")) {
       const d = await r.json();
@@ -155,12 +155,12 @@ async function publishToGithub() {
   } else {
     showToast("Copiado. En GitHub: Ctrl+A, Ctrl+V y Commit changes");
   }
-  window.open(GITHUB_URL_EDITAR_DATOS, "_blank", "noopener");
+  window.open(GITHUB_EDIT_DATA_URL, "_blank", "noopener");
 }
 
 
 // Conecta todos los botones del panel del creador
-function iniciarPanelCreador() {
+function initCreatorPanel() {
   // Panel del creador: NO hay botón público. Solo se abre entrando a la URL con #creador
   function openCreatorFromHash() {
     if (location.hash.toLowerCase() === "#creador") {
@@ -265,16 +265,16 @@ print("Laboratorio de la Semana ${pad} listo para ejecución")`,
   });
 
   document.getElementById("uploadSyllabusGithubBtn").addEventListener("click", () => {
-    window.open(githubUrlSubir(RUTA_SILABO), "_blank", "noopener");
+    window.open(githubUploadUrl(SYLLABUS_PATH), "_blank", "noopener");
   });
 
-  document.getElementById("selectFotoDestino").addEventListener("change", actualizarNombreFoto);
+  document.getElementById("selectFotoDestino").addEventListener("change", updateSuggestedPhotoName);
   document.getElementById("uploadPhotoBtn").addEventListener("click", () => {
-    window.open(githubUrlSubir(RUTA_IMAGENES), "_blank", "noopener");
+    window.open(githubUploadUrl(IMAGES_PATH), "_blank", "noopener");
   });
   document.getElementById("uploadWeekFilesBtn").addEventListener("click", () => {
     const weekNum = parseInt(document.getElementById("selectWeekEdit").value, 10) || 1;
-    window.open(githubUrlSubir(carpetaSemana(weekNum)), "_blank", "noopener");
+    window.open(githubUploadUrl(weekFolder(weekNum)), "_blank", "noopener");
   });
 
   // Quitar / Eliminar la Semana Seleccionada

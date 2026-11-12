@@ -126,7 +126,7 @@ function renderSingleWeekView() {
     : (w.topics.length >= 5 ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-5" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4");
 
   const topicsGridHtml = w.topics.map((rawTopic, idx) => {
-    const parsed = parseTopicItem(rawTopic, w.week, idx);
+    const parsed = parseTopic(rawTopic, w.week, idx);
     return `
     <div class="topic-card">
       <span class="text-xs sm:text-sm font-bold text-slate-400 mb-2 block">${escapeHtml(parsed.numBadge)}</span>

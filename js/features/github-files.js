@@ -55,12 +55,12 @@ function classifyWeekFiles(names) {
 }
 
 // Convierte las listas de archivos (por semana, vistas PDF y sílabos) en el "manifiesto" que usa la página
-function armarManifiesto(byWeek, viewsByWeek, silabos) {
+function buildManifest(byWeek, viewsByWeek, silabos) {
   const manifest = {};
   if (silabos.length) {
     const orden = silabos.slice().sort();
     // Si subes tu propio sílabo, tiene prioridad sobre el oficial incluido
-    const propios = orden.filter((n) => n !== SILABO_OFICIAL);
+    const propios = orden.filter((n) => n !== OFFICIAL_SYLLABUS);
     const lista = propios.length ? propios : orden;
     manifest.silabo = lista.find((n) => /s[ií]labo/i.test(n)) || lista[0];
   }
@@ -76,16 +76,16 @@ function armarManifiesto(byWeek, viewsByWeek, silabos) {
 
 // true cuando el manifiesto salió de datos/archivos.js (generado por GitHub): ya es fiable y no hace falta
 // comprobar archivo por archivo que existan.
-let manifiestoDeLista = false;
+let manifestFromList = false;
 
 // Lista de archivos. Primero la que genera GitHub al subir archivos (datos/archivos.js): llega antes de dibujar,
 // no gasta la cuota de la API (60 por hora por conexión) y no depende de nadie. Si no existe, se pregunta a la API.
 async function loadManifestFromGithub() {
   try {
-    const L = window.__ARCHIVOS_LISTA;
+    const L = window.__FILE_LIST;
     if (L && typeof L === "object" && L.semanas) {
-      manifiestoDeLista = true;
-      return armarManifiesto(L.semanas, L.vistas || {}, L.silabos || []);
+      manifestFromList = true;
+      return buildManifest(L.semanas, L.vistas || {}, L.silabos || []);
     }
   } catch (e) {}
   try {
@@ -96,7 +96,7 @@ async function loadManifestFromGithub() {
     }
   } catch (e) {}
   try {
-    const r = await fetch("https://api.github.com/repos/" + GITHUB_REPO + "/git/trees/" + GITHUB_RAMA + "?recursive=1", { headers: { Accept: "application/vnd.github+json" } });
+    const r = await fetch("https://api.github.com/repos/" + GITHUB_REPO + "/git/trees/" + GITHUB_BRANCH + "?recursive=1", { headers: { Accept: "application/vnd.github+json" } });
     if (!r.ok) return null;
     const d = await r.json();
     const byWeek = {};
@@ -119,7 +119,7 @@ async function loadManifestFromGithub() {
       if (!byWeek[wk]) byWeek[wk] = [];
       byWeek[wk].push(m[2]);
     }
-    const manifest = armarManifiesto(byWeek, viewsByWeek, silabos);
+    const manifest = buildManifest(byWeek, viewsByWeek, silabos);
     try { sessionStorage.setItem("ia_tree_v2", JSON.stringify({ t: Date.now(), m: manifest })); } catch (e) {}
     return manifest;
   } catch (e) {
@@ -132,10 +132,10 @@ async function autoDetectWeekFiles() {
   // 1) La lista de archivos se lee de GitHub (cualquier nombre sirve)
   // 2) Si GitHub no responde, se buscan los nombres estándar (presentacion.pptx, informe.docx, laboratorio.ipynb)
   const manifest = await loadManifestFromGithub();
-  const verify = !manifiestoDeLista;   // con la lista de GitHub no hace falta preguntar por cada archivo
+  const verify = !manifestFromList;   // con la lista de GitHub no hace falta preguntar por cada archivo
   detectSyllabus(manifest, verify);
   await Promise.all(appState.weeks.map(async (w) => {
-    const folder = carpetaSemana(w.week) + "/";
+    const folder = weekFolder(w.week) + "/";
     for (const kind of FILE_CONVENTION) {
       const cur = w[kind.urlKey];
       const isDefault = !cur || cur === "https://colab.research.google.com/";
@@ -159,7 +159,7 @@ async function autoDetectWeekFiles() {
             const listed = manifest[String(w.week)][kind.viewKey];
             const viewName = listed || (name + ".pdf");
             const viewUrl = new URL(folder + "_vista/" + encodeURIComponent(viewName), location.href).href;
-            if ((listed && manifiestoDeLista) || await publicFileExists(viewUrl)) w[kind.viewKey] = viewUrl;
+            if ((listed && manifestFromList) || await publicFileExists(viewUrl)) w[kind.viewKey] = viewUrl;
           }
           changed = true;
         }

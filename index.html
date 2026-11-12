@@ -8,7 +8,7 @@
   css/tailwind.css .... estilos de Tailwind (los genera sola GitHub al cambiar index.html o js/; no lo edites)
   js/ ................. la lógica, en orden numérico (00 → 14). Cada archivo
                         empieza con un comentario que explica qué contiene.
-  js/visores/ ......... visores de PDF y de cuadernos Colab (.ipynb)
+  js/viewers/ ......... código de los visores (PDF, cuadernos Colab); js/vendor/ = librerías de terceros
   img/ ................ fotos de la portada, unidades y semanas
                         (portada-facultad.jpg, unidad-1.jpg, semana-01.jpg … las usa sola)
   datos/portafolio.json  contenido publicado (semanas, nombres, temas)
@@ -50,7 +50,7 @@
   <script>
     // Las dos fotos de la portada se piden YA (con prioridad), sin esperar a que cargue el resto de la página
     (function () {
-      var L = window.__FOTOS_LISTA || {};
+      var L = window.__PHOTO_LIST || {};
       [["portada-facultad", "img/facultad-fisi.jpg"], ["portada-docente", "img/docente.jpg"]].forEach(function (f) {
         var l = document.createElement("link");
         l.rel = "preload"; l.as = "image"; l.href = L[f[0]] || f[1];
@@ -822,7 +822,7 @@
     // Con la lista de fotos ya conocida, las fotos de la portada se muestran en cuanto llegan,
     // sin esperar a que cargue el resto de los scripts.
     (function () {
-      var L = window.__FOTOS_LISTA;
+      var L = window.__PHOTO_LIST;
       if (!L) return;
       document.querySelectorAll("img[data-foto]").forEach(function (im) {
         var n = im.getAttribute("data-foto"), u = L[n];
@@ -832,20 +832,20 @@
     })();
   </script>
   <script src="datos/archivos.js"></script>
-  <script src="js/00-configuracion.js"></script>
-  <script src="js/01-fotos-y-escudo.js"></script>
-  <script src="js/02-temas-y-unidades.js"></script>
-  <script src="js/03-semanas-por-defecto.js"></script>
-  <script src="js/04-estado.js"></script>
-  <script src="js/05-navegacion.js"></script>
-  <script src="js/06-paginas.js"></script>
-  <script src="js/07-diapositivas-demo.js"></script>
-  <script src="js/08-visor-silabo.js"></script>
-  <script src="js/09-visores-demo.js"></script>
-  <script src="js/10-visores-reales.js"></script>
-  <script src="js/11-archivos-github.js"></script>
-  <script src="js/12-panel-creador.js"></script>
-  <script src="js/13-eventos-pagina.js"></script>
-  <script src="js/14-inicio.js"></script>
+  <script src="js/core/config.js"></script>
+  <script src="js/features/photos.js"></script>
+  <script src="js/data/units-and-topics.js"></script>
+  <script src="js/data/default-state.js"></script>
+  <script src="js/core/state.js"></script>
+  <script src="js/features/navigation.js"></script>
+  <script src="js/features/pages.js"></script>
+  <script src="js/features/demo-slides.js"></script>
+  <script src="js/features/syllabus-viewer.js"></script>
+  <script src="js/features/demo-viewers.js"></script>
+  <script src="js/features/real-viewers.js"></script>
+  <script src="js/features/github-files.js"></script>
+  <script src="js/features/creator-panel.js"></script>
+  <script src="js/features/page-events.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>

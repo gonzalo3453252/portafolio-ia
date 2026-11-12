@@ -82,7 +82,7 @@ if os.path.isdir(WEB):
 
 contenido = (
     "/* Generado automáticamente al subir fotos a img/ (.github/workflows/fotos-lista.yml). No lo edites. */\n"
-    "window.__FOTOS_LISTA = " + json.dumps(lista, ensure_ascii=False, indent=2, sort_keys=True) + ";\n"
+    "window.__PHOTO_LIST = " + json.dumps(lista, ensure_ascii=False, indent=2, sort_keys=True) + ";\n"
 )
 os.makedirs(os.path.dirname(SALIDA), exist_ok=True)
 anterior = open(SALIDA, encoding="utf-8").read() if os.path.exists(SALIDA) else None

@@ -7,7 +7,7 @@
 // GENERADOR DE 12 DIAPOSITIVAS ESTILO UNIVERSIDAD SAN MARCOS
 // =========================================================================
 function buildSlidesForWeek(w) {
-  const parsedTopics = w.topics.map((t, i) => parseTopicItem(t, w.week, i));
+  const parsedTopics = w.topics.map((t, i) => parseTopic(t, w.week, i));
   const slides = [
     {
       isCover: true,
@@ -18,7 +18,7 @@ function buildSlidesForWeek(w) {
       section: "AGENDA DE LA SESIÓN",
       title: "Contenido Temático de la Semana " + w.week,
       subtitle: w.unitName,
-      bullets: w.topics.map(tituloDeTema)
+      bullets: w.topics.map(topicTitle)
     },
     {
       section: "INTRODUCCIÓN Y CONTEXTO",

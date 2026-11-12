@@ -1,5 +1,5 @@
 /* Generado automáticamente al subir archivos a archivos/ (.github/workflows). No lo edites. */
-window.__ARCHIVOS_LISTA = {
+window.__FILE_LIST = {
  "semanas": {
   "1": [
    "SEMANA 1 - FUNDAMENTOS DE LA IA.pptx",

@@ -171,7 +171,7 @@ render();
       iframe.src = `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(w.docUrl)}`;
     } else {
       const subtemasHtml = w.topics.map((t, idx) => {
-        const parsed = parseTopicItem(t, w.week, idx);
+        const parsed = parseTopic(t, w.week, idx);
         return `
         <div style="margin-top:22px;">
           <h3 style="font-size:15.5px;font-weight:700;color:#0f172a;font-family:'Georgia',serif;">${escapeHtml(parsed.code)} ${escapeHtml(parsed.title)}</h3>

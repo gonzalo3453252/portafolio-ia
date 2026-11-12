@@ -1,5 +1,5 @@
 /* Generado automáticamente al subir fotos a img/ (.github/workflows/fotos-lista.yml). No lo edites. */
-window.__FOTOS_LISTA = {
+window.__PHOTO_LIST = {
   "semana-01": "img/_web/semana-01.68eb6bd8-1000.webp",
   "semana-02": "img/_web/semana-02.20bbc41c-1000.webp",
   "semana-03": "img/_web/semana-03.2ad6f1f2-1000.webp",

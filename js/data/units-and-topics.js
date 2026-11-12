@@ -78,27 +78,27 @@ const TOPIC_DESCRIPTIONS = {
 // Un tema se escribe en el panel así:   1.1 Título del tema | Frase que se muestra debajo
 // Lo que va después de la barra | es la frase propia del tema. Si no hay barra,
 // se usa la frase de TOPIC_DESCRIPTIONS (arriba) y, si tampoco existe, una frase genérica.
-function separarTema(rawTopic) {
+function splitTopic(rawTopic) {
   const partes = String(rawTopic || "").split("|");
   return { texto: partes[0].trim(), fraseDelTema: partes.slice(1).join("|").trim() };
 }
 
 // Solo el título del tema, sin la frase (para listas y diapositivas)
-function tituloDeTema(rawTopic) {
-  return separarTema(rawTopic).texto;
+function topicTitle(rawTopic) {
+  return splitTopic(rawTopic).texto;
 }
 
 // Lo que se muestra en la caja de temas del panel: «título | frase» (con la frase actual ya escrita)
-function topicParaEditar(rawTopic) {
-  const { texto, fraseDelTema } = separarTema(rawTopic);
+function topicForEditing(rawTopic) {
+  const { texto, fraseDelTema } = splitTopic(rawTopic);
   if (fraseDelTema) return texto + " | " + fraseDelTema;
   const m = texto.match(/^(\d+\.\d+)\s/);
   const base = m && TOPIC_DESCRIPTIONS[m[1]];
   return base ? texto + " | " + base : texto;
 }
 
-function parseTopicItem(rawTopic, weekNum, idx) {
-  const { texto, fraseDelTema } = separarTema(rawTopic);
+function parseTopic(rawTopic, weekNum, idx) {
+  const { texto, fraseDelTema } = splitTopic(rawTopic);
   const match = texto.match(/^(\d+\.\d+)\s+(.*)$/);
   const numBadge = String((idx || 0) + 1).padStart(2, "0") + ".";
   if (match) {
