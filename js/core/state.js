@@ -1,93 +1,132 @@
 /* =============================================================================
-   ESTADO DE LA PÁGINA
-   Variables globales, guardado en el navegador, avisos (toast) y utilidades pequeñas.
-   ============================================================================= */
+   ESTADO DE LA PÁGINA  (core/state.js)
+   Datos que cambian mientras se usa la página (semana abierta, contenido publicado y cambios guardados
+   en este navegador).
 
-let appState = JSON.parse(JSON.stringify(DEFAULT_STATE));
+   Dos fuentes de contenido, en este orden de prioridad:
+     1. publishedState: lo publicado en datos/portafolio.json (lo ve todo el mundo).
+     2. Cambios del panel creador guardados en este navegador y aún sin publicar (solo los ve quien los hizo).
+
+   Depende de: config.js, storage.js, utils.js, data/default-state.js (DEFAULT_STATE).
+   Expone: appState, activePage, activeUnitNum, activeWeekNum, publishedState, getWeek, loadPublishedState, loadSavedState, saveState,
+           stateForPersist, refreshPendingNote, refreshContentViews, refreshActiveView.
+   ============================================================================= */
+"use strict";
+
+/** Contenido que se está mostrando (perfil, semanas, textos, archivos). Empieza con los datos de ejemplo. */
+let appState = cloneJson(DEFAULT_STATE);
+
+/** Contenido publicado, leído de datos/portafolio.json (null si no se pudo leer). */
+let publishedState = null;
+
+/* Estas variables se reasignan desde otros archivos (todos comparten el mismo ámbito global). */
+/* eslint-disable prefer-const */
+/** Página abierta: "presentacion" | "silabo" | "todas-unidades" | "unidad-especifica" | "semana-individual". */
 let activePage = "presentacion";
 let activeUnitNum = 1;
 let activeWeekNum = 1;
-let baseFontScale = 100;
+
+/** Ventana de previsualización (iframe) abierta ahora mismo. */
 let currentIframeBlobUrl = null;
 let currentModalDownloadHandler = null;
+/* eslint-enable prefer-const */
 
-const PENDING_KEY = "unmsm_fisi_ia_pendientes";
+/** La semana con ese número (o la primera, si no existe). */
+function getWeek(weekNum) {
+  return appState.weeks.find((week) => week.week === weekNum) || appState.weeks[0];
+}
 
+/** ¿Es válido un estado guardado? (tiene autor y al menos una semana) */
+function isUsableState(state) {
+  return Boolean(state && state.studentName && Array.isArray(state.weeks) && state.weeks.length > 0);
+}
+
+/** Lee el contenido publicado (datos/portafolio.json). Si falta o está dañado, se queda con los datos de ejemplo. */
+async function loadPublishedState() {
+  try {
+    const response = await fetch(PUBLISHED_DATA_PATH, { cache: "no-cache" });
+    const contentType = (response.headers.get("content-type") || "").toLowerCase();
+    if (!response.ok || !contentType.includes("json")) return;
+    const data = await response.json();
+    if (isUsableState(data)) publishedState = data;
+  } catch {
+    // Sin red o JSON dañado: se queda con los datos de ejemplo
+  }
+}
+
+/**
+ * Decide qué contenido mostrar al abrir la página: lo publicado, o los cambios sin publicar de este navegador.
+ * Si lo guardado ya es igual a lo publicado, se borra la marca de "cambios pendientes".
+ */
 function loadSavedState() {
   try {
-    const published = window.__CUSTOM_PORTFOLIO_STATE__ ? JSON.parse(JSON.stringify(window.__CUSTOM_PORTFOLIO_STATE__)) : null;
-    if (published) appState = JSON.parse(JSON.stringify(published));
-    const saved = localStorage.getItem("unmsm_fisi_ia_editorial_v17");
-    const pending = localStorage.getItem(PENDING_KEY) === "1";
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      if (parsed && parsed.studentName && Array.isArray(parsed.weeks) && parsed.weeks.length > 0) {
-        const same = published && JSON.stringify(parsed) === JSON.stringify(published);
-        if (same) {
-          localStorage.removeItem(PENDING_KEY);
-        } else if (!published || pending) {
-          appState = parsed;
-          if (appState.groupBadge === "Semestre Académico 2026-I") {
-            appState.groupBadge = "Semestre Académico 2026-II";
-          }
-        }
-      }
+    if (publishedState) appState = cloneJson(publishedState);
+    const saved = localStore.get(STORAGE_KEYS.STATE);
+    if (!saved) return;
+
+    const parsed = JSON.parse(saved);
+    if (!isUsableState(parsed)) return;
+
+    const hasPending = localStore.get(STORAGE_KEYS.PENDING) === "1";
+    const sameAsPublished = publishedState && JSON.stringify(parsed) === JSON.stringify(publishedState);
+    if (sameAsPublished) {
+      localStore.remove(STORAGE_KEYS.PENDING);
+    } else if (!publishedState || hasPending) {
+      appState = parsed;
+      // Migración: versiones antiguas guardaban el semestre anterior
+      if (appState.groupBadge === "Semestre Académico 2026-I") appState.groupBadge = "Semestre Académico 2026-II";
     }
-  } catch (e) {}
+  } catch {
+    // Datos guardados dañados: se ignoran y se queda con el contenido publicado
+  }
 }
 
+/** Muestra u oculta el aviso "tienes cambios sin publicar" del panel creador. */
 function refreshPendingNote() {
-  const el = document.getElementById("pendingChangesNote");
-  if (!el) return;
-  let pending = false;
-  try { pending = localStorage.getItem(PENDING_KEY) === "1"; } catch (e) {}
-  el.classList.toggle("hidden", !pending);
+  const note = document.getElementById("pendingChangesNote");
+  if (!note) return;
+  note.classList.toggle("hidden", localStore.get(STORAGE_KEYS.PENDING) !== "1");
 }
 
-// Copia del estado sin los archivos autodetectados de las carpetas de GitHub
+/**
+ * Copia del estado lista para guardar o publicar: sin lo que la página detecta sola en las carpetas de
+ * GitHub (archivos y vistas PDF), para que no quede grabado como si lo hubieras escrito tú.
+ */
 function stateForPersist() {
-  const c = JSON.parse(JSON.stringify(appState));
-  (c.weeks || []).forEach((w) => {
-    delete w.pptView;
-    delete w.docView;
-    if (w._auto) {
-      FILE_CONVENTION.forEach((kind) => {
-        const o = w._auto[kind.key];
-        if (o) {
-          w[kind.urlKey] = o.url; w[kind.label] = o.label;
-          // Si lo ocultaste tú, se guarda como oculto (no se restaura el valor anterior a la autodetección)
-          w[kind.flag] = (w.ocultos && w.ocultos[kind.key]) ? false : o.flag;
-        }
-      });
-      delete w._auto;
-    }
+  const copy = cloneJson(appState);
+  (copy.weeks || []).forEach((week) => {
+    delete week.pptView;
+    delete week.docView;
+    if (!week._auto) return;
+    FILE_CONVENTION.forEach((kind) => {
+      const original = week._auto[kind.key];
+      if (!original) return;
+      week[kind.urlKey] = original.url;
+      week[kind.label] = original.label;
+      // Si lo ocultaste tú, se guarda como oculto (no se restaura el valor anterior a la autodetección)
+      week[kind.flag] = (week.ocultos && week.ocultos[kind.key]) ? false : original.flag;
+    });
+    delete week._auto;
   });
-  return c;
+  return copy;
 }
 
+/** Guarda los cambios del panel creador en este navegador y marca que hay cambios sin publicar. */
 function saveState() {
-  try {
-    localStorage.setItem("unmsm_fisi_ia_editorial_v17", JSON.stringify(stateForPersist()));
-    localStorage.setItem(PENDING_KEY, "1");
-  } catch (e) {}
+  localStore.set(STORAGE_KEYS.STATE, JSON.stringify(stateForPersist()));
+  localStore.set(STORAGE_KEYS.PENDING, "1");
   refreshPendingNote();
 }
 
-function showToast(msg) {
-  const toast = document.getElementById("toastContainer");
-  const text = document.getElementById("toastMessage");
-  text.textContent = msg;
-  toast.classList.remove("hidden");
-  if (window._toastTimer) clearTimeout(window._toastTimer);
-  window._toastTimer = setTimeout(() => {
-    toast.classList.add("hidden");
-  }, 2600);
+/** Vuelve a dibujar las páginas de contenido (unidades y semana) si alguna está abierta. */
+function refreshContentViews() {
+  if (activePage === "todas-unidades") renderAllUnitsSummary();
+  else if (activePage === "unidad-especifica") renderSpecificUnitView();
+  else if (activePage === "semana-individual") renderSingleWeekView();
 }
 
-function escapeHtml(str) {
-  return String(str || "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
+/** Vuelve a dibujar la página que está abierta (contenido o sílabo) después de cambiar datos. */
+function refreshActiveView() {
+  if (activePage === "silabo") showSilaboPage();
+  else refreshContentViews();
 }

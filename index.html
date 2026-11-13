@@ -39,7 +39,7 @@
   <!-- Mantiene ocultas las fotos hasta que se sabe cuál mostrar (ver css/estilos.css). Si el script principal no arranca, se muestran igual a los 4 s. -->
   <script>
     document.documentElement.classList.add("fotos-js");
-    setTimeout(function () { if (!window.__fotosIniciado) document.documentElement.classList.remove("fotos-js"); }, 4000);
+    setTimeout(function () { if (!window.__photosStarted) document.documentElement.classList.remove("fotos-js"); }, 4000);
   </script>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -334,7 +334,6 @@
             <span id="singleWeekNumberBreadcrumb" class="text-[#0f172a] font-bold">Semana 01</span>
           </div>
 
-          <div class="hidden" id="unitWeekSelectorTabs" aria-hidden="true"></div>
 
           <button type="button" id="backToCurrentUnitInfoBtn" class="text-xs sm:text-[13.5px] font-bold text-[#0f172a] hover:underline cursor-pointer">
             ← Volver a la unidad
@@ -567,197 +566,6 @@
       </div>
     </section>
 
-    <!-- Contenedor Auxiliar Oculto para Compatibilidad -->
-    <div class="hidden" aria-hidden="true">
-      <button type="button" id="fontDecreaseBtn" disabled>A-</button>
-      <button type="button" id="fontResetBtn" disabled>reset</button>
-      <button type="button" id="fontIncreaseBtn" disabled>A+</button>
-      <button type="button" id="heroSyllabusQuickBtn" disabled>Previsualizar o descargar sílabo →</button>
-      <button type="button" disabled>Entendido</button>
-      <button type="button" disabled>Ver ficha de la unidad</button>
-      <button type="button" disabled>← Volver a la ficha de la unidad</button>
-      <div id="syllabusPrintableDoc"></div>
-    <button type="button" disabled>Presentación</button>
-    <button type="button" disabled>X</button>
-      <button type="button" disabled>Ver semanas y recursos de esta unidad →</button>
-      <button type="button" disabled>Información de la unidad</button>
-      <div id="mobileMenuPanel"></div>
-      <div id="tab-personalizar"></div>
-      <div id="tab-guia"></div>
-      <div id="tab-semanas"></div>
-      <div id="tab-visor"></div>
-      <div id="tab-colab"></div>
-      <span id="heroAvatarInitials">GC</span>
-      <span id="visitCounterText">148</span>
-      <span id="breadcrumbCurrent"></span>
-      <span id="cardStudentName">Gonzalo Manuel Calero Falcón</span>
-      <span id="cardStudentRole">EP Ingeniería de Sistemas</span>
-      <span id="cardStudentEmail">calero2020gm@gmail.com</span>
-      <ul id="cardTeamList"></ul>
-      <div id="weeksTableContainer"><tbody id="weeksTableBody"></tbody></div>
-      <div id="colabSelectorList"></div>
-      <span id="activeColabWeekBadge"></span>
-      <span id="activeColabTitle"></span>
-      <p id="activeColabDesc"></p>
-      <div id="activeColabTags"></div>
-      <code id="activeColabCode"></code>
-      <span id="activeColabOutput"></span>
-      <a id="activeColabExternalLink" href="https://colab.research.google.com/">Ejecutar en Colab ↗</a>
-      <select id="previewWeekSelect"></select>
-      <span id="viewerCurrentWeekTag"></span>
-      <span id="viewerCurrentWeekTitle"></span>
-      <div id="viewerModePpt"></div>
-      <div id="viewerModeWord"><div id="wordDocumentPaper"></div></div>
-      <div id="viewerModeColab"><span id="colabViewerFilename"></span><a id="colabViewerOpenExternal" href="https://colab.research.google.com/">Abrir</a><div id="colabViewerCells"></div></div>
-      <span id="pptSlideHeaderCourse"></span>
-      <span id="pptSlideCounter"></span>
-      <div id="pptSlideBody"></div>
-      <span id="pptSlideFooterAuthor"></span>
-      <div id="customPptEmbedBox"></div>
-      <button type="button" disabled id="heroGoWeeksBtn">Explorar las 16 Semanas →</button>
-      <button type="button" disabled id="heroOpenPreviewerBtn">Abrir Visor de Archivos</button>
-      <button type="button" disabled id="cardViewColabBtn">Ver Cuadernos de Google Colab y Código →</button>
-      <button type="button" disabled id="quickEditProfileBtn">Editar datos</button>
-      <button type="button" disabled id="viewCardsBtn">Vista Tarjetas</button>
-      <button type="button" disabled id="viewTableBtn">Vista Tabla Clásica</button>
-      <button type="button" disabled id="copyColabCodeBtn">Copiar Código Python</button>
-      <button type="button" disabled id="downloadPptBtn">⬇ Descargar Presentación PPT</button>
-      <button type="button" disabled id="downloadWordBtn">⬇ Descargar Informe Word (.doc)</button>
-      <button type="button" disabled id="downloadColabBtn">⬇ Descargar Notebook (.ipynb)</button>
-      <button type="button" disabled id="prevSlideBtn">← Anterior</button>
-      <button type="button" disabled id="nextSlideBtn">Siguiente →</button>
-      <button type="button" disabled class="doc-mode-btn" data-docmode="ppt">📊 Ver PPT</button>
-      <button type="button" disabled class="doc-mode-btn" data-docmode="word">📄 Ver Word</button>
-      <button type="button" disabled class="doc-mode-btn" data-docmode="colab">⚡ Ver Colab</button>
-      <button type="button" disabled class="nav-tab-btn" data-tab="inicio">Portafolio (13 Semanas)</button>
-      <button type="button" disabled class="nav-tab-btn" data-tab="personalizar">Subir Archivos / Editar Datos</button>
-      <button type="button" disabled class="nav-tab-btn" data-tab="guia">¿Cómo Publicar?</button>
-      <button type="button" disabled class="nav-tab-btn" data-tab="inicio">Inicio y Curso</button>
-      <button type="button" disabled class="nav-tab-btn" data-tab="semanas">16 Semanas (PPT + Colab)</button>
-      <button type="button" disabled class="nav-tab-btn" data-tab="colab">Laboratorio Colab y Ejercicios</button>
-      <button type="button" disabled class="nav-tab-btn" data-tab="visor">Visor Integrado (PPT · Word · Colab)</button>
-      <button type="button" disabled class="nav-tab-btn" data-tab="personalizar">Editar mis Datos / Links</button>
-      <button type="button" disabled class="nav-tab-btn" data-tab="guia">Guía Paso a Paso</button>
-      <button type="button" disabled class="mobile-tab-btn" data-tab="inicio">Portafolio (13 Semanas Teóricas)</button>
-      <button type="button" disabled class="mobile-tab-btn" data-tab="personalizar">Editar mis Datos y Subir Links</button>
-      <button type="button" disabled class="mobile-tab-btn" data-tab="guia">Guía Paso a Paso para Publicar</button>
-      <button type="button" disabled class="mobile-tab-btn" data-tab="inicio">Inicio y Ficha del Curso</button>
-      <button type="button" disabled class="mobile-tab-btn" data-tab="semanas">Semanas Teóricas (13 Clases: PPT + Word + Colab)</button>
-      <button type="button" disabled class="mobile-tab-btn" data-tab="semanas">Calendario de 16 Semanas (PPT + Tareas + Colab)</button>
-      <button type="button" disabled class="mobile-tab-btn" data-tab="colab">Laboratorio Google Colab y Ejercicios</button>
-      <button type="button" disabled class="mobile-tab-btn" data-tab="visor">Visor y Descarga Directa (PPT · Word · Colab)</button>
-      <button type="button" disabled class="unit-filter-btn" data-unit="all">Todas (16)</button>
-      <button type="button" disabled class="unit-filter-btn" data-unit="1">Unidad I: Fundamentos y Agentes (Sem. 1–2)</button>
-      <button type="button" disabled class="unit-filter-btn" data-unit="2">Unidad II: Búsquedas y Juegos (Sem. 3–4)</button>
-      <button type="button" disabled class="unit-filter-btn" data-unit="3">Unidad III: Machine Learning (Sem. 5–7)</button>
-      <button type="button" disabled class="unit-filter-btn" data-unit="4">Unidad IV: Deep Learning (Sem. 9–11)</button>
-      <button type="button" disabled class="unit-filter-btn" data-unit="5">Unidad V: IA Generativa y Ética (Sem. 12–14)</button>
-      <button type="button" disabled class="unit-filter-btn" data-unit="1">U1 · IA y Agentes (Sem. 1–2)</button>
-      <button type="button" disabled class="unit-filter-btn" data-unit="2">U2 · Búsquedas y Juegos (Sem. 3–4)</button>
-      <button type="button" disabled class="unit-filter-btn" data-unit="3">U3 · Machine Learning (Sem. 5–7)</button>
-      <button type="button" disabled class="unit-filter-btn" data-unit="4">U4 · Deep Learning (Sem. 9–11)</button>
-      <button type="button" disabled class="unit-filter-btn" data-unit="5">U5 · IA Generativa (Sem. 12–14)</button>
-      <button type="button" disabled class="unit-filter-btn" data-unit="1">U1: Fundamentos y Agentes</button>
-      <button type="button" disabled class="unit-filter-btn" data-unit="2">U2: Búsquedas y Juegos</button>
-      <button type="button" disabled class="unit-filter-btn" data-unit="3">U3: Machine Learning</button>
-      <button type="button" disabled class="unit-filter-btn" data-unit="4">U4: Deep Learning</button>
-      <button type="button" disabled class="unit-filter-btn" data-unit="5">U5: IA Generativa</button>
-      <button type="button" disabled class="unit-jump-btn" data-unit-jump="1"><span>UNIDAD I</span> <p>IA y Agentes</p> <p>Sem. 1–2</p></button>
-      <button type="button" disabled class="unit-jump-btn" data-unit-jump="2"><span>UNIDAD II</span> <p>Búsquedas y Juegos</p> <p>Sem. 3–4</p></button>
-      <button type="button" disabled class="unit-jump-btn" data-unit-jump="3"><span>UNIDAD III</span> <p>Machine Learning</p> <p>Sem. 5–7</p></button>
-      <button type="button" disabled class="unit-jump-btn" data-unit-jump="4"><span>UNIDAD IV</span> <p>Deep Learning</p> <p>Sem. 9–11</p></button>
-      <button type="button" disabled class="unit-jump-btn" data-unit-jump="5"><span>Unidad V</span> <p>IA Generativa</p> <p>Semanas 12 – 14</p></button>
-      <button type="button" disabled class="unit-jump-btn" data-unit-jump="5"><span>UNIDAD V</span> <p>IA Generativa y Ética</p> <p>Sem. 12–16</p></button>
-      <button type="button" disabled id="brandHomeBtn">Inteligencia Artificial</button>
-      <button type="button" disabled id="headerBackBtn">← Volver a la pestaña anterior</button>
-      <div id="topPageTabs">
-        <a href="#presentacion" id="topTabPresentacion">Presentación</a>
-        <a href="#cronograma-teorico" id="topTabClases">Clases Teóricas</a>
-        <button type="button" disabled>Unidad I</button>
-        <button type="button" disabled>Unidad II</button>
-        <button type="button" disabled>Unidad III</button>
-        <button type="button" disabled>Unidad IV</button>
-        <button type="button" disabled>Unidad V</button>
-      </div>
-      <button type="button" disabled id="openAllWeeksFromHomeBtn">Ver índice completo de las 13 clases teóricas →</button>
-      <div id="homeUnitsGrid"></div>
-      <div id="pageViewPresentacion"></div>
-      <div id="pageViewUnidad"></div>
-      <div id="pageViewSemana"></div>
-      <div id="pageViewSilabo"></div>
-      <button type="button" disabled id="backToHomeFromUnitBtn">← Volver a Presentación</button>
-      <button type="button" disabled id="breadcrumbHomeUnitBtn">Inicio</button>
-      <span id="unitBreadcrumbLabel"></span>
-      <button type="button" disabled id="prevUnitPageBtn">← Unidad anterior</button>
-      <button type="button" disabled id="nextUnitPageBtn">Siguiente unidad →</button>
-      <div id="activeUnitHeaderBox"></div>
-      <p id="activeUnitBadge"></p>
-      <h2 id="activeUnitTitle"></h2>
-      <p id="activeUnitDescription"></p>
-      <img id="activeUnitHeaderImg" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="" />
-      <div id="cronograma-teorico"></div>
-      <div id="unitFilterButtons">
-        <button type="button" disabled class="unit-filter-btn" data-unit="all">Todas las Clases (13)</button>
-        <button type="button" disabled class="unit-filter-btn" data-unit="1">Unidad I: Fundamentos y Agentes</button>
-        <button type="button" disabled class="unit-filter-btn" data-unit="2">Unidad II: Búsquedas y Juegos</button>
-        <button type="button" disabled class="unit-filter-btn" data-unit="3">Unidad III: Machine Learning</button>
-        <button type="button" disabled class="unit-filter-btn" data-unit="4">Unidad IV: Deep Learning</button>
-        <button type="button" disabled class="unit-filter-btn" data-unit="5">Unidad V: IA Generativa y Ética</button>
-      </div>
-      <input type="text" id="weekSearchInput" />
-      <div id="weeksCardsContainer"></div>
-      <button type="button" disabled id="backToUnitFromWeekBtn"><span id="backToUnitFromWeekLabel">← Volver a la Unidad</span></button>
-      <button type="button" disabled id="backToHomeFromWeekBtn">Ir a Presentación</button>
-      <span id="weekDetailBreadcrumb"></span>
-      <button type="button" disabled id="prevWeekDetailBtn">← Semana anterior</button>
-      <button type="button" disabled id="nextWeekDetailBtn">Siguiente semana →</button>
-      <div id="weekDetailPageContent"></div>
-      <button type="button" disabled id="weekPageSlidePrevBtn">← Lámina anterior</button>
-      <button type="button" disabled id="weekPageSlideNextBtn">Siguiente lámina →</button>
-      <button type="button" disabled id="weekPageDlPptBtn">⬇ Descargar Presentación</button>
-      <button type="button" disabled id="weekPageDlWordBtn">⬇ Descargar Informe Word (.doc)</button>
-      <button type="button" disabled id="weekPageCopyCodeBtn">Copiar código</button>
-      <button type="button" disabled id="weekPageDlColabBtn">⬇ Descargar .ipynb</button>
-      <button type="button" disabled id="backFromSyllabusPageBtn">← Volver a la pestaña anterior</button>
-      <input type="file" id="uploadSyllabusPageInput" />
-      <button type="button" disabled id="downloadSyllabusPageBtn">⬇ Descargar Sílabo Oficial</button>
-      <div id="syllabusPageBody"></div>
-      <p id="unitViewWeeksSummary"></p>
-      <div id="viewUnidad"></div>
-      <button type="button" disabled id="metricOpenUnitsBtn">Ver las 5 unidades →</button>
-      <button type="button" disabled id="metricOpenUnit1Btn">Iniciar en Unidad I →</button>
-      <button type="button" disabled id="metricOpenLabsBtn">Explorar código Python →</button>
-      <button type="button" disabled id="metricOpenProjectBtn">Ver proyecto integrador →</button>
-      <button type="button" disabled id="dropdownShowAllUnitsBtn">Ver todas las Unidades (I – V)</button>
-      <button type="button" disabled id="backToAllUnitsListBtn">Ver todas las unidades (I – V)</button>
-      <button type="button" disabled id="enterUnitWeeksBtn">Ver semanas y recursos de esta unidad →</button>
-      <button type="button" disabled id="unitTitleReturnInfoBtn">UNIDAD I · FUNDAMENTOS Y AGENTES</button>
-      <button type="button" disabled id="viewUnitSummaryLinkBtn">Ver información general de la unidad</button>
-      <div id="viewUnidadInfo"></div>
-      <div id="unitInfoWeeksEntryList"></div>
-      <div id="unitHeroPhotoTrigger"></div>
-      <div id="viewUnidadSemanas"></div>
-      <div id="unitQuickSwitchBar"></div>
-      <button type="button" disabled>Previsualizar o descargar sílabo →</button>
-      <button type="button" disabled>Unidad I · Fundamentos y Agentes Sem. 1–2</button>
-      <button type="button" disabled>Unidad II · Búsquedas y Juegos Sem. 3–4</button>
-      <button type="button" disabled>Unidad III · Machine Learning Sem. 5–7</button>
-      <button type="button" disabled>Unidad IV · Deep Learning Sem. 9–11</button>
-      <button type="button" disabled>Unidad V · IA Generativa y Ética Sem. 12–14</button>
-      <button type="button" disabled>Ver Sílabo Oficial</button>
-      <button type="button" disabled>Ver todas las Unidades (I – V) →</button>
-      <button type="button" disabled id="navBtnProyecto">Proyecto Aplicado</button>
-      <button type="button" disabled id="navBtnBibliografia">Bibliografía</button>
-      <button type="button" disabled id="downloadProjectTemplateBtn">⬇ Descargar Estructura de Informe (.doc)</button>
-      <button type="button" disabled id="goToLabsFromProjectBtn">Revisar cuadernos de código →</button>
-      <button type="button" disabled>Abrir o descargar sílabo →</button>
-      <button type="button" disabled>Sílabo Oficial</button>
-      <div id="viewProyecto"></div>
-      <div id="viewBibliografia"></div>
-      <button type="button" disabled id="navBtnLaboratorios">Laboratorios</button>
-      <div id="viewLaboratorios"><div id="labsIndexSidebar"></div><div id="labsDetailPane"><button type="button" disabled id="labCopyCodeBtn">Copiar</button><button type="button" disabled id="labDownloadIpynbBtn">Descargar</button></div></div>
-    </div>
-
   </main>
 
   <!-- ===================================================================== -->
@@ -832,20 +640,30 @@
     })();
   </script>
   <script src="datos/archivos.js"></script>
+  <!-- Núcleo -->
   <script src="js/core/config.js"></script>
-  <script src="js/features/photos.js"></script>
+  <script src="js/core/storage.js"></script>
+  <script src="js/core/utils.js"></script>
+  <!-- Datos -->
+  <script src="js/data/shield.js"></script>
   <script src="js/data/units-and-topics.js"></script>
   <script src="js/data/default-state.js"></script>
   <script src="js/core/state.js"></script>
-  <script src="js/features/navigation.js"></script>
+  <!-- Funciones de la página -->
+  <script src="js/features/photos.js"></script>
   <script src="js/features/pages.js"></script>
+  <script src="js/features/navigation.js"></script>
   <script src="js/features/demo-slides.js"></script>
-  <script src="js/features/syllabus-viewer.js"></script>
+  <script src="js/features/viewer-styles.js"></script>
   <script src="js/features/demo-viewers.js"></script>
   <script src="js/features/real-viewers.js"></script>
+  <script src="js/features/preview-modal.js"></script>
+  <script src="js/features/downloads.js"></script>
+  <script src="js/features/syllabus.js"></script>
   <script src="js/features/github-files.js"></script>
   <script src="js/features/creator-panel.js"></script>
   <script src="js/features/page-events.js"></script>
+  <!-- Arranque (siempre el último) -->
   <script src="js/app.js"></script>
 </body>
 </html>

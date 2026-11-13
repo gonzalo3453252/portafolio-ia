@@ -1,9 +1,17 @@
 /* =============================================================================
-   TEMAS Y UNIDADES
-   Descripción de cada tema, nombres de las 5 unidades y su información (resultados de aprendizaje, etc.).
-   Aquí se editan los textos de las unidades.
-   ============================================================================= */
+   TEMAS Y UNIDADES  (data/units-and-topics.js)
+   Textos del curso que NO cambian desde el panel: la frase que acompaña a cada tema, los nombres de las 5
+   unidades y su ficha (resumen, objetivo, pie de foto). Aquí se editan esos textos.
 
+   Un tema se escribe en el panel así:   1.1 Título del tema | Frase que se muestra debajo
+   Si no hay barra |, se usa la frase de TOPIC_DESCRIPTIONS (código "1.1") y, si tampoco existe, una genérica.
+
+   Depende de: utils.js (padWeek).
+   Expone: TOPIC_DESCRIPTIONS, UNITS_INFO, UNIT_FULL_NAMES, splitTopic, topicTitle, topicForEditing, parseTopic.
+   ============================================================================= */
+"use strict";
+
+/** Frase que se muestra bajo cada tema, según su código (semana.número). */
 const TOPIC_DESCRIPTIONS = {
   "1.1": "Recorrido desde el Test de Turing (1950) y la Conferencia de Dartmouth (1956) hasta los sistemas cognitivos modernos.",
   "1.2": "Casos de uso en diagnóstico asistido por visión artificial, comprensión del lenguaje humano, robótica autónoma y sistemas expertos.",
@@ -75,46 +83,50 @@ const TOPIC_DESCRIPTIONS = {
   "14.4": "Evaluación de impacto dispar, equidad algorítmica, trazabilidad, protección de datos personales y desafíos futuros de la IA."
 };
 
-// Un tema se escribe en el panel así:   1.1 Título del tema | Frase que se muestra debajo
-// Lo que va después de la barra | es la frase propia del tema. Si no hay barra,
-// se usa la frase de TOPIC_DESCRIPTIONS (arriba) y, si tampoco existe, una frase genérica.
+/** Separa «título | frase» en sus dos partes. */
 function splitTopic(rawTopic) {
-  const partes = String(rawTopic || "").split("|");
-  return { texto: partes[0].trim(), fraseDelTema: partes.slice(1).join("|").trim() };
+  const parts = String(rawTopic || "").split("|");
+  return { text: parts[0].trim(), ownPhrase: parts.slice(1).join("|").trim() };
 }
 
-// Solo el título del tema, sin la frase (para listas y diapositivas)
+/** Solo el título del tema, sin la frase (para listas y diapositivas). */
 function topicTitle(rawTopic) {
-  return splitTopic(rawTopic).texto;
+  return splitTopic(rawTopic).text;
 }
 
-// Lo que se muestra en la caja de temas del panel: «título | frase» (con la frase actual ya escrita)
+/** Lo que se muestra en la caja de temas del panel: «título | frase» (con la frase actual ya escrita). */
 function topicForEditing(rawTopic) {
-  const { texto, fraseDelTema } = splitTopic(rawTopic);
-  if (fraseDelTema) return texto + " | " + fraseDelTema;
-  const m = texto.match(/^(\d+\.\d+)\s/);
-  const base = m && TOPIC_DESCRIPTIONS[m[1]];
-  return base ? texto + " | " + base : texto;
+  const { text, ownPhrase } = splitTopic(rawTopic);
+  if (ownPhrase) return text + " | " + ownPhrase;
+  const codeMatch = text.match(/^(\d+\.\d+)\s/);
+  const defaultPhrase = codeMatch && TOPIC_DESCRIPTIONS[codeMatch[1]];
+  return defaultPhrase ? text + " | " + defaultPhrase : text;
 }
 
-function parseTopic(rawTopic, weekNum, idx) {
-  const { texto, fraseDelTema } = splitTopic(rawTopic);
-  const match = texto.match(/^(\d+\.\d+)\s+(.*)$/);
-  const numBadge = String((idx || 0) + 1).padStart(2, "0") + ".";
+/**
+ * Interpreta un tema escrito como «1.1 Título | Frase».
+ * @returns {{code: string, numBadge: string, title: string, desc: string}}
+ *   code = "1.1" (o "S<semana>" si no tiene código), numBadge = "01." (posición), title y desc para mostrar.
+ */
+function parseTopic(rawTopic, weekNum, index) {
+  const { text, ownPhrase } = splitTopic(rawTopic);
+  const match = text.match(/^(\d+\.\d+)\s+(.*)$/);
+  const numBadge = padWeek((index || 0) + 1) + ".";
   if (match) {
     const code = match[1];
     const title = match[2];
-    const desc = fraseDelTema || TOPIC_DESCRIPTIONS[code] || `Análisis conceptual y práctico de ${title.toLowerCase()} en la sesión ${weekNum}.`;
+    const desc = ownPhrase || TOPIC_DESCRIPTIONS[code] || `Análisis conceptual y práctico de ${title.toLowerCase()} en la sesión ${weekNum}.`;
     return { code, numBadge, title, desc };
   }
   return {
     code: `S${weekNum}`,
     numBadge,
-    title: texto,
-    desc: fraseDelTema || `Desarrollo conceptual y aplicado de ${texto.toLowerCase()}.`
+    title: text,
+    desc: ownPhrase || `Desarrollo conceptual y aplicado de ${text.toLowerCase()}.`
   };
 }
 
+/** Ficha de cada unidad (la ve el visitante en la página de la unidad). */
 const UNITS_INFO = {
   1: {
     unit: 1,
@@ -166,4 +178,13 @@ const UNITS_INFO = {
     objective: "Comprender la arquitectura Transformer (Self-Attention y GPT), implementar esquemas generativos adversarios (GAN) y auditar el impacto ético y normativo bajo la Ley N.° 31814 del Perú y el EU AI Act.",
     caption: "Unidad V — Modelos Fundacionales Transformer, Síntesis Generativa y Gobernanza Algorítmica"
   }
+};
+
+/** Nombre completo de cada unidad, como se guarda en cada semana (campo unitName). */
+const UNIT_FULL_NAMES = {
+  1: "Unidad I · Fundamentos de la IA y Agentes",
+  2: "Unidad II · Búsquedas en Espacios de Estados y Juegos",
+  3: "Unidad III · Machine Learning",
+  4: "Unidad IV · Deep Learning",
+  5: "Unidad V · IA Generativa, Ética y Futuro de la IA"
 };

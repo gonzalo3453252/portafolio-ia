@@ -1,8 +1,18 @@
 /* =============================================================================
-   SEMANAS INICIALES (valores por defecto)
-   Contenido de partida de las semanas. Lo que publicas con el panel (datos/portafolio.json)
-   siempre tiene prioridad sobre esto; esto solo se usa si ese archivo no existe.
+   CONTENIDO INICIAL  (data/default-state.js)
+   Datos de partida de la página: autores, docente y las semanas con sus temas, resumen y código de ejemplo.
+   Lo que publicas con el panel (datos/portafolio.json) siempre tiene prioridad sobre esto; esto solo se
+   usa si ese archivo no existe o no se puede leer.
+
+   Campos de cada semana (los mismos que guarda el panel creador):
+     week, unit, unitName, title, subtitleSlide, photoCaption, topics[], evaluation, summary,
+     hasPpt / hasWord / hasColab (¿se muestra cada material?), pptLabel/docLabel/colabLabel (nombre que se ve),
+     pptUrl/docUrl/colabUrl (enlace al archivo real; vacío = ejemplo), codeSnippet, codeOutput,
+     ocultos {ppt|doc|colab: true} (lo que ocultaste a propósito; nombre en español por compatibilidad con lo ya publicado).
+
+   Depende de: nada. Expone: DEFAULT_STATE.
    ============================================================================= */
+"use strict";
 
 const DEFAULT_STATE = {
   studentName: "Calero Falcón, Gonzalo Manuel · Huanacuni Gomez, Jean Carlos Josue",

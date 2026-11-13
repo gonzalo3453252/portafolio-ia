@@ -1,134 +1,94 @@
 /* =============================================================================
-   EVENTOS DE LA PÁGINA
-   Conecta los botones públicos: tamaño de letra, menús, navegación, ventanas y el desplegable del sílabo.
+   EVENTOS DE LA PÁGINA  (features/page-events.js)
+   Conecta los botones públicos: navegación, menús desplegables (Unidades y Sílabo) y la ventana de
+   previsualización. (Los botones del panel del creador están en creator-panel.js.)
+
+   Los menús se abren al pasar el mouse en pantallas anchas (≥ 640 px) y con clic en celular.
+
+   Depende de: navigation.js, preview-modal.js, syllabus.js, state.js. Expone: bindPageEvents.
    ============================================================================= */
+"use strict";
 
-// Conecta los botones y menús de la página pública
-function bindPageEvents() {
-  document.getElementById("fontIncreaseBtn").addEventListener("click", () => {
-    baseFontScale = Math.min(115, baseFontScale + 5);
-    document.documentElement.style.fontSize = `${baseFontScale}%`;
-  });
-  document.getElementById("fontDecreaseBtn").addEventListener("click", () => {
-    baseFontScale = Math.max(90, baseFontScale - 5);
-    document.documentElement.style.fontSize = `${baseFontScale}%`;
-  });
-  document.getElementById("fontResetBtn").addEventListener("click", () => {
-    baseFontScale = 100;
-    document.documentElement.style.fontSize = "100%";
-  });
+const DESKTOP_MIN_WIDTH = 640;
+const isDesktopWidth = () => window.innerWidth >= DESKTOP_MIN_WIDTH;
 
-  document.getElementById("headerLogoHomeTrigger").addEventListener("click", showPresentacionPage);
-  document.getElementById("navBtnPresentacion").addEventListener("click", showPresentacionPage);
-  document.getElementById("breadcrumbWeekHomeIconBtn").addEventListener("click", showPresentacionPage);
-  document.getElementById("singleWeekUnitBreadcrumb").addEventListener("click", () => {
-    showSpecificUnitPage(activeUnitNum);
+/** Menú que se abre con el mouse (solo en pantalla ancha) y se cierra al hacer clic fuera. */
+function bindHoverDropdown(wrapperId, open, close) {
+  const wrapper = byId(wrapperId);
+  wrapper.addEventListener("mouseenter", () => { if (isDesktopWidth()) open(); });
+  wrapper.addEventListener("mouseleave", () => { if (isDesktopWidth()) close(); });
+  document.addEventListener("click", (event) => { if (!wrapper.contains(event.target)) close(); });
+}
+
+function bindHomeNavigation() {
+  ["headerLogoHomeTrigger", "navBtnPresentacion", "breadcrumbWeekHomeIconBtn"].forEach((id) => {
+    byId(id).addEventListener("click", showPresentacionPage);
   });
+  byId("singleWeekUnitBreadcrumb").addEventListener("click", () => showSpecificUnitPage(activeUnitNum));
+  byId("backToCurrentUnitInfoBtn").addEventListener("click", () => showSpecificUnitPage(activeUnitNum));
+}
 
-  const dropdownWrapper = document.getElementById("unitsDropdownWrapper");
-  const dropdownToggle = document.getElementById("unitsDropdownToggleBtn");
-  const dropdownMenu = document.getElementById("unitsDropdownMenu");
+function bindUnitsDropdown() {
+  const menu = byId("unitsDropdownMenu");
+  bindHoverDropdown("unitsDropdownWrapper", openUnitsDropdown, closeUnitsDropdown);
 
-  dropdownWrapper.addEventListener("mouseenter", () => {
-    if (window.innerWidth >= 640) openUnitsDropdown();
-  });
-
-  dropdownWrapper.addEventListener("mouseleave", () => {
-    if (window.innerWidth >= 640) closeUnitsDropdown();
+  byId("unitsDropdownToggleBtn").addEventListener("click", (event) => {
+    event.stopPropagation();
+    if (isDesktopWidth()) showAllUnitsSummaryPage();
+    else if (menu.classList.contains("hidden")) openUnitsDropdown();
+    else closeUnitsDropdown();
   });
 
-  dropdownToggle.addEventListener("click", (e) => {
-    e.stopPropagation();
-    if (window.innerWidth < 640) {
-      if (dropdownMenu.classList.contains("hidden")) {
-        openUnitsDropdown();
-      } else {
-        closeUnitsDropdown();
-      }
-    } else {
-      showAllUnitsSummaryPage();
-    }
-  });
-
-  document.addEventListener("click", (e) => {
-    if (!dropdownWrapper.contains(e.target)) {
-      closeUnitsDropdown();
-    }
-  });
-
-  document.querySelectorAll(".unit-dropdown-item").forEach(item => {
-    item.addEventListener("click", (e) => {
-      e.stopPropagation();
-      const uNum = parseInt(item.getAttribute("data-select-unit"), 10) || 1;
-      showSpecificUnitPage(uNum);
+  document.querySelectorAll(".unit-dropdown-item").forEach((item) => {
+    item.addEventListener("click", (event) => {
+      event.stopPropagation();
+      showSpecificUnitPage(parseIntOr(item.getAttribute("data-select-unit"), 1));
     });
   });
 
-  document.getElementById("backToCurrentUnitInfoBtn").addEventListener("click", () => {
-    showSpecificUnitPage(activeUnitNum);
+  document.querySelectorAll("[data-syllabus-goto-unit]").forEach((card) => {
+    card.addEventListener("click", () => showSpecificUnitPage(parseIntOr(card.getAttribute("data-syllabus-goto-unit"), 1)));
   });
+}
 
-  document.getElementById("closeFloatingPreviewBtn").addEventListener("click", closeFloatingPreviewModal);
-  document.getElementById("floatingPreviewModal").addEventListener("click", (e) => {
-    if (e.target.id === "floatingPreviewModal") {
-      closeFloatingPreviewModal();
-    }
-  });
-  document.getElementById("floatingModalDownloadBtn").addEventListener("click", () => {
-    if (typeof currentModalDownloadHandler === "function") {
-      currentModalDownloadHandler();
-    }
-  });
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") {
-      closeFloatingPreviewModal();
-    }
-  });
+function bindSyllabusDropdown() {
+  const menu = byId("syllabusDropdownMenu");
+  bindHoverDropdown("syllabusDropdownWrapper", openSyllabusDropdown, closeSyllabusDropdown);
 
-  // Desplegable rápido del Sílabo (hover en PC y clic en móvil/PC) solo con Previsualizar y Descargar
-  const syllabusWrapper = document.getElementById("syllabusDropdownWrapper");
-  const syllabusToggle = document.getElementById("heroOpenSyllabusBtn");
-  const syllabusMenu = document.getElementById("syllabusDropdownMenu");
-
-  syllabusWrapper.addEventListener("mouseenter", () => {
-    if (window.innerWidth >= 640) openSyllabusDropdown();
+  byId("heroOpenSyllabusBtn").addEventListener("click", (event) => {
+    event.stopPropagation();
+    if (menu.classList.contains("hidden")) openSyllabusDropdown();
+    else closeSyllabusDropdown();
   });
-
-  syllabusWrapper.addEventListener("mouseleave", () => {
-    if (window.innerWidth >= 640) closeSyllabusDropdown();
-  });
-
-  syllabusToggle.addEventListener("click", (e) => {
-    e.stopPropagation();
-    if (syllabusMenu.classList.contains("hidden")) {
-      openSyllabusDropdown();
-    } else {
-      closeSyllabusDropdown();
-    }
-  });
-
-  document.addEventListener("click", (e) => {
-    if (syllabusWrapper && !syllabusWrapper.contains(e.target)) {
-      closeSyllabusDropdown();
-    }
-  });
-
-  document.getElementById("heroSyllabusQuickBtn").addEventListener("click", openSyllabusModal);
-  document.getElementById("homePreviewSyllabusRowBtn").addEventListener("click", (e) => {
-    e.stopPropagation();
+  byId("homePreviewSyllabusRowBtn").addEventListener("click", (event) => {
+    event.stopPropagation();
     closeSyllabusDropdown();
     openSyllabusModal();
   });
-  document.getElementById("homeDownloadSyllabusRowBtn").addEventListener("click", (e) => {
-    e.stopPropagation();
+  byId("homeDownloadSyllabusRowBtn").addEventListener("click", (event) => {
+    event.stopPropagation();
     closeSyllabusDropdown();
     downloadSyllabusFile();
   });
+}
 
-  document.querySelectorAll("[data-syllabus-goto-unit]").forEach(card => {
-    card.addEventListener("click", () => {
-      const uNum = parseInt(card.getAttribute("data-syllabus-goto-unit"), 10) || 1;
-      showSpecificUnitPage(uNum);
-    });
+function bindPreviewModal() {
+  byId("closeFloatingPreviewBtn").addEventListener("click", closeFloatingPreviewModal);
+  byId("floatingPreviewModal").addEventListener("click", (event) => {
+    if (event.target.id === "floatingPreviewModal") closeFloatingPreviewModal();   // clic en el fondo oscuro
   });
+  byId("floatingModalDownloadBtn").addEventListener("click", () => {
+    if (typeof currentModalDownloadHandler === "function") currentModalDownloadHandler();
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") closeFloatingPreviewModal();
+  });
+}
+
+/** Conecta los botones y menús de la página pública. */
+function bindPageEvents() {
+  bindHomeNavigation();
+  bindUnitsDropdown();
+  bindSyllabusDropdown();
+  bindPreviewModal();
 }

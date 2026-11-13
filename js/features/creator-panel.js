@@ -1,406 +1,404 @@
 /* =============================================================================
-   PANEL DEL CREADOR
-   Todo lo que hace el panel que solo tú ves (entrando con #creador): editar perfil, semanas y unidades,
-   subir archivos a GitHub y publicar los cambios.
+   PANEL DEL CREADOR  (features/creator-panel.js)
+   El panel que solo ve el dueño (se abre con #creador al final de la dirección): editar perfil, semanas y
+   unidades, subir archivos a GitHub y publicar los cambios.
+
+   Cómo funciona la edición (no hay servidor):
+     1. Los cambios se guardan en ESTE navegador (saveState) y se ven solo aquí.
+     2. «Publicar en GitHub» copia el contenido como JSON y abre el editor de GitHub en datos/portafolio.json.
+        Quien tiene sesión en GitHub pega y confirma: ese commit es lo que ve todo el mundo.
+   Por eso el panel no puede cambiar la página de nadie: publicar exige iniciar sesión en GitHub.
+
+   Depende de: config.js, state.js, utils.js, data/units-and-topics.js, github-files.js (FILE_CONVENTION),
+               navigation.js, pages.js. Expone: initCreatorPanel, populateWeekSelectors.
    ============================================================================= */
+"use strict";
 
-function triggerBlobDownload(blob, filename) {
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-}
+const MAX_WEEK_NUMBER = 32;
 
-function triggerDataDownload(dataUrl, filename) {
-  const a = document.createElement("a");
-  a.href = dataUrl;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  showToast(`Archivo ${filename} descargado`);
-}
+/**
+ * Los tres materiales en el formulario de una semana: casilla «mostrar», nombre y enlace.
+ *   kind   = clave de FILE_CONVENTION ("ppt" | "doc" | "colab")
+ *   isShown = cómo se sabe si la semana lo muestra ahora
+ */
+const MATERIAL_FIELDS = [
+  { kind: "ppt",   toggleId: "toggleHasPpt",   labelId: "inputWeekPptLabel",   urlId: "inputWeekPptUrl",
+    isShown: (week) => week.hasPpt !== false,   defaultLabel: (pad) => `Clase${pad}_IA.pptx` },
+  { kind: "doc",   toggleId: "toggleHasWord",  labelId: "inputWeekDocLabel",   urlId: "inputWeekDocUrl",
+    isShown: (week) => Boolean(week.hasWord),   defaultLabel: (pad) => `Informe_Semana${pad}.pdf` },
+  { kind: "colab", toggleId: "toggleHasColab", labelId: "inputWeekColabLabel", urlId: "inputWeekColabUrl",
+    isShown: (week) => week.hasColab !== false, defaultLabel: (pad) => `Lab${pad}_IA.ipynb` }
+];
 
-const UNIT_FULL_NAMES = {
-  1: "Unidad I · Fundamentos de la IA y Agentes",
-  2: "Unidad II · Búsquedas en Espacios de Estados y Juegos",
-  3: "Unidad III · Machine Learning",
-  4: "Unidad IV · Deep Learning",
-  5: "Unidad V · IA Generativa, Ética y Futuro de la IA"
-};
+const fileKind = (key) => FILE_CONVENTION.find((kind) => kind.key === key);
 
+// ---------------------------------------------------------------------------
+// Listas desplegables (semanas y destinos de foto)
+// ---------------------------------------------------------------------------
 function sortWeeksInPlace() {
   appState.weeks.sort((a, b) => (a.week || 0) - (b.week || 0));
 }
 
+function fillSelect(select, options) {
+  select.innerHTML = "";
+  options.forEach(([value, text]) => {
+    const option = document.createElement("option");
+    option.value = value;
+    option.textContent = text;
+    select.appendChild(option);
+  });
+}
+
+/** Llena la lista de semanas del panel y carga en el formulario la semana elegida. */
 function populateWeekSelectors(selectedWeekNum) {
   sortWeeksInPlace();
-  const editSel = document.getElementById("selectWeekEdit");
-  if (!editSel) return;
-  editSel.innerHTML = "";
-  appState.weeks.forEach(w => {
-    const opt = document.createElement("option");
-    opt.value = w.week;
-    opt.textContent = `Semana ${String(w.week).padStart(2, "0")} (U${w.unit}): ${w.title}`;
-    editSel.appendChild(opt);
-  });
-  if (selectedWeekNum && appState.weeks.some(w => w.week === selectedWeekNum)) {
-    editSel.value = String(selectedWeekNum);
-  }
+  const select = byId("selectWeekEdit");
+  if (!select) return;
+  fillSelect(select, appState.weeks.map((w) => [w.week, `Semana ${padWeek(w.week)} (U${w.unit}): ${w.title}`]));
+  if (selectedWeekNum && appState.weeks.some((w) => w.week === selectedWeekNum)) select.value = String(selectedWeekNum);
   loadSelectedWeekIntoInputs();
   populatePhotoTargets();
 }
 
-// Lista del panel «Cambiar fotos»: portada, unidades y semanas, con el nombre que debe tener el archivo
+/** Lista del panel «Cambiar fotos»: portada, unidades y semanas, con el nombre que debe tener el archivo. */
 function populatePhotoTargets() {
-  const sel = document.getElementById("selectFotoDestino");
-  if (!sel) return;
-  const previo = sel.value;
-  const opciones = [
+  const select = byId("selectFotoDestino");
+  if (!select) return;
+  const previous = select.value;
+  const options = [
     ["portada-facultad", "Portada · foto de la facultad"],
     ["portada-docente", "Portada · foto del docente"]
   ];
-  [1, 2, 3, 4, 5].forEach(u => opciones.push(["unidad-" + u, UNITS_INFO[u].roman + " · " + UNITS_INFO[u].title]));
-  appState.weeks.forEach(w => opciones.push(["semana-" + String(w.week).padStart(2, "0"), "Semana " + String(w.week).padStart(2, "0") + " · " + w.title]));
-  sel.innerHTML = "";
-  opciones.forEach(([valor, texto]) => {
-    const opt = document.createElement("option");
-    opt.value = valor;
-    opt.textContent = texto;
-    sel.appendChild(opt);
-  });
-  if (previo && opciones.some(o => o[0] === previo)) sel.value = previo;
+  UNIT_NUMBERS.forEach((unit) => options.push(["unidad-" + unit, UNITS_INFO[unit].roman + " · " + UNITS_INFO[unit].title]));
+  appState.weeks.forEach((w) => options.push(["semana-" + padWeek(w.week), "Semana " + padWeek(w.week) + " · " + w.title]));
+  fillSelect(select, options);
+  if (previous && options.some((option) => option[0] === previous)) select.value = previous;
   updateSuggestedPhotoName();
 }
 
 function updateSuggestedPhotoName() {
-  const sel = document.getElementById("selectFotoDestino");
-  const el = document.getElementById("fotoNombreSugerido");
-  if (sel && el) el.textContent = sel.value + ".jpg";
+  const select = byId("selectFotoDestino");
+  const label = byId("fotoNombreSugerido");
+  if (select && label) label.textContent = select.value + ".jpg";
 }
 
+// ---------------------------------------------------------------------------
+// Formulario de una semana
+// ---------------------------------------------------------------------------
+const isStoredInPanel = (url) => Boolean(url) && url.startsWith("data:");
+
+/** Pasa los datos de una semana a los campos del formulario. */
 function loadSelectedWeekIntoInputs() {
-  const editSel = document.getElementById("selectWeekEdit");
-  const weekNum = parseInt(editSel?.value, 10) || (appState.weeks[0]?.week || 1);
-  const found = appState.weeks.find(w => w.week === weekNum) || appState.weeks[0];
-  if (!found) return;
+  const weekNum = parseIntOr(byId("selectWeekEdit")?.value, appState.weeks[0]?.week || 1);
+  const week = getWeek(weekNum);
+  if (!week) return;
+  const pad = padWeek(week.week);
 
-  document.getElementById("editWeekNumberInput").value = found.week;
-  document.getElementById("editWeekUnitSelect").value = String(found.unit || 1);
-  const upBtn = document.getElementById("uploadWeekFilesBtn");
-  if (upBtn) upBtn.textContent = `Subir archivos de la Semana ${String(found.week).padStart(2, "0")} a GitHub`;
-  document.getElementById("editWeekTitleInput").value = found.title || "";
-  document.getElementById("editWeekEvalInput").value = found.evaluation || "";
-  document.getElementById("editWeekSummaryInput").value = found.summary || "";
-  document.getElementById("editWeekTopicsInput").value = Array.isArray(found.topics) ? found.topics.map(topicForEditing).join(String.fromCharCode(10)) : "";
+  byId("editWeekNumberInput").value = week.week;
+  byId("editWeekUnitSelect").value = String(week.unit || 1);
+  const uploadButton = byId("uploadWeekFilesBtn");
+  if (uploadButton) uploadButton.textContent = `Subir archivos de la Semana ${pad} a GitHub`;
+  byId("editWeekTitleInput").value = week.title || "";
+  byId("editWeekEvalInput").value = week.evaluation || "";
+  byId("editWeekSummaryInput").value = week.summary || "";
+  byId("editWeekTopicsInput").value = Array.isArray(week.topics) ? week.topics.map(topicForEditing).join("\n") : "";
 
-  document.getElementById("toggleHasPpt").checked = found.hasPpt !== false;
-  document.getElementById("toggleHasWord").checked = Boolean(found.hasWord);
-  document.getElementById("toggleHasColab").checked = found.hasColab !== false;
-
-  document.getElementById("inputWeekPptLabel").value = found.pptLabel || `Clase${String(found.week).padStart(2, "0")}_IA.pptx`;
-  document.getElementById("inputWeekDocLabel").value = found.docLabel || `Informe_Semana${String(found.week).padStart(2, "0")}.pdf`;
-  document.getElementById("inputWeekColabLabel").value = found.colabLabel || `Lab${String(found.week).padStart(2, "0")}_IA.ipynb`;
-
-  document.getElementById("inputWeekPptUrl").value = found.pptUrl && !found.pptUrl.startsWith("data:") ? found.pptUrl : "";
-  document.getElementById("inputWeekDocUrl").value = found.docUrl && !found.docUrl.startsWith("data:") ? found.docUrl : "";
-  document.getElementById("inputWeekColabUrl").value = found.colabUrl && !found.colabUrl.startsWith("data:") ? found.colabUrl : "";
-
-}
-
-function readFileAsDataUrl(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
+  MATERIAL_FIELDS.forEach((field) => {
+    const kind = fileKind(field.kind);
+    byId(field.toggleId).checked = field.isShown(week);
+    byId(field.labelId).value = week[kind.label] || field.defaultLabel(pad);
+    // Un archivo guardado dentro del panel (data:) no se muestra como enlace
+    byId(field.urlId).value = (week[kind.urlKey] && !isStoredInPanel(week[kind.urlKey])) ? week[kind.urlKey] : "";
   });
 }
 
-// Descarga el sílabo (el subido por ti o el oficial incluido)
-function downloadSyllabusFile() {
-  if (appState.syllabusDataUrl && !syllabusDetected) {
-    triggerDataDownload(appState.syllabusDataUrl, syllabusDisplayName());
+/** Datos escritos en el formulario de la semana. */
+function readWeekForm() {
+  const form = {
+    number: parseInt(byId("editWeekNumberInput").value, 10),
+    unit: parseInt(byId("editWeekUnitSelect").value, 10),
+    title: byId("editWeekTitleInput").value.trim(),
+    evaluation: byId("editWeekEvalInput").value.trim(),
+    summary: byId("editWeekSummaryInput").value.trim(),
+    topics: byId("editWeekTopicsInput").value.split("\n").map((line) => line.trim()).filter(Boolean),
+    materials: {}
+  };
+  MATERIAL_FIELDS.forEach((field) => {
+    form.materials[field.kind] = {
+      shown: byId(field.toggleId).checked,
+      label: byId(field.labelId).value.trim(),
+      url: byId(field.urlId).value.trim()
+    };
+  });
+  return form;
+}
+
+/**
+ * Aplica las casillas «mostrar». Si desmarcas algo que se estaba mostrando, queda en "ocultos" para que la
+ * detección automática de archivos (que busca en las carpetas de GitHub) no lo vuelva a activar.
+ */
+function applyVisibility(week, form) {
+  const wasShown = {};
+  MATERIAL_FIELDS.forEach((field) => { wasShown[field.kind] = field.isShown(week); });
+
+  week.ocultos = week.ocultos || {};
+  MATERIAL_FIELDS.forEach((field) => {
+    if (form.materials[field.kind].shown) delete week.ocultos[field.kind];
+    else if (wasShown[field.kind]) week.ocultos[field.kind] = true;
+  });
+  if (!Object.keys(week.ocultos).length) delete week.ocultos;
+
+  MATERIAL_FIELDS.forEach((field) => { week[fileKind(field.kind).flag] = form.materials[field.kind].shown; });
+}
+
+/**
+ * Aplica nombres y enlaces. Pegar una URL NUEVA activa ese material; si la URL es la misma que ya estaba en
+ * el campo (por ejemplo la que se autodetectó de GitHub), la casilla marcada o desmarcada decide.
+ */
+function applyMaterialLinks(week, form) {
+  const urlBefore = {};
+  MATERIAL_FIELDS.forEach((field) => { urlBefore[field.kind] = week[fileKind(field.kind).urlKey] || ""; });
+
+  MATERIAL_FIELDS.forEach((field) => {
+    const kind = fileKind(field.kind);
+    const { label, url } = form.materials[field.kind];
+    if (label) week[kind.label] = label;
+
+    if (url) {
+      week[kind.urlKey] = url;
+      if (url !== urlBefore[field.kind]) {
+        week[kind.flag] = true;
+        if (week.ocultos) delete week.ocultos[field.kind];
+      }
+    } else if (!isStoredInPanel(week[kind.urlKey])) {
+      week[kind.urlKey] = "";
+    }
+  });
+  if (week.ocultos && !Object.keys(week.ocultos).length) delete week.ocultos;
+}
+
+/** Guarda los cambios de la semana elegida (contenido, unidad, número, materiales). */
+function saveSelectedWeek() {
+  const originalNumber = parseIntOr(byId("selectWeekEdit").value, 1);
+  const week = appState.weeks.find((w) => w.week === originalNumber);
+  if (!week) return;
+
+  const form = readWeekForm();
+  const newNumber = form.number || originalNumber;
+  if (newNumber !== originalNumber && appState.weeks.some((w) => w.week === newNumber)) {
+    showToast(`Ya existe la Semana ${newNumber}. Elige otro número de semana.`);
     return;
   }
-  triggerLinkDownload(syllabusPdfUrl(), syllabusDisplayName());
+
+  const newUnit = form.unit || week.unit;
+  week.week = newNumber;
+  week.unit = newUnit;
+  week.unitName = UNIT_FULL_NAMES[newUnit] || week.unitName;
+  if (form.title) week.title = form.title;
+  if (form.evaluation) week.evaluation = form.evaluation;
+  if (form.summary) week.summary = form.summary;
+  if (form.topics.length > 0) week.topics = form.topics;
+  applyVisibility(week, form);
+  applyMaterialLinks(week, form);
+
+  activeWeekNum = week.week;
+  activeUnitNum = week.unit;
+  sortWeeksInPlace();
+  saveState();
+  populateWeekSelectors(week.week);
+  refreshContentViews();
+  showToast(`Semana ${padWeek(week.week)} guardada correctamente`);
 }
 
-// Estado publicado por el creador (lo guarda el botón "Publicar en GitHub" del panel)
-async function loadPublishedState() {
-  try {
-    const r = await fetch(PUBLISHED_DATA_PATH, { cache: "no-cache" });
-    const ct = (r.headers.get("content-type") || "").toLowerCase();
-    if (r.ok && ct.includes("json")) {
-      const d = await r.json();
-      if (d && Array.isArray(d.weeks) && d.weeks.length > 0 && d.studentName) {
-        window.__CUSTOM_PORTFOLIO_STATE__ = d;
-      }
-    }
-  } catch (e) {}
+// ---------------------------------------------------------------------------
+// Semanas nuevas y eliminadas
+// ---------------------------------------------------------------------------
+/** Semana nueva con texto de ejemplo para completar. */
+function buildNewWeek(num, unit, title) {
+  const pad = padWeek(num);
+  return {
+    week: num,
+    unit: unit,
+    unitName: UNIT_FULL_NAMES[unit] || UNIT_FULL_NAMES[1],
+    title: title || `Sesión Académica de la Semana ${pad}`,
+    subtitleSlide: `Desarrollo teórico y práctico — Semana ${pad}`,
+    photoCaption: `Sesión ${pad} — Inteligencia Artificial FISI UNMSM`,
+    topics: [
+      `${num}.1 Fundamentos conceptuales y modelo teórico de la sesión`,
+      `${num}.2 Algoritmos y formulación computacional`,
+      `${num}.3 Casos de estudio aplicados en Ingeniería de Sistemas`,
+      `${num}.4 Experimentación práctica en Python y Google Colab`
+    ],
+    evaluation: "Clase Teórica y Práctica de Laboratorio",
+    summary: `Estudio de los fundamentos teóricos, modelado algorítmico e implementación práctica correspondientes a la Semana ${pad} de la asignatura de Inteligencia Artificial.`,
+    hasPpt: true,
+    hasWord: true,
+    hasColab: true,
+    pptLabel: `Clase${pad}_Sesion_IA.pptx`,
+    pptUrl: "",
+    docLabel: `Tarea${pad}_Informe_Academico.pdf`,
+    docUrl: "",
+    colabLabel: `Lab${pad}_Implementacion_IA.ipynb`,
+    colabUrl: "",
+    codeSnippet: `# Semana ${pad} — Laboratorio de Inteligencia Artificial (UNMSM)
+import numpy as np
+print("Laboratorio de la Semana ${pad} listo para ejecución")`,
+    codeOutput: `Laboratorio de la Semana ${pad} listo para ejecución`
+  };
 }
 
-// Publicar: copia los datos y abre el editor de GitHub en el archivo correcto
+/** Primer número de semana libre. */
+function firstFreeWeekNumber() {
+  const used = appState.weeks.map((w) => w.week);
+  let candidate = 1;
+  while (used.includes(candidate)) candidate++;
+  return candidate;
+}
+
+function openNewWeekForm() {
+  byId("newWeekNum").value = firstFreeWeekNumber();
+  byId("newWeekUnit").value = String(parseIntOr(byId("editWeekUnitSelect").value, 1));
+  byId("newWeekTitle").value = "";
+  byId("newWeekForm").classList.remove("hidden");
+  byId("newWeekNum").focus();
+}
+
+function createNewWeek() {
+  const num = parseInt(byId("newWeekNum").value, 10);
+  const unit = parseIntOr(byId("newWeekUnit").value, 1);
+  const title = byId("newWeekTitle").value.trim();
+  if (!Number.isInteger(num) || num < 1 || num > MAX_WEEK_NUMBER) {
+    showToast(`El número de semana debe estar entre 1 y ${MAX_WEEK_NUMBER}`);
+    return;
+  }
+  if (appState.weeks.some((w) => w.week === num)) {
+    showToast(`Ya existe la Semana ${num}. Elige otro número.`);
+    return;
+  }
+  appState.weeks.push(buildNewWeek(num, unit, title));
+  sortWeeksInPlace();
+  saveState();
+  populateWeekSelectors(num);
+  byId("newWeekForm").classList.add("hidden");
+  refreshContentViews();
+  showToast(`Semana ${padWeek(num)} creada en la Unidad ${unit}. Completa sus datos y pulsa «Publicar en GitHub»`);
+}
+
+function deleteSelectedWeek() {
+  if (appState.weeks.length <= 1) {
+    showToast("El portafolio debe conservar al menos una semana activa");
+    return;
+  }
+  const weekNum = parseInt(byId("selectWeekEdit").value, 10);
+  const index = appState.weeks.findIndex((w) => w.week === weekNum);
+  if (index === -1) return;
+
+  const removed = appState.weeks.splice(index, 1)[0];
+  saveState();
+  const fallbackWeek = appState.weeks[Math.min(index, appState.weeks.length - 1)]?.week || appState.weeks[0].week;
+  if (activeWeekNum === removed.week) activeWeekNum = fallbackWeek;
+  populateWeekSelectors(fallbackWeek);
+  refreshContentViews();
+  showToast(`Semana ${padWeek(removed.week)} eliminada del portafolio`);
+}
+
+// ---------------------------------------------------------------------------
+// Perfil, restaurar y publicar
+// ---------------------------------------------------------------------------
+function saveProfile() {
+  appState.studentName = byId("inputStudentName").value.trim() || DEFAULT_STATE.studentName;
+  appState.studentEmail = byId("inputStudentEmail").value.trim() || DEFAULT_STATE.studentEmail;
+  appState.groupBadge = byId("inputGroupBadge").value.trim() || DEFAULT_STATE.groupBadge;
+  appState.profName = byId("inputProfName").value.trim() || DEFAULT_STATE.profName;
+  saveState();
+  renderProfileHeader();
+  refreshActiveView();
+  showToast("Datos institucionales guardados");
+}
+
+/** Descarta los cambios sin publicar de este navegador y vuelve a la versión publicada. */
+function restorePublishedVersion() {
+  appState = cloneJson(publishedState || DEFAULT_STATE);
+  saveState();
+  localStore.remove(STORAGE_KEYS.PENDING);
+  refreshPendingNote();
+  renderProfileHeader();
+  refreshActiveView();
+  populateWeekSelectors();
+  showToast("Se restauró la versión publicada");
+}
+
+/** Publicar: copia los datos y abre el editor de GitHub en el archivo correcto. */
 async function publishToGithub() {
   const json = JSON.stringify(stateForPersist(), null, 2);
   let copied = false;
-  try { await navigator.clipboard.writeText(json); copied = true; } catch (e) {}
-  if (!copied) {
+  try {
+    await navigator.clipboard.writeText(json);
+    copied = true;
+  } catch {
+    // El navegador no deja copiar: se descarga el archivo en su lugar
+  }
+  if (copied) {
+    showToast("Copiado. En GitHub: Ctrl+A, Ctrl+V y Commit changes");
+  } else {
     triggerBlobDownload(new Blob([json], { type: "application/json" }), "portafolio.json");
     showToast("No pude copiar: se descargó portafolio.json. Pégalo/arrástralo en GitHub");
-  } else {
-    showToast("Copiado. En GitHub: Ctrl+A, Ctrl+V y Commit changes");
   }
   window.open(GITHUB_EDIT_DATA_URL, "_blank", "noopener");
 }
 
+function openGithubUpload(folder) {
+  window.open(githubUploadUrl(folder), "_blank", "noopener");
+}
 
-// Conecta todos los botones del panel del creador
-function initCreatorPanel() {
-  // Panel del creador: NO hay botón público. Solo se abre entrando a la URL con #creador
-  function openCreatorFromHash() {
-    if (location.hash.toLowerCase() === "#creador") {
-      populateWeekSelectors(activeWeekNum);
-      refreshPendingNote();
-      document.getElementById("creatorAdminModal").classList.remove("hidden");
-    }
-  }
-  window.addEventListener("hashchange", openCreatorFromHash);
-  setTimeout(openCreatorFromHash, 300);
-  document.getElementById("closeCreatorModalBtn").addEventListener("click", () => {
-    document.getElementById("creatorAdminModal").classList.add("hidden");
-    try { history.replaceState(null, "", location.pathname + location.search); } catch (e) {}
-  });
-
-  document.getElementById("saveProfileBtn").addEventListener("click", () => {
-    appState.studentName = document.getElementById("inputStudentName").value.trim() || DEFAULT_STATE.studentName;
-    appState.studentEmail = document.getElementById("inputStudentEmail").value.trim() || DEFAULT_STATE.studentEmail;
-    appState.groupBadge = document.getElementById("inputGroupBadge").value.trim() || DEFAULT_STATE.groupBadge;
-    appState.profName = document.getElementById("inputProfName").value.trim() || DEFAULT_STATE.profName;
-    saveState();
-    renderProfileHeader();
-    if (activePage === "silabo") showSilaboPage();
-    if (activePage === "todas-unidades") renderAllUnitsSummary();
-    if (activePage === "unidad-especifica") renderSpecificUnitView();
-    if (activePage === "semana-individual") renderSingleWeekView();
-    showToast("Datos institucionales guardados");
-  });
-
-  document.getElementById("selectWeekEdit").addEventListener("change", loadSelectedWeekIntoInputs);
-
-  // Agregar una Nueva Semana (tú eliges número y unidad)
-  function buildNewWeek(num, unit, titleVal) {
-    const pad = String(num).padStart(2, "0");
-    return {
-      week: num,
-      unit: unit,
-      unitName: UNIT_FULL_NAMES[unit] || UNIT_FULL_NAMES[1],
-      title: titleVal || `Sesión Académica de la Semana ${pad}`,
-      subtitleSlide: `Desarrollo teórico y práctico — Semana ${pad}`,
-      photoCaption: `Sesión ${pad} — Inteligencia Artificial FISI UNMSM`,
-      topics: [
-        `${num}.1 Fundamentos conceptuales y modelo teórico de la sesión`,
-        `${num}.2 Algoritmos y formulación computacional`,
-        `${num}.3 Casos de estudio aplicados en Ingeniería de Sistemas`,
-        `${num}.4 Experimentación práctica en Python y Google Colab`
-      ],
-      evaluation: "Clase Teórica y Práctica de Laboratorio",
-      summary: `Estudio de los fundamentos teóricos, modelado algorítmico e implementación práctica correspondientes a la Semana ${pad} de la asignatura de Inteligencia Artificial.`,
-      hasPpt: true,
-      hasWord: true,
-      hasColab: true,
-      pptLabel: `Clase${pad}_Sesion_IA.pptx`,
-      pptUrl: "",
-      docLabel: `Tarea${pad}_Informe_Academico.pdf`,
-      docUrl: "",
-      colabLabel: `Lab${pad}_Implementacion_IA.ipynb`,
-      colabUrl: "",
-      codeSnippet: `# Semana ${pad} — Laboratorio de Inteligencia Artificial (UNMSM)
-import numpy as np
-print("Laboratorio de la Semana ${pad} listo para ejecución")`,
-      codeOutput: `Laboratorio de la Semana ${pad} listo para ejecución`
-    };
-  }
-
-  document.getElementById("addNewWeekBtn").addEventListener("click", () => {
-    const used = appState.weeks.map(w => w.week);
-    let suggested = 1;
-    while (used.includes(suggested)) suggested++;
-    document.getElementById("newWeekNum").value = suggested;
-    document.getElementById("newWeekUnit").value = String(parseInt(document.getElementById("editWeekUnitSelect").value, 10) || 1);
-    document.getElementById("newWeekTitle").value = "";
-    document.getElementById("newWeekForm").classList.remove("hidden");
-    document.getElementById("newWeekNum").focus();
-  });
-
-  document.getElementById("newWeekCancelBtn").addEventListener("click", () => {
-    document.getElementById("newWeekForm").classList.add("hidden");
-  });
-
-  document.getElementById("newWeekCreateBtn").addEventListener("click", () => {
-    const num = parseInt(document.getElementById("newWeekNum").value, 10);
-    const unit = parseInt(document.getElementById("newWeekUnit").value, 10) || 1;
-    const titleVal = document.getElementById("newWeekTitle").value.trim();
-    if (!Number.isInteger(num) || num < 1 || num > 32) {
-      showToast("El número de semana debe estar entre 1 y 32");
-      return;
-    }
-    if (appState.weeks.some(w => w.week === num)) {
-      showToast(`Ya existe la Semana ${num}. Elige otro número.`);
-      return;
-    }
-    appState.weeks.push(buildNewWeek(num, unit, titleVal));
-    sortWeeksInPlace();
-    saveState();
-    populateWeekSelectors(num);
-    document.getElementById("newWeekForm").classList.add("hidden");
-    if (activePage === "todas-unidades") renderAllUnitsSummary();
-    if (activePage === "unidad-especifica") renderSpecificUnitView();
-    if (activePage === "semana-individual") renderSingleWeekView();
-    showToast(`Semana ${String(num).padStart(2, "0")} creada en la Unidad ${unit}. Completa sus datos y pulsa «Publicar en GitHub»`);
-  });
-
-  document.getElementById("uploadSyllabusGithubBtn").addEventListener("click", () => {
-    window.open(githubUploadUrl(SYLLABUS_PATH), "_blank", "noopener");
-  });
-
-  document.getElementById("selectFotoDestino").addEventListener("change", updateSuggestedPhotoName);
-  document.getElementById("uploadPhotoBtn").addEventListener("click", () => {
-    window.open(githubUploadUrl(IMAGES_PATH), "_blank", "noopener");
-  });
-  document.getElementById("uploadWeekFilesBtn").addEventListener("click", () => {
-    const weekNum = parseInt(document.getElementById("selectWeekEdit").value, 10) || 1;
-    window.open(githubUploadUrl(weekFolder(weekNum)), "_blank", "noopener");
-  });
-
-  // Quitar / Eliminar la Semana Seleccionada
-  document.getElementById("deleteSelectedWeekBtn").addEventListener("click", () => {
-    if (appState.weeks.length <= 1) {
-      showToast("El portafolio debe conservar al menos una semana activa");
-      return;
-    }
-    const weekNum = parseInt(document.getElementById("selectWeekEdit").value, 10);
-    const idx = appState.weeks.findIndex(w => w.week === weekNum);
-    if (idx === -1) return;
-
-    const removed = appState.weeks.splice(idx, 1)[0];
-    saveState();
-    const fallbackWeek = appState.weeks[Math.min(idx, appState.weeks.length - 1)]?.week || appState.weeks[0].week;
-    if (activeWeekNum === removed.week) {
-      activeWeekNum = fallbackWeek;
-    }
-    populateWeekSelectors(fallbackWeek);
-    if (activePage === "todas-unidades") renderAllUnitsSummary();
-    if (activePage === "unidad-especifica") renderSpecificUnitView();
-    if (activePage === "semana-individual") renderSingleWeekView();
-    showToast(`Semana ${String(removed.week).padStart(2, "0")} eliminada del portafolio`);
-  });
-
-  // Guardar cambios de contenido, unidad, número y archivos de la Semana Seleccionada
-  document.getElementById("saveWeekLinksBtn").addEventListener("click", async () => {
-    const origWeekNum = parseInt(document.getElementById("selectWeekEdit").value, 10) || 1;
-    const target = appState.weeks.find(w => w.week === origWeekNum);
-    if (!target) return;
-
-    const newWeekNum = parseInt(document.getElementById("editWeekNumberInput").value, 10) || origWeekNum;
-    if (newWeekNum !== origWeekNum && appState.weeks.some(w => w.week === newWeekNum)) {
-      showToast(`Ya existe la Semana ${newWeekNum}. Elige otro número de semana.`);
-      return;
-    }
-
-    const newUnitNum = parseInt(document.getElementById("editWeekUnitSelect").value, 10) || target.unit;
-    target.week = newWeekNum;
-    target.unit = newUnitNum;
-    target.unitName = UNIT_FULL_NAMES[newUnitNum] || target.unitName;
-
-    const titleVal = document.getElementById("editWeekTitleInput").value.trim();
-    const evalVal = document.getElementById("editWeekEvalInput").value.trim();
-    const summaryVal = document.getElementById("editWeekSummaryInput").value.trim();
-    const topicsLines = document.getElementById("editWeekTopicsInput").value
-      .split(String.fromCharCode(10))
-      .map(line => line.trim())
-      .filter(Boolean);
-
-    if (titleVal) target.title = titleVal;
-    if (evalVal) target.evaluation = evalVal;
-    if (summaryVal) target.summary = summaryVal;
-    if (topicsLines.length > 0) target.topics = topicsLines;
-
-    // Las casillas mandan. Si desmarcas algo que se estaba mostrando, queda en "ocultos" para que
-    // la detección automática de archivos (que busca en las carpetas de GitHub) no lo vuelva a activar.
-    const antes = {
-      ppt: target.hasPpt !== false,
-      doc: Boolean(target.hasWord),
-      colab: target.hasColab !== false
-    };
-    const ahora = {
-      ppt: document.getElementById("toggleHasPpt").checked,
-      doc: document.getElementById("toggleHasWord").checked,
-      colab: document.getElementById("toggleHasColab").checked
-    };
-    target.ocultos = target.ocultos || {};
-    Object.keys(ahora).forEach((k) => {
-      if (ahora[k]) delete target.ocultos[k];
-      else if (antes[k]) target.ocultos[k] = true;
-    });
-    if (!Object.keys(target.ocultos).length) delete target.ocultos;
-    target.hasPpt = ahora.ppt;
-    target.hasWord = ahora.doc;
-    target.hasColab = ahora.colab;
-
-    const urlAntes = { ppt: target.pptUrl || "", doc: target.docUrl || "", colab: target.colabUrl || "" };
-
-    const pptLabelVal = document.getElementById("inputWeekPptLabel").value.trim();
-    const docLabelVal = document.getElementById("inputWeekDocLabel").value.trim();
-    const colabLabelVal = document.getElementById("inputWeekColabLabel").value.trim();
-    if (pptLabelVal) target.pptLabel = pptLabelVal;
-    if (docLabelVal) target.docLabel = docLabelVal;
-    if (colabLabelVal) target.colabLabel = colabLabelVal;
-
-    const pptInputUrl = document.getElementById("inputWeekPptUrl").value.trim();
-    const docInputUrl = document.getElementById("inputWeekDocUrl").value.trim();
-    const colabInputUrl = document.getElementById("inputWeekColabUrl").value.trim();
-
-    // Pegar una URL NUEVA activa ese archivo. Si la URL es la misma que ya estaba en la casilla
-    // (por ejemplo la que se autodetectó de GitHub), la casilla marcada/desmarcada decide.
-    if (pptInputUrl) { target.pptUrl = pptInputUrl; if (pptInputUrl !== urlAntes.ppt) { target.hasPpt = true; if (target.ocultos) delete target.ocultos.ppt; } }
-    else if (!target.pptUrl || !target.pptUrl.startsWith("data:")) { target.pptUrl = ""; }
-
-    if (docInputUrl) { target.docUrl = docInputUrl; if (docInputUrl !== urlAntes.doc) { target.hasWord = true; if (target.ocultos) delete target.ocultos.doc; } }
-    else if (!target.docUrl || !target.docUrl.startsWith("data:")) { target.docUrl = ""; }
-
-    if (colabInputUrl) { target.colabUrl = colabInputUrl; if (colabInputUrl !== urlAntes.colab) { target.hasColab = true; if (target.ocultos) delete target.ocultos.colab; } }
-    else if (!target.colabUrl || !target.colabUrl.startsWith("data:")) { target.colabUrl = ""; }
-    if (target.ocultos && !Object.keys(target.ocultos).length) delete target.ocultos;
-
-    activeWeekNum = target.week;
-    activeUnitNum = target.unit;
-    sortWeeksInPlace();
-    saveState();
-    populateWeekSelectors(target.week);
-    if (activePage === "todas-unidades") renderAllUnitsSummary();
-    if (activePage === "unidad-especifica") renderSpecificUnitView();
-    if (activePage === "semana-individual") renderSingleWeekView();
-    showToast(`Semana ${String(target.week).padStart(2, "0")} guardada correctamente`);
-  });
-
-  document.getElementById("resetDefaultsBtn").addEventListener("click", () => {
-    appState = JSON.parse(JSON.stringify(window.__CUSTOM_PORTFOLIO_STATE__ || DEFAULT_STATE));
-    saveState();
-    try { localStorage.removeItem(PENDING_KEY); } catch (e) {}
+// ---------------------------------------------------------------------------
+// Conexión de los botones del panel
+// ---------------------------------------------------------------------------
+/** El panel NO tiene botón público: solo se abre entrando a la dirección con #creador. */
+function bindCreatorModal() {
+  const openIfRequested = () => {
+    if (location.hash.toLowerCase() !== "#creador") return;
+    populateWeekSelectors(activeWeekNum);
     refreshPendingNote();
-    renderProfileHeader();
-    if (activePage === "silabo") showSilaboPage();
-    if (activePage === "todas-unidades") renderAllUnitsSummary();
-    if (activePage === "unidad-especifica") renderSpecificUnitView();
-    if (activePage === "semana-individual") renderSingleWeekView();
-    populateWeekSelectors();
-    showToast("Se restauró la versión publicada");
-  });
+    byId("creatorAdminModal").classList.remove("hidden");
+  };
+  window.addEventListener("hashchange", openIfRequested);
+  setTimeout(openIfRequested, 300);
 
-  document.getElementById("publishGithubBtn").addEventListener("click", publishToGithub);
+  byId("closeCreatorModalBtn").addEventListener("click", () => {
+    byId("creatorAdminModal").classList.add("hidden");
+    try {
+      history.replaceState(null, "", location.pathname + location.search);
+    } catch {
+      // Algunos navegadores no permiten cambiar la dirección: el panel queda cerrado igual
+    }
+  });
+}
+
+function bindWeekEditor() {
+  byId("selectWeekEdit").addEventListener("change", loadSelectedWeekIntoInputs);
+  byId("saveWeekLinksBtn").addEventListener("click", saveSelectedWeek);
+  byId("deleteSelectedWeekBtn").addEventListener("click", deleteSelectedWeek);
+  byId("addNewWeekBtn").addEventListener("click", openNewWeekForm);
+  byId("newWeekCancelBtn").addEventListener("click", () => byId("newWeekForm").classList.add("hidden"));
+  byId("newWeekCreateBtn").addEventListener("click", createNewWeek);
+}
+
+function bindUploadButtons() {
+  byId("uploadSyllabusGithubBtn").addEventListener("click", () => openGithubUpload(SYLLABUS_PATH));
+  byId("selectFotoDestino").addEventListener("change", updateSuggestedPhotoName);
+  byId("uploadPhotoBtn").addEventListener("click", () => openGithubUpload(IMAGES_PATH));
+  byId("uploadWeekFilesBtn").addEventListener("click", () => {
+    openGithubUpload(weekFolder(parseIntOr(byId("selectWeekEdit").value, 1)));
+  });
+}
+
+/** Conecta todos los botones del panel del creador. */
+function initCreatorPanel() {
+  bindCreatorModal();
+  byId("saveProfileBtn").addEventListener("click", saveProfile);
+  bindWeekEditor();
+  bindUploadButtons();
+  byId("resetDefaultsBtn").addEventListener("click", restorePublishedVersion);
+  byId("publishGithubBtn").addEventListener("click", publishToGithub);
 }

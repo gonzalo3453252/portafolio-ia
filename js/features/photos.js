@@ -1,17 +1,30 @@
 /* =============================================================================
-   FOTOS DE UNIDADES Y ESCUDO
-   Qué foto usa cada semana y unidad, fotos personalizadas y el escudo (SVG) de las diapositivas.
+   FOTOS DE UNIDADES Y SEMANAS  (features/photos.js)
+   Qué foto usa cada semana y cada unidad, y cómo se muestran las fotos propias del creador.
 
-   FOTOS PERSONALIZADAS (sin tocar código): sube a la carpeta img/ una imagen con
-   uno de estos nombres y la página la usará sola en lugar de la foto por defecto:
+   FOTOS PROPIAS (sin tocar código): sube a la carpeta img/ una imagen con uno de estos nombres y la
+   página la usará sola en lugar de la foto por defecto:
        portada-facultad.jpg  portada-docente.jpg   → fotos de la portada
        unidad-1.jpg … unidad-5.jpg                  → foto de cada unidad
        semana-01.jpg … semana-15.jpg                → foto de cada semana
-   Formatos aceptados: .jpg  .jpeg  .png  .webp
-   Si no existe la foto con ese nombre, se usa la de siempre.
-   ============================================================================= */
+   Formatos aceptados: .jpg  .jpeg  .png  .webp. Si no existe la foto con ese nombre, se usa la de siempre.
 
-// Fotografías de cada unidad (están en la carpeta img/)
+   Cómo se sabe qué fotos propias existen:
+     1. Normal: datos/fotos.js (PHOTO_LIST), que genera GitHub al subir imágenes. Llega antes de dibujar la
+        página, así que la foto correcta se ve desde el primer instante.
+     2. Respaldo (si ese archivo falta): se prueban los nombres posibles y se recuerda el resultado en el navegador.
+
+   Las <img data-foto="nombre"> permanecen ocultas (CSS) hasta tener marcado data-listo: así nunca se ve
+   primero la foto de antes.
+
+   Depende de: config.js, storage.js, utils.js. Expone: UNIT_PHOTOS, getWeekPhotoSrc, getUnitPhotoSrc,
+   applyCustomPhotos, initCustomPhotos.
+   ============================================================================= */
+"use strict";
+
+// ---------------------------------------------------------------------------
+// Fotos por defecto (están en la carpeta img/)
+// ---------------------------------------------------------------------------
 const UNIT_PHOTOS = {
   u1: "img/unidad-1-robotica-agentes.jpg",
   u2: "img/unidad-2-busquedas-juegos.jpg",
@@ -21,172 +34,176 @@ const UNIT_PHOTOS = {
   alt: "img/red-neuronal.jpg"
 };
 
-// Foto que se muestra para cada semana. Para cambiar la foto de una semana,
-// cambia el valor aquí (u1…u5 o alt). Las semanas que no aparecen usan u1.
-// Foto por defecto de una semana (la de siempre, sin mirar las fotos personalizadas)
+/** Qué foto por defecto usa cada semana (u1…u5 o alt). Las semanas que no aparecen usan la de la unidad 1. */
+const DEFAULT_WEEK_PHOTO_KEY = { 1: "u1", 2: "alt", 3: "u2", 4: "u1", 5: "u3", 6: "u2", 7: "alt", 9: "alt", 10: "u4", 11: "u3", 12: "u5", 13: "u4", 14: "u5" };
+
+const absoluteUrl = (path) => new URL(path, location.href).href;
+
+/** Foto por defecto de una semana (la de siempre, sin mirar las fotos propias). */
 function getDefaultWeekPhotoSrc(weekNum) {
-  const abs = (ruta) => new URL(ruta, location.href).href;
-  const p1 = abs(UNIT_PHOTOS.u1), p2 = abs(UNIT_PHOTOS.u2), p3 = abs(UNIT_PHOTOS.u3);
-  const p4 = abs(UNIT_PHOTOS.u4), p5 = abs(UNIT_PHOTOS.u5), pAlt = abs(UNIT_PHOTOS.alt);
-  const weekPool = {
-    1: p1, 2: pAlt, 3: p2, 4: p1, 5: p3, 6: p2, 7: pAlt,
-    9: pAlt, 10: p4, 11: p3, 12: p5, 13: p4, 14: p5
-  };
-  return weekPool[weekNum] || p1;
+  return absoluteUrl(UNIT_PHOTOS[DEFAULT_WEEK_PHOTO_KEY[weekNum] || "u1"]);
 }
 
-function getWeekPhotoSrc(weekNum, unitNum) {
-  const propia = customPhotos["semana-" + String(weekNum).padStart(2, "0")];
-  return propia || getDefaultWeekPhotoSrc(weekNum);
+/** Foto de una semana: la propia (semana-NN) o, si no hay, la de siempre. */
+function getWeekPhotoSrc(weekNum) {
+  return customPhotos["semana-" + padWeek(weekNum)] || getDefaultWeekPhotoSrc(weekNum);
 }
 
-// Foto de una unidad: la personalizada (unidad-N) o, si no hay, la de siempre de esa unidad.
-// NO usa la foto personalizada de su primera semana: así subir semana-01.jpg solo cambia la semana 1.
-function getUnitPhotoSrc(unitNum, primeraSemana) {
-  return customPhotos["unidad-" + unitNum] || getDefaultWeekPhotoSrc(primeraSemana || 1);
+/**
+ * Foto de una unidad: la propia (unidad-N) o, si no hay, la de siempre de su primera semana.
+ * No usa la foto propia de esa semana: así subir semana-01.jpg solo cambia la semana 1.
+ */
+function getUnitPhotoSrc(unitNum, firstWeek) {
+  return customPhotos["unidad-" + unitNum] || getDefaultWeekPhotoSrc(firstWeek || 1);
 }
 
 // ---------------------------------------------------------------------------
-// Búsqueda de fotos personalizadas en img/ (una sola vez por foto)
+// Qué fotos propias existen
 // ---------------------------------------------------------------------------
 const PHOTO_EXTENSIONS = ["jpg", "jpeg", "png", "webp"];
-const customPhotos = {};   // nombre -> URL encontrada (o null si no existe)
-const photoLookups = {};       // nombre -> promesa en curso
+const PHOTO_READY_TIMEOUT_MS = 3000;   // si la comprobación tarda más, la foto se muestra igual
 
-// Memoria del navegador: recuerda qué fotos propias existen para dibujarlas bien desde el primer
-// instante (sin que se vea un momento la foto de antes). Igual se comprueba de nuevo en segundo plano.
-const PHOTO_CACHE_KEY = "ia_fotos_v1";
-try {
-  const guardadas = JSON.parse(localStorage.getItem(PHOTO_CACHE_KEY) || "{}");
-  Object.keys(guardadas).forEach((k) => { customPhotos[k] = guardadas[k]; });
-} catch (e) {}
+/** nombre de foto -> dirección encontrada (o null si no existe) */
+const customPhotos = {};
+/** nombre de foto -> comprobación en curso (para no repetirla) */
+const photoLookups = {};
+
+/** Lista oficial de fotos propias generada por GitHub, o null si datos/fotos.js no existe. */
+const PHOTO_LIST = (window.__PHOTO_LIST && typeof window.__PHOTO_LIST === "object") ? window.__PHOTO_LIST : null;
+
+/** Memoria del navegador: recuerda qué fotos propias existen (se vuelve a comprobar en segundo plano). */
+function loadPhotoCache() {
+  try {
+    Object.assign(customPhotos, JSON.parse(localStore.get(STORAGE_KEYS.PHOTO_CACHE) || "{}"));
+  } catch {
+    // Memoria dañada: se ignora y se vuelve a comprobar
+  }
+}
+
 function savePhotoCache() {
-  try { localStorage.setItem(PHOTO_CACHE_KEY, JSON.stringify(customPhotos)); } catch (e) {}
+  localStore.set(STORAGE_KEYS.PHOTO_CACHE, JSON.stringify(customPhotos));
 }
 
-// Lista de fotos propias que genera GitHub solo al subir imágenes (datos/fotos.js). Llega ANTES de
-// dibujar la página, así cualquiera (también un visitante nuevo) ve la foto correcta al instante.
-// Si ese archivo no existe, se usa el método de respaldo de abajo (memoria del navegador + comprobar).
-const PHOTO_LIST = (typeof window !== "undefined" && window.__PHOTO_LIST && typeof window.__PHOTO_LIST === "object") ? window.__PHOTO_LIST : null;
+loadPhotoCache();
 if (PHOTO_LIST) {
-  Object.keys(customPhotos).forEach((k) => { delete customPhotos[k]; });
-  Object.keys(PHOTO_LIST).forEach((k) => { customPhotos[k] = new URL(PHOTO_LIST[k], location.href).href; });
+  // La lista de GitHub manda: reemplaza lo recordado por el navegador
+  Object.keys(customPhotos).forEach((name) => { delete customPhotos[name]; });
+  Object.keys(PHOTO_LIST).forEach((name) => { customPhotos[name] = absoluteUrl(PHOTO_LIST[name]); });
 }
 
+/** Resuelve true si la imagen de esa dirección carga bien. */
 function imageLoads(url) {
-  return new Promise(resolve => {
-    const im = new Image();
-    im.onload = () => resolve(true);
-    im.onerror = () => resolve(false);
-    im.src = url;
+  return new Promise((resolve) => {
+    const image = new Image();
+    image.onload = () => resolve(true);
+    image.onerror = () => resolve(false);
+    image.src = url;
   });
 }
 
-// Devuelve la URL de img/<nombre>.<ext> si existe, o null
-// (se comprueba una sola vez por visita, aunque la memoria del navegador ya tenga una respuesta)
-function findCustomPhoto(nombre) {
-  if (PHOTO_LIST) return Promise.resolve(customPhotos[nombre] || null);   // la lista ya lo dice
-  if (photoLookups[nombre]) return photoLookups[nombre];
-  const urls = PHOTO_EXTENSIONS.map(ext => new URL(IMAGES_PATH + "/" + nombre + "." + ext, location.href).href);
-  photoLookups[nombre] = Promise.all(urls.map(imageLoads)).then(resultados => {
-    const i = resultados.indexOf(true);
-    const nueva = i >= 0 ? urls[i] : null;
-    const cambio = customPhotos[nombre] !== nueva;
-    customPhotos[nombre] = nueva;
-    if (cambio) savePhotoCache();
-    return nueva;
+/** Devuelve la dirección de img/<nombre>.<ext> si existe, o null (se comprueba una vez por visita). */
+function findCustomPhoto(name) {
+  if (PHOTO_LIST) return Promise.resolve(customPhotos[name] || null);   // la lista ya lo dice
+  if (photoLookups[name]) return photoLookups[name];
+  const urls = PHOTO_EXTENSIONS.map((ext) => absoluteUrl(IMAGES_PATH + "/" + name + "." + ext));
+  photoLookups[name] = Promise.all(urls.map(imageLoads)).then((results) => {
+    const index = results.indexOf(true);
+    const found = index >= 0 ? urls[index] : null;
+    const changed = customPhotos[name] !== found;
+    customPhotos[name] = found;
+    if (changed) savePhotoCache();
+    return found;
   });
-  return photoLookups[nombre];
+  return photoLookups[name];
 }
 
-// La foto se muestra (se quita el "oculto") cuando ya es la definitiva y terminó de cargar.
-// Mientras tanto el CSS la mantiene transparente, así nunca se ve primero la foto de antes.
-function markPhotoReady(img, nombre) {
-  const listo = () => { if (img.dataset.foto === nombre) img.setAttribute("data-listo", nombre); };
-  if (img.complete && img.naturalWidth > 0) listo();
-  else { img.addEventListener("load", listo, { once: true }); img.addEventListener("error", listo, { once: true }); }
+// ---------------------------------------------------------------------------
+// Mostrar las fotos en la página
+// ---------------------------------------------------------------------------
+/** Marca la foto como lista (ya se muestra) cuando ya es la definitiva y terminó de cargar. */
+function markPhotoReady(img, name) {
+  const markReady = () => { if (img.dataset.foto === name) img.setAttribute("data-listo", name); };
+  if (img.complete && img.naturalWidth > 0) {
+    markReady();
+  } else {
+    img.addEventListener("load", markReady, { once: true });
+    img.addEventListener("error", markReady, { once: true });
+  }
 }
 
-// Recorre las <img data-foto="nombre"> de la página y cambia su foto si hay una personalizada
+/** Resuelve la foto de una <img data-foto="nombre">: pone la propia si existe y la muestra. */
+function resolvePhoto(img) {
+  const name = img.dataset.foto;
+  if (img.dataset.listo === name) return;                    // ya resuelta
+  const apply = (url) => {
+    if (img.dataset.foto !== name) return;                   // la imagen se reutilizó para otra foto
+    if (url && img.src !== url) img.src = url;
+    markPhotoReady(img, name);
+  };
+
+  // Con la lista de GitHub la respuesta es inmediata y definitiva
+  if (PHOTO_LIST) { apply(customPhotos[name] || null); return; }
+
+  // Respaldo: si el navegador ya sabe la respuesta (visita anterior) se usa de inmediato; luego se comprueba
+  if (name in customPhotos) apply(customPhotos[name]);
+  findCustomPhoto(name).then(apply);
+  setTimeout(() => {
+    if (img.dataset.foto === name && !img.hasAttribute("data-listo")) img.setAttribute("data-listo", name);
+  }, PHOTO_READY_TIMEOUT_MS);
+}
+
+/** Recorre las <img data-foto="nombre"> de la página y cambia su foto si hay una propia. */
 function applyCustomPhotos() {
-  document.querySelectorAll("img[data-foto]").forEach(img => {
-    const nombre = img.dataset.foto;
-    if (img.dataset.listo === nombre) return;               // ya resuelta
-    const poner = (url) => {
-      if (img.dataset.foto !== nombre) return;
-      if (url && img.src !== url) img.src = url;
-      markPhotoReady(img, nombre);
-    };
-    // Con la lista de GitHub la respuesta es inmediata y definitiva: sin esperas ni comprobaciones
-    if (PHOTO_LIST) { poner(customPhotos[nombre] || null); return; }
-    // Respaldo: si el navegador ya sabe la respuesta (visita anterior), se usa de inmediato
-    if (nombre in customPhotos) poner(customPhotos[nombre]);
-    // Primera visita (o foto nueva): se espera la comprobación, con un tope por si algo falla
-    findCustomPhoto(nombre).then(poner);
-    setTimeout(() => { if (img.dataset.foto === nombre && !img.hasAttribute("data-listo")) img.setAttribute("data-listo", nombre); }, 3000);
-  });
+  document.querySelectorAll("img[data-foto]").forEach(resolvePhoto);
 }
 
-// Vigila la página: cada vez que se dibuja una foto con data-foto, busca la suya
-// Cuando la página ya terminó de cargar, baja en segundo plano las fotos de las demás semanas y
-// unidades (son livianas) para que al navegar ya estén listas. Se omite con "ahorro de datos".
+// ---------------------------------------------------------------------------
+// Precarga en segundo plano
+// ---------------------------------------------------------------------------
+const PRELOAD_PARALLEL = 3;          // fotos que se bajan a la vez
+const PRELOAD_START_DELAY_MS = 300;  // espera tras cargar la página
+
+/** Baja en segundo plano las fotos de las demás semanas y unidades (son livianas) para que al navegar ya estén. */
 function preloadPhotosInBackground() {
   if (!PHOTO_LIST) return;
-  try { if (navigator.connection && navigator.connection.saveData) return; } catch (e) {}
-  // Fotos de semanas y unidades propias + las de siempre de cada unidad (todas son livianas)
+  if (navigator.connection && navigator.connection.saveData) return;   // respeta el "ahorro de datos"
+
   const urls = [];
-  const agregar = (u) => { if (u && urls.indexOf(u) < 0) urls.push(u); };
-  Object.keys(customPhotos).forEach((k) => agregar(customPhotos[k]));
-  Object.keys(UNIT_PHOTOS).forEach((k) => agregar(new URL(UNIT_PHOTOS[k], location.href).href));
-  let i = 0, activas = 0;
-  const siguiente = () => {
-    while (activas < 3 && i < urls.length) {          // de a 3 a la vez: rápido pero sin saturar la conexión
-      activas++;
-      const im = new Image();
-      im.decoding = "async";
-      const fin = () => { activas--; siguiente(); };
-      im.onload = fin; im.onerror = fin;
-      im.src = urls[i++];
+  const add = (url) => { if (url && !urls.includes(url)) urls.push(url); };
+  Object.keys(customPhotos).forEach((name) => add(customPhotos[name]));
+  Object.keys(UNIT_PHOTOS).forEach((key) => add(absoluteUrl(UNIT_PHOTOS[key])));
+
+  let next = 0;
+  let active = 0;
+  const pump = () => {
+    while (active < PRELOAD_PARALLEL && next < urls.length) {
+      active++;
+      const image = new Image();
+      image.decoding = "async";
+      const done = () => { active--; pump(); };
+      image.onload = done;
+      image.onerror = done;
+      image.src = urls[next++];
     }
   };
-  // Arranca apenas la página está lista (las portadas ya pidieron lo suyo antes), sin esperar al evento "load"
-  const arrancar = () => setTimeout(siguiente, 300);
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", arrancar, { once: true });
-  else arrancar();
+  const start = () => setTimeout(pump, PRELOAD_START_DELAY_MS);
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start, { once: true });
+  else start();
 }
 
+/** Arranca el sistema de fotos: precarga y vigila la página para resolver cada foto que se dibuje. */
 function initCustomPhotos() {
-  window.__fotosIniciado = true;
+  window.__photosStarted = true;   // lo lee el aviso de index.html para no ocultar las fotos si este script no arrancó
   preloadPhotosInBackground();
-  let pendiente = false;
-  const programar = () => {
-    if (pendiente) return;
-    pendiente = true;
-    requestAnimationFrame(() => { pendiente = false; applyCustomPhotos(); });
+
+  let scheduled = false;
+  const schedule = () => {
+    if (scheduled) return;
+    scheduled = true;
+    requestAnimationFrame(() => { scheduled = false; applyCustomPhotos(); });
   };
-  new MutationObserver(programar).observe(document.body, {
+  new MutationObserver(schedule).observe(document.body, {
     childList: true, subtree: true, attributes: true, attributeFilter: ["data-foto"]
   });
   applyCustomPhotos();
 }
-
-// Escudo de la universidad (dibujo vectorial)
-const UNMSM_SHIELD_SVG = `<svg viewBox="0 0 120 140" width="54" height="64" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;">
-  <defs>
-    <linearGradient id="goldGrad" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#eab308"/>
-      <stop offset="50%" stop-color="#ca8a04"/>
-      <stop offset="100%" stop-color="#854d0e"/>
-    </linearGradient>
-  </defs>
-  <path d="M60 6 L106 24 L106 72 C106 104 84 124 60 134 C36 124 14 104 14 72 L14 24 Z" fill="url(#goldGrad)" stroke="#713f12" stroke-width="3"/>
-  <path d="M60 14 L98 29 L98 70 C98 97 80 114 60 123 C40 114 22 97 22 70 L22 29 Z" fill="#fef9c3" stroke="#a16207" stroke-width="2"/>
-  <path d="M60 20 L92 33 L92 68 C92 91 77 106 60 115 C43 106 28 91 28 68 L28 33 Z" fill="#1e3a8a"/>
-  <line x1="60" y1="20" x2="60" y2="115" stroke="#eab308" stroke-width="2.5"/>
-  <line x1="28" y1="68" x2="92" y2="68" stroke="#eab308" stroke-width="2.5"/>
-  <circle cx="44" cy="46" r="8" fill="#eab308"/>
-  <polygon points="76,36 80,46 90,46 82,52 85,62 76,56 67,62 70,52 62,46 72,46" fill="#eab308"/>
-  <path d="M36 84 Q44 76 52 84 L52 96 L36 96 Z" fill="#eab308"/>
-  <path d="M68 84 Q76 76 84 84 L84 96 L68 96 Z" fill="#eab308"/>
-  <circle cx="60" cy="12" r="4" fill="#b91c1c"/>
-</svg>`;
