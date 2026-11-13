@@ -1,0 +1,16 @@
+{
+  "name": "portafolio-ia",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Portafolio académico del curso de Inteligencia Artificial (UNMSM). Sitio estático: no necesita instalar nada para funcionar; este archivo solo sirve para las herramientas de calidad.",
+  "scripts": {
+    "lint": "eslint .",
+    "verify": "node tests/verificar-estructura.js",
+    "check": "npm run lint && npm run verify",
+    "start": "python3 -m http.server 8000"
+  },
+  "devDependencies": {
+    "eslint": "^9.17.0",
+    "globals": "^15.14.0"
+  }
+}

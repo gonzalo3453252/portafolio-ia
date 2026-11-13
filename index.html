@@ -6,9 +6,14 @@
   index.html .......... estructura de la página (textos fijos, botones, ventanas)
   css/estilos.css ..... colores, tipografías y animaciones propias
   css/tailwind.css .... estilos de Tailwind (los genera sola GitHub al cambiar index.html o js/; no lo edites)
-  js/ ................. la lógica, en orden numérico (00 → 14). Cada archivo
-                        empieza con un comentario que explica qué contiene.
-  js/viewers/ ......... código de los visores (PDF, cuadernos Colab); js/vendor/ = librerías de terceros
+  js/ ................. la lógica, por capas (el orden de carga está al final de este archivo):
+      core/ ............... configuración, almacenamiento, utilidades y estado
+      data/ ............... datos fijos (unidades, semanas por defecto, escudo)
+      features/ ........... pantallas y funciones (fotos, páginas, visores, panel del creador…)
+      viewers/ ............ código que corre DENTRO de los visores (PDF, Word, PPT, Colab)
+      vendor/ ............. librerías de terceros ya descargadas (pdf.js, marked); no se editan
+      app.js .............. arranque: une todo al cargar la página
+      Más detalle en docs/ARQUITECTURA.md y README.md
   img/ ................ fotos de la portada, unidades y semanas
                         (portada-facultad.jpg, unidad-1.jpg, semana-01.jpg … las usa sola)
   datos/portafolio.json  contenido publicado (semanas, nombres, temas)
@@ -16,7 +21,9 @@
       silabo/ ............. sílabo en PDF
       semana-01/ … ........ PPT, Word, PDF y Colab de cada semana
       (la carpeta _vista/ la crea sola GitHub; no la toques)
-  .github/workflows/ .. tarea automática que convierte PPT/Word a PDF
+  .github/workflows/ .. tareas automáticas (listas de fotos/archivos, PDF de vista previa, Tailwind, calidad)
+  .github/scripts/ .... scripts de Python que usan esas tareas
+  docs/ ............... documentación técnica para traspaso y auditoría
 
   PANEL DEL CREADOR: abre esta misma página con  #creador  al final del enlace.
   =====================================================================

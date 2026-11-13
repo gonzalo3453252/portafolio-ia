@@ -3,8 +3,14 @@
    (Tailwind aporta las clases utilitarias; aquí van variables de color, tipografías,
     animaciones y detalles que Tailwind no cubre.)
    ============================================================================= */
-/* El panel del creador nunca se muestra al público, ni mientras carga Tailwind */
+/* -----------------------------------------------------------------------------
+   Índice:  1. Reglas de seguridad visual · 2. Variables y base · 3. Navegación
+            4. Tarjetas y materiales · 5. Botones · 6. Animaciones · 7. Fotos
+   ----------------------------------------------------------------------------- */
+
+/* 1. El panel del creador nunca se muestra al público, ni mientras carga Tailwind */
 #creatorAdminModal.hidden { display: none !important; }
+/* 2. Variables y base */
 :root {
   --bg-page: #ffffff;
   --bg-soft: #f8fafc;
@@ -33,7 +39,7 @@ h1, h2, h3, h4, h5, .display-heading {
   letter-spacing: -0.022em;
 }
 
-/* Enlaces de navegación perfectamente alineados */
+/* 3. Navegación: enlaces perfectamente alineados */
 .nav-link {
   position: relative;
   color: var(--ink-secondary);
@@ -73,7 +79,7 @@ h1, h2, h3, h4, h5, .display-heading {
   transform: scaleX(1);
 }
 
-/* Tarjetas de subtemas (01., 02., 03., 04.) idénticas al diseño de referencia */
+/* 4. Tarjetas de subtemas (01., 02., 03., 04.) */
 .topic-card {
   background-color: #f8fafc;
   border: 1px solid #e2e8f0;
@@ -108,7 +114,7 @@ h1, h2, h3, h4, h5, .display-heading {
   }
 }
 
-/* Botones píldora de Previsualizar y Descargar idénticos a la imagen de referencia */
+/* 5. Botones píldora de Previsualizar y Descargar */
 .btn-pill-preview {
   display: inline-flex;
   align-items: center;
@@ -151,6 +157,7 @@ h1, h2, h3, h4, h5, .display-heading {
   border-color: #1e293b;
 }
 
+/* 6. Animaciones y separadores */
 .view-fade {
   animation: fadeSlideIn 0.2s cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -163,8 +170,8 @@ h1, h2, h3, h4, h5, .display-heading {
   border-color: var(--line-soft);
 }
 
-/* Fotos de portada, unidades y semanas: ocultas hasta saber cuál es la definitiva
-   (evita ver un instante la foto de antes). El tope de seguridad está en js/01-fotos-y-escudo.js */
+/* 7. Fotos de portada, unidades y semanas: ocultas hasta saber cuál es la definitiva
+   (evita ver un instante la foto de antes). El tope de seguridad está en js/features/photos.js (y el aviso inline de index.html) */
 html.fotos-js img[data-foto]:not([data-listo]) {
   opacity: 0;
 }

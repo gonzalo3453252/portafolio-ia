@@ -1,0 +1,45 @@
+name: Control de calidad
+
+# Revisa el código cada vez que cambias algo (no modifica nada del repositorio, solo avisa si hay un error):
+#   - ESLint: errores de JavaScript (nombres que no existen, var, ==, catch vacíos…)
+#   - tests/verificar-estructura.js: scripts que faltan, orden de carga, JSON válido, cabeceras
+#   - Python: sintaxis de los scripts de .github/scripts
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'js/**'
+      - 'datos/**'
+      - 'tests/**'
+      - 'eslint.config.js'
+      - 'package.json'
+      - '.github/scripts/**'
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  calidad:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Instalar herramientas
+        run: npm ci --no-audit --no-fund
+
+      - name: ESLint
+        run: npm run lint
+
+      - name: Estructura del proyecto
+        run: npm run verify
+
+      - name: Sintaxis de los scripts de Python
+        run: python3 -m py_compile .github/scripts/*.py
