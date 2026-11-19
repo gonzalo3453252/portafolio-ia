@@ -42,6 +42,10 @@ window.__FILE_LIST = {
   ],
   "11": [
    "Semana 11 - Redes Recurrentes y LSTM (UNMSM - FISI).pptx"
+  ],
+  "13": [
+   "Semana 13_ Redes_Generativas_Adversarias_GAN.pptx",
+   "Semana_13_Invasion_Pixel_GAN_Colab (1).ipynb"
   ]
  },
  "vistas": {
