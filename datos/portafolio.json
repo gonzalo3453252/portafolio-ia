@@ -349,9 +349,9 @@
       ],
       "evaluation": "Clase Teórica y Práctica de GAN en Google Colab",
       "summary": "Estudio del equilibrio en redes generativas adversarias donde el Generador aprende a transformar ruido latente en muestras sintéticas realistas frente al Discriminador.",
-      "hasPpt": false,
+      "hasPpt": true,
       "hasWord": false,
-      "hasColab": false,
+      "hasColab": true,
       "pptLabel": "Clase13_Redes_Adversarias_GAN.pptx",
       "pptUrl": "",
       "docLabel": "Informe_Semana13_GAN_PyTorch.pdf",
@@ -361,9 +361,7 @@
       "codeSnippet": "import torch\nimport torch.nn as nn\nimport matplotlib.pyplot as plt",
       "codeOutput": "Tensor de imágenes sintéticas generadas: torch.Size([8, 784])",
       "ocultos": {
-        "doc": true,
-        "colab": true,
-        "ppt": true
+        "doc": true
       }
     },
     {
