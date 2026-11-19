@@ -78,6 +78,9 @@ window.__FILE_LIST = {
   ],
   "11": [
    "Semana 11 - Redes Recurrentes y LSTM (UNMSM - FISI).pptx.pdf"
+  ],
+  "13": [
+   "Semana 13_ Redes_Generativas_Adversarias_GAN.pptx.pdf"
   ]
  },
  "silabos": [
